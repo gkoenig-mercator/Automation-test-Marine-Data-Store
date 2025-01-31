@@ -1,5 +1,6 @@
 import copernicusmarine
 import re
+import date_handling
 
 list_products = copernicusmarine.describe()
 
@@ -10,7 +11,7 @@ list_last_dates = []
 def extract_last_date(string_with_last_available_date):
     
     # Regular expression to extract the last date
-    last_date_pattern = r"\[.*?, (\d{4}-\d{2}-\d{2})"
+    last_date_pattern = r"\[.*?, (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})"
 
     # Find all matches and extract the last date
     matches = re.findall(last_date_pattern, string_with_last_available_date)
@@ -36,7 +37,17 @@ for id in list_id:
     except Exception as e:
         exception_message = str(e)
         print("Exception Message:", exception_message)
-        list_last_dates.append(extract_last_date(exception_message))
-
+        last_date = extract_last_date(exception_message)
+        list_last_dates.append(last_date)
+        
+        date_one_day_before = date_handling.shift_date(last_date)
+        copernicusmarine.subset(dataset_id=id,
+                                start_datetime=date_one_day_before,
+                                end_datetime=last_date,
+                                )
+        
+        
+        
+        
 print(list_last_dates)
 
