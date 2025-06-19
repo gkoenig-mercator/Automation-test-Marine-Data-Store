@@ -2,6 +2,12 @@ import pandas as pd
 import copernicusmarine
 import os
 import re
+import argparse
+
+# --- Argument parsing ---
+parser = argparse.ArgumentParser(description='Analyze dataset downloadability and timing.')
+parser.add_argument('--data-dir', type=str, required=True, help='Path to the directory containing downloaded_datasets.csv')
+args = parser.parse_args()
 
 # We need this function in case the datasets are not available at the good date
 def extract_last_date(string_with_last_available_date):
@@ -97,4 +103,4 @@ for product in datasets_copernicus.products:
 
 df_informations_datasets = pd.DataFrame(dataset_informations)
 
-df_informations_datasets.to_csv('list_of_informations_from_the_describe.csv',index=False)
+df_informations_datasets.to_csv(os.path.join(args.data_dir, 'list_of_informations_from_the_describe.csv'),index=False)
