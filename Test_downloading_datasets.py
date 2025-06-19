@@ -1,6 +1,13 @@
 import pandas as pd
 import copernicusmarine
 import os
+import argparse
+
+# --- Argument parsing ---
+parser = argparse.ArgumentParser(description='Analyze dataset downloadability and timing.')
+parser.add_argument('--data-dir', type=str, required=True, help='Path to the directory containing downloaded_datasets.csv')
+args = parser.parse_args()
+
 
 region_identifier = {'Mediterranean': {'keywords': ['MEDSEA', 'MED_SST', 'MED_PHY', 'MED_BGC', '_med_'],
                                        'min_lon':14,
@@ -54,6 +61,7 @@ region_identifier = {'Mediterranean': {'keywords': ['MEDSEA', 'MED_SST', 'MED_PH
                                        'max_lat': 3}                           
                                                 }
 
+
 def determine_region(dataset_id, region_identifier):
     for region in region_identifier:
         for keyword in region_identifier[region]['keywords']:
@@ -104,9 +112,7 @@ downloadable = []
 last_downloadable_time = []
 regions = []
 
-dataset_informations = pd.read_csv('list_of_informations_from_the_describe.csv')
-
-copernicusmarine.login()
+dataset_informations = pd.read_csv(os.path.join(args.data_dir, 'list_of_informations_from_the_describe.csv'))
 
 for index, dataset_information in dataset_informations.iterrows():
     regions.append(determine_region(dataset_information.dataset_id, region_identifier))
@@ -154,8 +160,8 @@ for index, dataset_information in dataset_informations.iterrows():
 dataset_informations['last_downloadable_time'] = last_downloadable_time
 dataset_informations['downloadable'] = downloadable
 
-dataset_informations.to_csv('downloaded_datasets.csv', index=True)
+dataset_informations.to_csv(os.path.join(args.data_dir, 'downloaded_datasets.csv'), index=True)
 
 dataset_informations_reduced = dataset_informations[['dataset_id','dataset_version','version_part','downloadable']]
 
-dataset_informations_reduced.to_csv('downloaded_datasets_reduced.csv', index=True)
+dataset_informations_reduced.to_csv(os.path.join(args.data_dir, 'downloaded_datasets_reduced.csv'), index=True)
