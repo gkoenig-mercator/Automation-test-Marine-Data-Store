@@ -2,11 +2,14 @@ import pandas as pd
 import copernicusmarine
 import os
 import argparse
+import logging
+
 
 # --- Argument parsing ---
 parser = argparse.ArgumentParser(description='Analyze dataset downloadability and timing.')
 parser.add_argument('--data-dir', type=str, required=True, help='Path to the directory containing downloaded_datasets.csv')
 args = parser.parse_args()
+logging.getLogger("copernicusmarine").setLevel("DEBUG")
 
 
 region_identifier = {'Mediterranean': {'keywords': ['MEDSEA', 'MED_SST', 'MED_PHY', 'MED_BGC', '_med_'],
@@ -47,8 +50,8 @@ region_identifier = {'Mediterranean': {'keywords': ['MEDSEA', 'MED_SST', 'MED_PH
                     'Black Sea': {'keywords': ['BLKSEA', 'BLK_BGC','SST_BS','INSITU_BLK','_blk_'],
                                        'min_lon':18,
                                        'max_lon': 20.5,
-                                       'min_lat':61,
-                                       'max_lat':62.5},
+                                       'min_lat':43,
+                                       'max_lat':45},
                     'Europe': {'keywords': ['_eur_'],
                                        'min_lon':5,
                                        'max_lon': 6.,
@@ -108,6 +111,15 @@ def download_whole_dataset(info):
 
     return subset_status
 
+def remove_files(directory):
+    for filename in os.listdir(directory):
+        if filename.endswith('.csv') or filename.endswith('.nc'):
+            file_path = os.path.join(directory, filename)
+            try:
+                os.remove(file_path)
+            except Exception as e:
+                return e
+
 downloadable = []
 last_downloadable_time = []
 regions = []
@@ -132,7 +144,7 @@ for index, dataset_information in dataset_informations.iterrows():
             print(subset_status.message, subset_status.status)
             downloadable.append(True)
             last_downloadable_time.append(dataset_information['last_available_time'])
-            os.remove('data/test.nc')
+            remove_files('data')
 
             first_error.append(None)
             second_error.append(None)
@@ -146,7 +158,7 @@ for index, dataset_information in dataset_informations.iterrows():
                 print(subset_status.message, subset_status.status)
                 downloadable.append(True)
                 last_downloadable_time.append(dataset_information['last_available_time'])
-                os.remove('data/test.nc')
+                remove_files('data')
                 second_error.append(None)
                 third_error.append(None)
             except Exception as e:
@@ -159,7 +171,7 @@ for index, dataset_information in dataset_informations.iterrows():
                     print(subset_status.message, subset_status.status)
                     downloadable.append(True)
                     last_downloadable_time.append(dataset_information['last_available_time'])
-                    os.remove('data/test.nc')
+                    remove_files('data')
 
                     third_error.append(None)
                 except Exception as e:
