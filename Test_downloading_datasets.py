@@ -76,6 +76,17 @@ def determine_region(dataset_id, region_identifier):
 def download_in_given_region_and_time_period(info, region_identifier):
     start_date = (pd.Timestamp(info['last_available_time']) - pd.tseries.offsets.DateOffset(hours=1)).strftime('%Y-%m-%d %X')
     end_date = info['last_available_time']
+
+    print(f"""copernicusmarine.subset(dataset_id = {info['dataset_id']},
+                                        start_datetime= {start_date}, 
+                                        end_datetime = {end_date},
+                                        maximum_depth = 1,
+                                        output_directory='data',
+                                        output_filename=f'test.nc',
+                                        minimum_longitude = {region_identifier[info['region']]['min_lon']},
+                                        maximum_longitude = {region_identifier[info['region']]['max_lon']},
+                                        minimum_latitude = {region_identifier[info['region']]['min_lat']},
+                                        maximum_latitude = {region_identifier[info['region']]['max_lat']})""")
     
     subset_status = copernicusmarine.subset(dataset_id = info['dataset_id'],
                                         start_datetime= start_date, 
@@ -88,11 +99,18 @@ def download_in_given_region_and_time_period(info, region_identifier):
                                         minimum_latitude = region_identifier[info['region']]['min_lat'],
                                         maximum_latitude = region_identifier[info['region']]['max_lat'])
 
+
     return subset_status
 
 def download_in_given_time_period(info):
     start_date = (pd.Timestamp(info['last_available_time']) - pd.tseries.offsets.DateOffset(hours=1)).strftime('%Y-%m-%d %X')
     end_date = info['last_available_time']
+
+    print(f"""copernicusmarine.subset(dataset_id = {info['dataset_id']},
+                                        start_datetime= {start_date}, 
+                                        end_datetime = {end_date},
+                                        output_directory='data',
+                                        output_filename=f'test.nc')""")
     
     subset_status = copernicusmarine.subset(dataset_id = info['dataset_id'],
                                         start_datetime= start_date, 
@@ -100,11 +118,16 @@ def download_in_given_time_period(info):
                                         output_directory='data',
                                         output_filename=f'test.nc')
 
+
     return subset_status
 
 def download_whole_dataset(info):
     start_date = (pd.Timestamp(info['last_available_time']) - pd.tseries.offsets.DateOffset(hours=1)).strftime('%Y-%m-%d %X')
     end_date = info['last_available_time']
+
+    print(f"""copernicusmarine.subset(dataset_id = {info['dataset_id']},
+                                        output_directory='data',
+                                        output_filename=f'test.nc')""")
     subset_status = copernicusmarine.subset(dataset_id = info['dataset_id'],
                                         output_directory='data',
                                         output_filename=f'test.nc')
