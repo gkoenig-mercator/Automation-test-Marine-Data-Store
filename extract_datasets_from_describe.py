@@ -65,7 +65,7 @@ def get_first_variable_with_a_time_coordinate(variables):
     return None, None
 
 
-allowed_services = ['omi-arco','arco-geo-series','arco-time-series']
+allowed_services = ['arco-geo-series','arco-time-series']
 
 # Now we get the list of datasets
 datasets_copernicus = copernicusmarine.describe()
