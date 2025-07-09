@@ -48,8 +48,8 @@ region_identifier = {'Mediterranean': {'keywords': ['MEDSEA', 'MED_SST', 'MED_PH
                                        'min_lat':61,
                                        'max_lat':62.5},
                     'Black Sea': {'keywords': ['BLKSEA', 'BLK_BGC','SST_BS','INSITU_BLK','_blk_'],
-                                       'min_lon':18,
-                                       'max_lon': 20.5,
+                                       'min_lon':28,
+                                       'max_lon': 29,
                                        'min_lat':43,
                                        'max_lat':45},
                     'Europe': {'keywords': ['_eur_'],
@@ -77,12 +77,12 @@ def download_in_given_region_and_time_period(info, region_identifier):
     start_date = (pd.Timestamp(info['last_available_time']) - pd.tseries.offsets.DateOffset(hours=1)).strftime('%Y-%m-%d %X')
     end_date = info['last_available_time']
 
-    print(f"""copernicusmarine.subset(dataset_id = "{info['dataset_id']}", start_datetime= "{start_date}", end_datetime = "{end_date}", variable = "{info['variable_name']}", maximum_depth = 1, output_directory='data', output_filename=f'test.nc', minimum_longitude = {region_identifier[info['region']]['min_lon']}, maximum_longitude = {region_identifier[info['region']]['max_lon']}, minimum_latitude = {region_identifier[info['region']]['min_lat']}, maximum_latitude = {region_identifier[info['region']]['max_lat']})""")
+    print(f"""copernicusmarine.subset(dataset_id = "{info['dataset_id']}", start_datetime= "{start_date}", end_datetime = "{end_date}", variables = ["{info['variable_name']}"], maximum_depth = 1, output_directory='data', output_filename=f'test.nc', minimum_longitude = {region_identifier[info['region']]['min_lon']}, maximum_longitude = {region_identifier[info['region']]['max_lon']}, minimum_latitude = {region_identifier[info['region']]['min_lat']}, maximum_latitude = {region_identifier[info['region']]['max_lat']})""")
     
     subset_status = copernicusmarine.subset(dataset_id = info['dataset_id'],
                                         start_datetime= start_date, 
                                         end_datetime = end_date,
-                                        variable = info['variable_name'],
+                                        variables = [info['variable_name']],
                                         maximum_depth = 1,
                                         output_directory='data',
                                         output_filename=f'test.nc',
@@ -103,7 +103,7 @@ def download_in_given_time_period(info):
     subset_status = copernicusmarine.subset(dataset_id = info['dataset_id'],
                                         start_datetime= start_date, 
                                         end_datetime = end_date,
-                                        variable = info['variable_name'],
+                                        variables = [info['variable_name']],
                                         output_directory='data',
                                         output_filename=f'test.nc')
 
