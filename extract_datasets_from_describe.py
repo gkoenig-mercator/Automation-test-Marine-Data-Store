@@ -58,7 +58,7 @@ def get_first_variable_with_a_time_coordinate(variables):
     for variable in variables:
         for coordinate in variable.coordinates:
             if coordinate.coordinate_id == 'time':
-                variable_with_time_coordinate = variable.standard_name
+                variable_with_time_coordinate = variable.short_name
                 return variable_with_time_coordinate, index
         index+=1
 
