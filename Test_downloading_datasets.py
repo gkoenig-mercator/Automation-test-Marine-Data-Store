@@ -73,11 +73,31 @@ def determine_region(dataset_id, region_identifier):
                
     return 'Global'
 
-def download_in_given_region_and_time_period(info, region_identifier):
+def get_command_download_in_given_region_and_time_period(info, region_identifier):
     start_date = (pd.Timestamp(info['last_available_time']) - pd.tseries.offsets.DateOffset(hours=1)).strftime('%Y-%m-%d %X')
     end_date = info['last_available_time']
 
-    print(f"""copernicusmarine.subset(dataset_id = "{info['dataset_id']}", start_datetime= "{start_date}", end_datetime = "{end_date}", variables = ["{info['variable_name']}"], maximum_depth = 1, output_directory='data', output_filename=f'test.nc', minimum_longitude = {region_identifier[info['region']]['min_lon']}, maximum_longitude = {region_identifier[info['region']]['max_lon']}, minimum_latitude = {region_identifier[info['region']]['min_lat']}, maximum_latitude = {region_identifier[info['region']]['max_lat']}, service = info['service_name'])""")
+    command = f"""copernicusmarine.subset(dataset_id = "{info['dataset_id']}", start_datetime= "{start_date}", end_datetime = "{end_date}", variables = ["{info['variable_name']}"], maximum_depth = 1, output_directory='data', output_filename=f'test.nc', minimum_longitude = {region_identifier[info['region']]['min_lon']}, maximum_longitude = {region_identifier[info['region']]['max_lon']}, minimum_latitude = {region_identifier[info['region']]['min_lat']}, maximum_latitude = {region_identifier[info['region']]['max_lat']}, service = info['service_name'])"""
+    
+    return command
+
+def get_command_download_in_give_region_and_time_period_all_variables(info, region_identifier):
+    start_date = (pd.Timestamp(info['last_available_time']) - pd.tseries.offsets.DateOffset(hours=1)).strftime('%Y-%m-%d %X')
+    end_date = info['last_available_time']
+
+    command = f"""copernicusmarine.subset(dataset_id = "{info['dataset_id']}", start_datetime= "{start_date}", end_datetime = "{end_date}", maximum_depth = 1, output_directory='data', output_filename=f'test.nc', minimum_longitude = {region_identifier[info['region']]['min_lon']}, maximum_longitude = {region_identifier[info['region']]['max_lon']}, minimum_latitude = {region_identifier[info['region']]['min_lat']}, maximum_latitude = {region_identifier[info['region']]['max_lat']}, service = info['service_name'])"""
+
+    return command
+
+def get_command_download_in_given_time_period(info):
+    
+    command = f"""copernicusmarine.subset(dataset_id = "{info['dataset_id']}", start_datetime= "{start_date}", end_datetime = "{end_date}", variable = "{info['variable_name']}", output_directory='data', output_filename=f'test.nc', service = info['service_name'])"""
+
+    return command
+
+def download_in_given_region_and_time_period(info, region_identifier):
+    start_date = (pd.Timestamp(info['last_available_time']) - pd.tseries.offsets.DateOffset(hours=1)).strftime('%Y-%m-%d %X')
+    end_date = info['last_available_time']
     
     subset_status = copernicusmarine.subset(dataset_id = info['dataset_id'],
                                         start_datetime= start_date, 
@@ -98,13 +118,10 @@ def download_in_given_region_and_time_period(info, region_identifier):
 def download_in_give_region_and_time_period_all_variables(info, region_identifier):
     start_date = (pd.Timestamp(info['last_available_time']) - pd.tseries.offsets.DateOffset(hours=1)).strftime('%Y-%m-%d %X')
     end_date = info['last_available_time']
-
-    print(f"""copernicusmarine.subset(dataset_id = "{info['dataset_id']}", start_datetime= "{start_date}", end_datetime = "{end_date}", maximum_depth = 1, output_directory='data', output_filename=f'test.nc', minimum_longitude = {region_identifier[info['region']]['min_lon']}, maximum_longitude = {region_identifier[info['region']]['max_lon']}, minimum_latitude = {region_identifier[info['region']]['min_lat']}, maximum_latitude = {region_identifier[info['region']]['max_lat']}, service = info['service_name'])""")
     
     subset_status = copernicusmarine.subset(dataset_id = info['dataset_id'],
                                         start_datetime= start_date, 
                                         end_datetime = end_date,
-                                        maximum_depth = 1,
                                         output_directory='data',
                                         output_filename=f'test.nc',
                                         minimum_longitude = region_identifier[info['region']]['min_lon'],
@@ -120,7 +137,7 @@ def download_in_given_time_period(info):
     start_date = (pd.Timestamp(info['last_available_time']) - pd.tseries.offsets.DateOffset(hours=1)).strftime('%Y-%m-%d %X')
     end_date = info['last_available_time']
 
-    print(f"""copernicusmarine.subset(dataset_id = "{info['dataset_id']}", start_datetime= "{start_date}", end_datetime = "{end_date}", variable = "{info['variable_name']}", output_directory='data', output_filename=f'test.nc', service = info['service_name'])""")
+
     
     subset_status = copernicusmarine.subset(dataset_id = info['dataset_id'],
                                         start_datetime= start_date, 
@@ -150,6 +167,10 @@ first_error = []
 second_error = []
 third_error = []
 
+first_command = []
+second_command = []
+third_command = []
+
 dataset_informations = pd.read_csv(os.path.join(args.data_dir, 'list_of_informations_from_the_describe.csv'))
 
 for index, dataset_information in dataset_informations.iterrows():
@@ -162,6 +183,7 @@ for index, dataset_information in dataset_informations.iterrows():
     if pd.isnull(dataset_information['last_available_time'])  == False:
         print(dataset_information.region, dataset_information.dataset_id)
         try:
+            first_command.append(get_command_download_in_give_region_and_time_period_all_variables(dataset_information, region_identifier))
             subset_status = download_in_given_region_and_time_period(dataset_information, region_identifier)
             print(subset_status.message, subset_status.status)
             downloadable.append(True)
@@ -170,18 +192,23 @@ for index, dataset_information in dataset_informations.iterrows():
 
             first_error.append(None)
             second_error.append(None)
+            second_command.append(None)
             third_error.append(None)
+            third_command.append(None)
         except Exception as e:
             exception_message = str(e)
             print("There was an error", exception_message)
             first_error.append(exception_message)
             try :
+                second_command.append(get_command_download_in_given_region_and_time_period(dataset_information, region_identifier))
                 subset_status = download_in_give_region_and_time_period_all_variables(dataset_information, region_identifier)
                 print(subset_status.message, subset_status.status)
                 downloadable.append(True)
                 last_downloadable_time.append(dataset_information['last_available_time'])
                 remove_files('data')
+                
                 second_error.append(None)
+                third_command.append(None)
                 third_error.append(None)
             except Exception as e:
                 exception_message = str(e)
@@ -189,6 +216,7 @@ for index, dataset_information in dataset_informations.iterrows():
 
                 second_error.append(None)
                 try: 
+                    third_command.append(get_command(dataset_information))
                     subset_status = download_in_given_time_period(dataset_information)
                     print(subset_status.message, subset_status.status)
                     downloadable.append(True)
@@ -209,6 +237,9 @@ for index, dataset_information in dataset_informations.iterrows():
         first_error.append('No last_downloadable_time available')
         second_error.append(None)
         third_error.append(None)
+        first_command.append(None)
+        second_command.append(None)
+        third_command.append(None)
 
 dataset_informations['last_downloadable_time'] = last_downloadable_time
 dataset_informations['downloadable'] = downloadable
