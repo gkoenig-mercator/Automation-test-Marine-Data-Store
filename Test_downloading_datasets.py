@@ -22,7 +22,7 @@ region_identifier = {'Mediterranean': {'keywords': ['MEDSEA', 'MED_SST', 'MED_PH
                                        'max_lon': -43,
                                        'min_lat':-90,
                                        'max_lat':-60},
-                     'Arctic': {'keywords': ['ARCTIC', 'ARC_BGC', 'SEA_ICE_GLO','SEAICE_ARC', 'INSITU_ARC','_arc_','arctic', 'SEAICE', 'north_nrt','nrt_nh','TIMESERIES-NH'],
+                     'Arctic': {'keywords': ['ARCTIC', 'ARC_BGC', 'SEA_ICE_GLO','SEAICE_ARC', 'INSITU_ARC','_arc_','arctic', 'north_nrt','nrt_nh','TIMESERIES-NH'],
                                        'min_lon':-45,
                                        'max_lon': -44,
                                        'min_lat':69,
@@ -77,7 +77,7 @@ def get_command_download_in_given_region_and_time_period(info, region_identifier
     start_date = (pd.Timestamp(info['last_available_time']) - pd.tseries.offsets.DateOffset(hours=1)).strftime('%Y-%m-%d %X')
     end_date = info['last_available_time']
 
-    command = f"""copernicusmarine.subset(dataset_id = "{info['dataset_id']}", start_datetime= "{start_date}", end_datetime = "{end_date}", variables = ["{info['variable_name']}"], maximum_depth = 1, output_directory='data', output_filename=f'test.nc', minimum_longitude = {region_identifier[info['region']]['min_lon']}, maximum_longitude = {region_identifier[info['region']]['max_lon']}, minimum_latitude = {region_identifier[info['region']]['min_lat']}, maximum_latitude = {region_identifier[info['region']]['max_lat']}, service = info['service_name'])"""
+    command = f"""copernicusmarine.subset(dataset_id = "{info['dataset_id']}", start_datetime= "{start_date}", end_datetime = "{end_date}", variables = ["{info['variable_name']}"], maximum_depth = 5, output_directory='data', output_filename=f'test.nc', minimum_longitude = {region_identifier[info['region']]['min_lon']}, maximum_longitude = {region_identifier[info['region']]['max_lon']}, minimum_latitude = {region_identifier[info['region']]['min_lat']}, maximum_latitude = {region_identifier[info['region']]['max_lat']}, service = info['service_name'])"""
     
     return command
 
@@ -85,11 +85,13 @@ def get_command_download_in_give_region_and_time_period_all_variables(info, regi
     start_date = (pd.Timestamp(info['last_available_time']) - pd.tseries.offsets.DateOffset(hours=1)).strftime('%Y-%m-%d %X')
     end_date = info['last_available_time']
 
-    command = f"""copernicusmarine.subset(dataset_id = "{info['dataset_id']}", start_datetime= "{start_date}", end_datetime = "{end_date}", maximum_depth = 1, output_directory='data', output_filename=f'test.nc', minimum_longitude = {region_identifier[info['region']]['min_lon']}, maximum_longitude = {region_identifier[info['region']]['max_lon']}, minimum_latitude = {region_identifier[info['region']]['min_lat']}, maximum_latitude = {region_identifier[info['region']]['max_lat']}, service = info['service_name'])"""
+    command = f"""copernicusmarine.subset(dataset_id = "{info['dataset_id']}", start_datetime= "{start_date}", end_datetime = "{end_date}", output_directory='data', output_filename=f'test.nc', minimum_longitude = {region_identifier[info['region']]['min_lon']}, maximum_longitude = {region_identifier[info['region']]['max_lon']}, minimum_latitude = {region_identifier[info['region']]['min_lat']}, maximum_latitude = {region_identifier[info['region']]['max_lat']}, service = info['service_name'])"""
 
     return command
 
 def get_command_download_in_given_time_period(info):
+    start_date = (pd.Timestamp(info['last_available_time']) - pd.tseries.offsets.DateOffset(hours=1)).strftime('%Y-%m-%d %X')
+    end_date = info['last_available_time']
     
     command = f"""copernicusmarine.subset(dataset_id = "{info['dataset_id']}", start_datetime= "{start_date}", end_datetime = "{end_date}", variable = "{info['variable_name']}", output_directory='data', output_filename=f'test.nc', service = info['service_name'])"""
 
@@ -103,7 +105,7 @@ def download_in_given_region_and_time_period(info, region_identifier):
                                         start_datetime= start_date, 
                                         end_datetime = end_date,
                                         variables = [info['variable_name']],
-                                        maximum_depth = 1,
+                                        maximum_depth = 5,
                                         output_directory='data',
                                         output_filename=f'test.nc',
                                         minimum_longitude = region_identifier[info['region']]['min_lon'],
@@ -137,8 +139,6 @@ def download_in_given_time_period(info):
     start_date = (pd.Timestamp(info['last_available_time']) - pd.tseries.offsets.DateOffset(hours=1)).strftime('%Y-%m-%d %X')
     end_date = info['last_available_time']
 
-
-    
     subset_status = copernicusmarine.subset(dataset_id = info['dataset_id'],
                                         start_datetime= start_date, 
                                         end_datetime = end_date,
@@ -216,7 +216,7 @@ for index, dataset_information in dataset_informations.iterrows():
 
                 second_error.append(None)
                 try: 
-                    third_command.append(get_command(dataset_information))
+                    third_command.append(get_command_download_in_given_time_period(dataset_information))
                     subset_status = download_in_given_time_period(dataset_information)
                     print(subset_status.message, subset_status.status)
                     downloadable.append(True)
@@ -244,8 +244,11 @@ for index, dataset_information in dataset_informations.iterrows():
 dataset_informations['last_downloadable_time'] = last_downloadable_time
 dataset_informations['downloadable'] = downloadable
 dataset_informations['first_error'] = first_error
+dataset_informations['first_command'] = first_command
 dataset_informations['second_error'] = second_error
+dataset_informations['second_command'] = second_command
 dataset_informations['third_error'] = third_error
+dataset_informations['third_command'] = third_command
 
 dataset_informations.to_csv(os.path.join(args.data_dir, 'downloaded_datasets.csv'), index=True)
 
