@@ -42,12 +42,13 @@ def collect_dataset_information() -> pd.DataFrame:
 
     return pd.DataFrame(dataset_informations)
 
-def main(data_dir):
+def collect_and_store_dataset_informations(data_dir):
     df = collect_dataset_information()
-    output_path = os.path.join(args.data_dir, 'list_of_informations_from_the_describe.csv')
+    print(data_dir)
+    output_path = os.path.join(data_dir, 'list_of_informations_from_the_describe.csv')
     df.to_csv(output_path, index=False)
     print(f"Saved dataset into {output_path}")
 
 if __name__ == "__main__":
     data_dir = get_data_directory_from_command_line()
-    main(data_dir)
+    collect_and_store_dataset_informations(data_dir)

@@ -12,7 +12,7 @@ database_name = os.environ.get("DATABASE_NAME","defaultdb")
 table_name = "List_of_datasets"
 engine = create_engine(f'postgresql+psycopg2://{username}:{password}@{database_url}:5432/{database_name}')
 
-def main(data_dir): 
+def append_data_in_db(data_dir): 
 
     file_path = os.path.join(data_dir, "downloaded_datasets.csv")
     df = pd.read_csv(file_path)
@@ -22,4 +22,4 @@ def main(data_dir):
 if __name__ == "__main__":
 
     data_dir = get_data_directory_from_command_line()
-    main(data_dir)
+    append_data_in_db(data_dir)

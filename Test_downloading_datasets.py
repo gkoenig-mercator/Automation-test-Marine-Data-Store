@@ -8,7 +8,7 @@ from utils.general import get_data_directory_from_command_line
 
 logging.getLogger("copernicusmarine").setLevel("DEBUG")
 
-def main(data_dir): 
+def test_dataset_availability_and_save_it(data_dir): 
     csv_path = os.path.join(data_dir, 'list_of_informations_from_the_describe.csv')
     df = pd.read_csv(csv_path)
 
@@ -66,4 +66,4 @@ def main(data_dir):
 if __name__ == "__main__":
     
     data_dir = get_data_directory_from_command_line()
-    main(data_dir)
+    test_dataset_availability_and_save_it(data_dir)
