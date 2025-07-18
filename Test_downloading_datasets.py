@@ -18,35 +18,50 @@ def main():
     regions = [determine_region(row.dataset_id, region_identifier) for _, row in df.iterrows()]
     df["region"] = regions
 
-    results = {
-        "downloadable": [],
-        "last_downloadable_time":[],
-        "errors": [],
-        "commands":[],
-    }
+    # Prepare lists for results
+    downloadable = []
+    last_downloadable_time = []
+    first_command = []
+    second_command = []
+    third_command = []
+    first_error = []
+    second_error = []
+    third_error = []
+
 
     for _, row in df.iterrows():
-        if pd.isnull(row['last_available_time']):
-            results["downloadable"].append(False)
-            results["last_downloadable_time"].append(pd.NaT)
-            results["errors"].append("No last_available_time available")
-            results["commands"].append(None)
+        if pd.isnull(row["last_available_time"]):
+            downloadable.append(False)
+            last_downloadable_time.append(pd.NaT)
+            first_command.append(None)
+            second_command.append(None)
+            third_command.append(None)
+            first_error.append("No last_available_time available")
+            second_error.append(None)
+            third_error.append(None)
+            continue
 
         info = row.to_dict()
-        success, last_time, error, command = attempt_download(info, region_identifier)
-        results["downloadable"].append(success)
-        results["last_downloadable_time"].append(last_time)
-        results["errors"].append(error)
-        results["commands"].append(command)
+        result = attempt_download(info, region_identifier, args.data_dir)
+        downloadable.append(result[0])
+        last_downloadable_time.append(result[1])
+        first_command.append(result[2])
+        first_error.append(result[3])
+        second_command.append(result[4])
+        second_error.append(result[5])
+        third_command.append(result[6])
+        third_error.append(result[7])
 
-    df["downloadable"] = results["downloadable"]
-    df["last_downloadable_time"] = results["last_downloadable_time"]
-    df["download_errors"] = results["errors"]
-    df["download_commands"] = results["commands"]
+    df["downloadable"] = downloadable
+    df["last_downloadable_time"] = last_downloadable_time
+    df["first_command"] = first_command
+    df["first_error"] = first_error
+    df["second_command"] = second_command
+    df["second_error"] = second_error
+    df["third_command"] = third_command
+    df["third_error"] = third_error
 
-    final_file_path = os.path.join(args.data_dir, "downloaded_datasets.csv")
-    df.to_csv(final_file_path, index= False)
-        
+    df.to_csv(os.path.join(args.data_dir, "downloaded_datasets.csv"), index=False)
     df[["dataset_id", "dataset_version", "version_part", "downloadable"]].to_csv(
         os.path.join(args.data_dir, "downloaded_datasets_reduced.csv"), index=False
     )
