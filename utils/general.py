@@ -19,7 +19,9 @@ def extract_last_available_time(variable: CopernicusMarineVariable) -> Optional[
     for coordinate in variable.coordinates:
         if  coordinate.coordinate_id == 'time':
             if coordinate.maximum_value:
-                return coordinate.maximum_value or coordinate.values[-1]
+                return coordinate.maximum_value
+            else:
+                return coordinate.values[-1]
 
     return None
 
