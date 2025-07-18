@@ -44,7 +44,6 @@ def collect_dataset_information() -> pd.DataFrame:
 
 def collect_and_store_dataset_informations(data_dir):
     df = collect_dataset_information()
-    print(data_dir)
     output_path = os.path.join(data_dir, 'list_of_informations_from_the_describe.csv')
     df.to_csv(output_path, index=False)
     print(f"Saved dataset into {output_path}")

@@ -45,14 +45,16 @@ def attempt_download(info: dict, region_dict: dict,
     last_downloadable_time = pd.NaT
     downloadable = False
 
+    temp_file_dir = os.path.join(data_dir, 'temp/')
+
     # First attempt with a given variable
     try:
-        kwargs = build_subset_kwargs(info, region, data_dir,
+        kwargs = build_subset_kwargs(info, region, temp_file_dir,
                                      [info["variable_name"]])
         first_command = f"copernicusmarine.subset({kwargs})"
         status = copernicusmarine.subset(**kwargs)
         downloadable = True
-        remove_files(data_dir)
+        remove_files(temp_file_dir)
         last_downloadable_time = info["last_available_time"]
         return downloadable, last_downloadable_time, first_command, first_error, second_command, second_error, third_command, third_error
     except Exception as e1:
@@ -60,10 +62,10 @@ def attempt_download(info: dict, region_dict: dict,
     # Second attempt with all variables
     try: 
         kwargs = build_subset_kwargs(info, region,
-                                     data_dir)
+                                     temp_file_dir)
         second_command = f"copernicusmarine.subset({kwargs})"
         status = copernicusmarine.subset(**kwargs)
-        remove_files(data_dir)
+        remove_files(temp_file_dir)
         downloadable = True
         last_downloadable_time = info["last_available_time"]
         return downloadable, last_downloadable_time, first_command, first_error, second_command, second_error, third_command, third_error
@@ -76,7 +78,7 @@ def attempt_download(info: dict, region_dict: dict,
         third_command = (
             f"copernicusmarine.subset(dataset_id={info['dataset_id']}, "
             f"start_datetime={start_time}, end_datetime={info['last_available_time']}, "
-            f"variables={[info['variable_name']]}, output_directory={data_dir}, "
+            f"variables={[info['variable_name']]}, output_directory={temp_file_dir}, "
             f"output_filename='test.nc', service={info['service_name']})"
         )
         status = copernicusmarine.subset(
@@ -84,11 +86,11 @@ def attempt_download(info: dict, region_dict: dict,
             start_datetime=start_time.strftime("%Y-%m-%d %X"),
             end_datetime=info["last_available_time"],
             variables=[info["variable_name"]],
-            output_directory=data_dir,
+            output_directory=temp_file_dir,
             output_filename="test.nc",
             service=info["service_name"],
         )
-        remove_files(data_dir)
+        remove_files(temp_file_dir)
         downloadable = True
         last_downloadable_time = info["last_available_time"]
     except Exception as e3:

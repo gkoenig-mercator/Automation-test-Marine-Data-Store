@@ -19,5 +19,5 @@ def set_env_var():
         else:
             print(f"{var} is already defined: '{value}'")
 
-if "__name__" == "__main__":
+if __name__ == "__main__":
     set_env_var()
