@@ -52,3 +52,9 @@ def get_first_variable_with_a_time_coordinate(variables: list[CopernicusMarineVa
             if coordinate.coordinate_id == 'time':
                 return variable.short_name, index
     return None, None
+
+def get_data_directory_from_command_line():
+    parser = argparse.ArgumentParser(description='Analyze dataset downloadability and timing.')
+    parser.add_argument('--data-dir', type=str, required=True, help='Path to the directory containing csv files')
+    args = parser.parse_args()
+    return args.data_dir

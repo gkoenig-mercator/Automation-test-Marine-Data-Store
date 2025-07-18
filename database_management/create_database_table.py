@@ -1,6 +1,10 @@
 from sqlalchemy import insert, Table, Column, Integer, String, MetaData, Float, inspect, create_engine
 import uuid
 import os
+import logging
+
+logging.basicConfig()
+logging.getLogger('sqlalchemy.engine').setLevel(logging.DEBUG)
 
 username = os.environ["DATABASE_USERNAME"]
 password = os.environ["DATABASE_PASSWORD"]
@@ -21,7 +25,7 @@ def create_table(engine, name):
     Column('version_part', String),
     Column('service_name', String),
     Column('variable_name', String),
-    Column('has_time_coordinate', Boolean),
+    Column('has_time_coordinate', String),
     Column('last_available_time',String),
     Column('region', String),
     Column('downloadable', String),
@@ -31,9 +35,16 @@ def create_table(engine, name):
     Column('second_command', String),
     Column('second_error', String),
     Column('third_command', String),
-    Column('third_error', String)
+    Column('third_error', String),
+    schema="public"
     )
 
     metadata.create_all(engine)
     
     return table
+
+def main():
+    create_table(engine, name)
+
+if __name__ == "__main__":
+    main()
