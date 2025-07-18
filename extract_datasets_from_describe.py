@@ -2,7 +2,7 @@ import pandas as pd
 import copernicusmarine
 import os
 import argparse
-from utils import (
+from utils.general import (
     extract_last_available_time,
     filter_allowed_services,
     check_if_there_is_time_coordinate,

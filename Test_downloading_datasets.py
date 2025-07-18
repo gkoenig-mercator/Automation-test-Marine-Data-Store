@@ -2,7 +2,7 @@ import pandas as pd
 import os
 import argparse
 import logging
-from utils_download import determine_region, attempt_download
+from utils.download import determine_region, attempt_download
 from region_config import region_identifier
 
 logging.getLogger("copernicusmarine").setLevel("DEBUG")
