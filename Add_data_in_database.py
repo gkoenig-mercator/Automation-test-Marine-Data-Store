@@ -2,6 +2,7 @@ import pandas as pd
 import argparse
 from sqlalchemy import create_engine
 import os
+import uuid
 from utils.general import get_data_directory_from_command_line
 
 username = os.environ["DATABASE_USERNAME"]
@@ -16,6 +17,7 @@ def append_data_in_db(data_dir):
 
     file_path = os.path.join(data_dir, "downloaded_datasets.csv")
     df = pd.read_csv(file_path)
+    df['id'] = [str(uuid.uuid4()) for _ in range(len(df))]
 
     df.to_sql(table_name, engine, if_exists="append", index=False, chunksize=500)
 
