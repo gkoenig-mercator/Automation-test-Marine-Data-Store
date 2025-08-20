@@ -3,3 +3,4 @@ copernicusmarine==2.0.0
 pandas
 sqlalchemy
 psycopg2
+dotenv
