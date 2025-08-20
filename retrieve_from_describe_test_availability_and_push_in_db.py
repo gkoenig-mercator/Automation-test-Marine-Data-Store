@@ -4,11 +4,16 @@ from Add_data_in_database import append_data_in_db
 from Set_environment_variables import set_env_var
 from utils.general import get_data_directory_from_command_line
 import copernicusmarine
+import os
+from dotenv import load_dotenv
 
 def main():
+    load_dotenv()
     data_dir = get_data_directory_from_command_line()
     set_env_var()
-    copernicusmarine.login()
+    copernicusmarine.login(username = os.environ["COPERNICUS_MARINE_USERNAME"],
+                           password = os.environ["COPERNICUS_SERVICE_PASSWORD"],
+                           force_overwrite = True)
     collect_and_store_dataset_informations(data_dir)
     test_dataset_availability_and_save_it(data_dir)
     append_data_in_db(data_dir)
