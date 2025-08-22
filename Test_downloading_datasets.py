@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 import logging
-from utils.download import determine_region, attempt_download
+from utils.download import determine_region, Downloader
 from utils.region_config import region_identifier
 from utils.general import get_data_directory_from_command_line
 
@@ -40,15 +40,16 @@ def test_dataset_availability_and_save_it(data_dir):
             continue
 
         info = row.to_dict()
-        result = attempt_download(info, region_identifier, data_dir)
-        downloadable.append(result[0])
-        last_downloadable_time.append(result[1])
-        first_command.append(result[2])
-        first_error.append(result[3])
-        second_command.append(result[4])
-        second_error.append(result[5])
-        third_command.append(result[6])
-        third_error.append(result[7])
+        downloader = Downloader(info, region_identifier, data_dir)
+        result = downloader.run()
+        downloadable.append(result['downloadable'])
+        last_downloadable_time.append(result['last_downloadable_time'])
+        first_command.append(result['commands'][0])
+        first_error.append(result['errors'][0])
+        second_command.append(result['commands'][1])
+        second_error.append(result['errors'][1])
+        third_command.append(result['commands'][2])
+        third_error.append(result['errors'][2])
 
     df["downloadable"] = downloadable
     df["last_downloadable_time"] = last_downloadable_time
