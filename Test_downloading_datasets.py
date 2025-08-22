@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 import logging
-from utils.download import determine_region, Downloader
+from utils.download import determine_region, Downloader, build_attempts
 from utils.region_config import region_identifier
 from utils.general import get_data_directory_from_command_line
 
@@ -40,8 +40,9 @@ def test_dataset_availability_and_save_it(data_dir):
             continue
 
         info = row.to_dict()
-        downloader = Downloader(info, region_identifier, data_dir)
-        result = downloader.run()
+        downloader = Downloader(data_dir)
+        attempts = build_attempts(info, region_identifier, data_dir)
+        result = downloader.run(attempts)
         downloadable.append(result['downloadable'])
         last_downloadable_time.append(result['last_downloadable_time'])
         first_command.append(result['commands'][0])

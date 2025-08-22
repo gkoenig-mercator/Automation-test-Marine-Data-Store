@@ -40,75 +40,80 @@ def build_subset_kwargs(
         **({"variables": variables} if variables else {}),
     }
 
+def build_attempts(info: dict, region_dict: dict, data_dir: str) -> list[dict]:
+    temp_file_dir = os.path.join(data_dir, "temp/")
+    region = region_dict.get(info.get("region"))
+
+    attempts = []
+
+    # Attempt 1: single variable
+    if region:
+        kwargs1 = build_subset_kwargs(info, region, temp_file_dir, [info["variable_name"]])
+        attempts.append({
+            "kwargs": kwargs1,
+            "command_repr": f"copernicusmarine.subset({kwargs1})"
+        })
+
+    # Attempt 2: all variables
+    if region:
+        kwargs2 = build_subset_kwargs(info, region, temp_file_dir)
+        attempts.append({
+            "kwargs": kwargs2,
+            "command_repr": f"copernicusmarine.subset(all variables: {kwargs2})"
+        })
+
+    # Attempt 3: no region info
+    start_time = pd.Timestamp(info["last_available_time"]) - pd.Timedelta(hours=1)
+    kwargs3 = {
+        "dataset_id": info["dataset_id"],
+        "start_datetime": start_time.strftime("%Y-%m-%d %X"),
+        "end_datetime": info["last_available_time"],
+        "variables": [info["variable_name"]],
+        "output_directory": temp_file_dir,
+        "output_filename": "test.nc",
+        "service": info["service_name"],
+    }
+    attempts.append({
+        "kwargs": kwargs3,
+        "command_repr": f"copernicusmarine.subset(no region info: {kwargs3})"
+    })
+
+    return attempts
 
 class Downloader:
-    def __init__(self, info: dict, region_dict: dict, data_dir: str):
-        self.info = info
-        self.region_dict = region_dict
+    def __init__(self, data_dir: str):
         self.data_dir = data_dir
         self.temp_file_dir = os.path.join(data_dir, "temp/")
-        
-        # State
         self.downloadable = False
         self.last_downloadable_time = pd.NaT
-        self.commands = [None, None, None]
-        self.errors = [None, None, None]
+        self.commands = []
+        self.errors = []
 
     def _remove_temp_files(self):
         if os.path.exists(self.temp_file_dir):
             remove_files(self.temp_file_dir)
 
-    def _attempt(self, index: int, kwargs: dict, command_repr: str):
-        """Generic attempt handler"""
-        try:
-            self.commands[index] = command_repr
-            copernicusmarine.subset(**kwargs)
-            self._remove_temp_files()
-            self.downloadable = True
-            self.last_downloadable_time = self.info["last_available_time"]
-            return True
-        except Exception as e:
-            self.errors[index] = str(e)
-            return False
+    def run(self, attempts: list[dict]):
+        """
+        Executes a list of attempts.
+        Each attempt is a dict with keys:
+            - 'kwargs': dict for copernicusmarine.subset
+            - 'command_repr': string describing the command
+        """
+        self.commands = [None] * len(attempts)
+        self.errors = [None] * len(attempts)
 
-    def attempt_first(self):
-        region = self.region_dict[self.info["region"]]
-        kwargs = build_subset_kwargs(
-            self.info, region, self.temp_file_dir, [self.info["variable_name"]]
-        )
-        command_repr = f"copernicusmarine.subset({kwargs})"
-        return self._attempt(0, kwargs, command_repr)
-
-    def attempt_second(self):
-        region = self.region_dict[self.info["region"]]
-        kwargs = build_subset_kwargs(self.info, region, self.temp_file_dir)
-        command_repr = f"copernicusmarine.subset({kwargs})"
-        return self._attempt(1, kwargs, command_repr)
-
-    def attempt_third(self):
-        start_time = pd.Timestamp(self.info["last_available_time"]) - pd.Timedelta(hours=1)
-        kwargs = dict(
-            dataset_id=self.info["dataset_id"],
-            start_datetime=start_time.strftime("%Y-%m-%d %X"),
-            end_datetime=self.info["last_available_time"],
-            variables=[self.info["variable_name"]],
-            output_directory=self.temp_file_dir,
-            output_filename="test.nc",
-            service=self.info["service_name"],
-        )
-        command_repr = (
-            f"copernicusmarine.subset(dataset_id={kwargs['dataset_id']}, "
-            f"start_datetime={kwargs['start_datetime']}, end_datetime={kwargs['end_datetime']}, "
-            f"variables={kwargs['variables']}, output_directory={kwargs['output_directory']}, "
-            f"output_filename={kwargs['output_filename']}, service={kwargs['service']})"
-        )
-        return self._attempt(2, kwargs, command_repr)
-
-    def run(self):
-        """Try all attempts in order"""
-        for attempt in [self.attempt_first, self.attempt_second, self.attempt_third]:
-            if attempt():
+        for i, attempt in enumerate(attempts):
+            try:
+                self.commands[i] = attempt['command_repr']
+                copernicusmarine.subset(**attempt['kwargs'])
+                self._remove_temp_files()
+                self.downloadable = True
+                self.last_downloadable_time = attempt['kwargs'].get('end_datetime', pd.NaT)
                 break
+            except Exception as e:
+                self.errors[i] = str(e)
+
         return {
             "downloadable": self.downloadable,
             "last_downloadable_time": self.last_downloadable_time,
