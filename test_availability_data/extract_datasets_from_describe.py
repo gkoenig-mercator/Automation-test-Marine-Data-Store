@@ -9,7 +9,7 @@ from test_availability_data.utils.general import (
     get_data_directory_from_command_line,
 )
 
-ALLOWED_SERVICES = ["arco-geo-series"]#, "arco-time-series"]
+ALLOWED_SERVICES = ["arco-geo-series", "arco-time-series"]
 
 
 def collect_dataset_information() -> pd.DataFrame:
@@ -17,7 +17,7 @@ def collect_dataset_information() -> pd.DataFrame:
     datasets_copernicus = copernicusmarine.describe()
     dataset_informations = []
 
-    for product in datasets_copernicus.products[:20]:
+    for product in datasets_copernicus.products:
         for dataset in product.datasets:
             for version in dataset.versions:
                 for part in version.parts[:1]:

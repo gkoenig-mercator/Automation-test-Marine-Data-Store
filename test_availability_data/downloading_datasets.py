@@ -101,4 +101,4 @@ def test_dataset_availability_and_save_it(data_dir, region_identifier, parallel=
 if __name__ == "__main__":
 
     data_dir = get_data_directory_from_command_line()
-    test_dataset_availability_and_save_it(data_dir, region_identifier, parallel=False)
+    test_dataset_availability_and_save_it(data_dir, region_identifier, parallel=True)
