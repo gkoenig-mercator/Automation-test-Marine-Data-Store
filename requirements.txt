@@ -2,5 +2,6 @@
 copernicusmarine==2.0.0
 pandas
 sqlalchemy
-psycopg2
+psycopg2-binary
 dotenv
+zarr==3.0.0
