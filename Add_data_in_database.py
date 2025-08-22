@@ -1,5 +1,4 @@
 import pandas as pd
-import argparse
 from sqlalchemy import create_engine
 import os
 import uuid

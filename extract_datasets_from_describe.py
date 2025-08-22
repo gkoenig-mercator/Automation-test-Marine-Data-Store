@@ -1,7 +1,6 @@
 import pandas as pd
 import copernicusmarine
 import os
-import argparse
 from utils.general import (
     extract_last_available_time,
     filter_allowed_services,
@@ -10,7 +9,7 @@ from utils.general import (
     get_data_directory_from_command_line
 )
 
-ALLOWED_SERVICES = ['arco-geo-series','arco-time-series']
+ALLOWED_SERVICES = ['arco-geo-series', 'arco-time-series']
 
 
 def collect_dataset_information() -> pd.DataFrame:

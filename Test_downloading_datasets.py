@@ -1,6 +1,5 @@
 import pandas as pd
 import os
-import argparse
 import logging
 from utils.download import determine_region, attempt_download
 from utils.region_config import region_identifier

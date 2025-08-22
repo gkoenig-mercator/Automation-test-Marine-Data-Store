@@ -1,14 +1,12 @@
 import pandas as pd
 import os
-import argparse
+from utils.general import get_data_directory_from_command_line
 
-# --- Argument parsing ---
-parser = argparse.ArgumentParser(description='Analyze dataset downloadability and timing.')
-parser.add_argument('--data-dir', type=str, required=True, help='Path to the directory containing downloaded_datasets.csv')
-args = parser.parse_args()
+
+data_dir = get_data_directory_from_command_line()
 
 # --- Load dataset ---
-csv_path = os.path.join(args.data_dir, "downloaded_datasets.csv")
+csv_path = os.path.join(data_dir, "downloaded_datasets.csv")
 dataset = pd.read_csv(csv_path)
 
 # --- Define regions ---
