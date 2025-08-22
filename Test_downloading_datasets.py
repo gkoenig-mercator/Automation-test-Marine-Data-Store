@@ -8,63 +8,63 @@ from utils.general import get_data_directory_from_command_line
 logging.getLogger("copernicusmarine").setLevel("DEBUG")
 
 
-def test_dataset_availability_and_save_it(data_dir):
-    csv_path = os.path.join(data_dir, "list_of_informations_from_the_describe.csv")
-    df = pd.read_csv(csv_path)
+def read_input_csv(data_dir, filename="list_of_informations_from_the_describe.csv"):
+    path = os.path.join(data_dir, filename)
+    return pd.read_csv(path)
 
-    regions = [
-        determine_region(row.dataset_id, region_identifier) for _, row in df.iterrows()
-    ]
-    df["region"] = regions
-
-    # Prepare lists for results
-    downloadable = []
-    last_downloadable_time = []
-    first_command = []
-    second_command = []
-    third_command = []
-    first_error = []
-    second_error = []
-    third_error = []
-
-    for _, row in df.iterrows():
-        if pd.isnull(row["last_available_time"]):
-            downloadable.append(False)
-            last_downloadable_time.append(pd.NaT)
-            first_command.append(None)
-            second_command.append(None)
-            third_command.append(None)
-            first_error.append("No last_available_time available")
-            second_error.append(None)
-            third_error.append(None)
-            continue
-
-        info = row.to_dict()
-        downloader = Downloader(data_dir)
-        attempts = build_attempts(info, region_identifier, data_dir)
-        result = downloader.run(attempts)
-        downloadable.append(result['downloadable'])
-        last_downloadable_time.append(result['last_downloadable_time'])
-        first_command.append(result['commands'][0])
-        first_error.append(result['errors'][0])
-        second_command.append(result['commands'][1])
-        second_error.append(result['errors'][1])
-        third_command.append(result['commands'][2])
-        third_error.append(result['errors'][2])
-
-    df["downloadable"] = downloadable
-    df["last_downloadable_time"] = last_downloadable_time
-    df["first_command"] = first_command
-    df["first_error"] = first_error
-    df["second_command"] = second_command
-    df["second_error"] = second_error
-    df["third_command"] = third_command
-    df["third_error"] = third_error
-
-    df.to_csv(os.path.join(data_dir, "downloaded_datasets.csv"), index=False)
+def write_output_csv(df, data_dir, full_filename="downloaded_datasets.csv", reduced_filename="downloaded_datasets_reduced.csv"):
+    df.to_csv(os.path.join(data_dir, full_filename), index=False)
     df[["dataset_id", "dataset_version", "version_part", "downloadable"]].to_csv(
-        os.path.join(data_dir, "downloaded_datasets_reduced.csv"), index=False
+        os.path.join(data_dir, reduced_filename), index=False
     )
+
+def assign_regions(df, region_identifier):
+    df["region"] = df["dataset_id"].apply(lambda ds: determine_region(ds, region_identifier))
+    return df
+
+def process_row_for_download(row, data_dir, region_identifier):
+    if pd.isnull(row["last_available_time"]):
+        return {
+            "downloadable": False,
+            "last_downloadable_time": pd.NaT,
+            "first_command": None,
+            "first_error": "No last_available_time available",
+            "second_command": None,
+            "second_error": None,
+            "third_command": None,
+            "third_error": None,
+        }
+
+    info = row.to_dict()
+    downloader = Downloader(data_dir)
+    attempts = build_attempts(info, region_identifier, data_dir)
+    result = downloader.run(attempts)
+
+    return {
+        "downloadable": result["downloadable"],
+        "last_downloadable_time": result["last_downloadable_time"],
+        "first_command": result["commands"][0],
+        "first_error": result["errors"][0],
+        "second_command": result["commands"][1],
+        "second_error": result["errors"][1],
+        "third_command": result["commands"][2],
+        "third_error": result["errors"][2],
+    }
+
+def process_dataframe(df, data_dir, region_identifier):
+    results = df.apply(
+        lambda row: process_row_for_download(row, data_dir, region_identifier),
+        axis=1, result_type='expand'
+    )
+    df = pd.concat([df, results], axis=1)
+    return df
+
+def test_dataset_availability_and_save_it(data_dir):
+    df = read_input_csv(data_dir)
+    df = assign_regions(df, region_identifier)
+    df = process_dataframe(df, data_dir, region_identifier)
+    write_output_csv(df, data_dir)
+    return df
 
 
 if __name__ == "__main__":
