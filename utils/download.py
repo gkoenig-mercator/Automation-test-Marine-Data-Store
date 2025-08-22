@@ -10,6 +10,11 @@ def determine_region(dataset_id: str, region_dict: dict) -> str:
             return region
     return "Global"
 
+def remove_files(directory: str):
+    for filename in os.listdir(directory):
+        if filename.endswith((".csv", ".nc")):
+            os.remove(os.path.join(directory, filename))
+
 def build_subset_kwargs(
     info: dict,
     region: dict,
