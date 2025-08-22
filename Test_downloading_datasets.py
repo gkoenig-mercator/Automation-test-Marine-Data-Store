@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import logging
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from utils.download import determine_region, Downloader, build_attempts
 from utils.region_config import region_identifier
 from utils.general import get_data_directory_from_command_line
@@ -59,10 +60,40 @@ def process_dataframe(df, data_dir, region_identifier):
     df = pd.concat([df, results], axis=1)
     return df
 
-def test_dataset_availability_and_save_it(data_dir):
+def process_dataframe_parallel(df, data_dir, region_identifier, max_workers=4):
+    results = []
+
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        # submit all tasks
+        futures = {
+            executor.submit(process_row_for_download, row, data_dir, region_identifier): idx
+            for idx, row in df.iterrows()
+        }
+
+        # collect results as they finish
+        for future in as_completed(futures):
+            idx = futures[future]
+            try:
+                results.append((idx, future.result()))
+            except Exception as e:
+                # in case something goes really wrong
+                results.append((idx, {"downloadable": False, "error": str(e)}))
+
+    # Rebuild into a DataFrame in the correct order
+    results_sorted = [res for _, res in sorted(results, key=lambda x: x[0])]
+    results_df = pd.DataFrame(results_sorted, index=df.index)
+    
+    return pd.concat([df, results_df], axis=1)
+
+def test_dataset_availability_and_save_it(data_dir, parallel=False, max_workers=4):
     df = read_input_csv(data_dir)
     df = assign_regions(df, region_identifier)
-    df = process_dataframe(df, data_dir, region_identifier)
+    
+    if parallel:
+        df = process_dataframe_parallel(df, data_dir, region_identifier, max_workers=max_workers)
+    else:
+        df = process_dataframe(df, data_dir, region_identifier)
+
     write_output_csv(df, data_dir)
     return df
 
@@ -70,4 +101,4 @@ def test_dataset_availability_and_save_it(data_dir):
 if __name__ == "__main__":
 
     data_dir = get_data_directory_from_command_line()
-    test_dataset_availability_and_save_it(data_dir)
+    test_dataset_availability_and_save_it(data_dir, parallel=False)
