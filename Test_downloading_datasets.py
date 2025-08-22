@@ -7,11 +7,14 @@ from utils.general import get_data_directory_from_command_line
 
 logging.getLogger("copernicusmarine").setLevel("DEBUG")
 
-def test_dataset_availability_and_save_it(data_dir): 
-    csv_path = os.path.join(data_dir, 'list_of_informations_from_the_describe.csv')
+
+def test_dataset_availability_and_save_it(data_dir):
+    csv_path = os.path.join(data_dir, "list_of_informations_from_the_describe.csv")
     df = pd.read_csv(csv_path)
 
-    regions = [determine_region(row.dataset_id, region_identifier) for _, row in df.iterrows()]
+    regions = [
+        determine_region(row.dataset_id, region_identifier) for _, row in df.iterrows()
+    ]
     df["region"] = regions
 
     # Prepare lists for results
@@ -23,7 +26,6 @@ def test_dataset_availability_and_save_it(data_dir):
     first_error = []
     second_error = []
     third_error = []
-
 
     for _, row in df.iterrows():
         if pd.isnull(row["last_available_time"]):
@@ -62,7 +64,8 @@ def test_dataset_availability_and_save_it(data_dir):
         os.path.join(data_dir, "downloaded_datasets_reduced.csv"), index=False
     )
 
+
 if __name__ == "__main__":
-    
+
     data_dir = get_data_directory_from_command_line()
     test_dataset_availability_and_save_it(data_dir)

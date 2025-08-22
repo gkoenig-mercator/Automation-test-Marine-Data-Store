@@ -15,15 +15,19 @@ database_name = os.environ["DATABASE_NAME"]
 database_port = os.environ["DATABASE_PORT"]
 
 table_name = "List_of_datasets"
-engine = create_engine(f'postgresql+psycopg2://{username}:{password}@{database_url}:{database_port}/{database_name}')
+engine = create_engine(
+    f"postgresql+psycopg2://{username}:{password}@{database_url}:{database_port}/{database_name}"
+)
 
-def append_data_in_db(data_dir): 
+
+def append_data_in_db(data_dir):
 
     file_path = os.path.join(data_dir, "downloaded_datasets.csv")
     df = pd.read_csv(file_path)
-    df['id'] = [str(uuid.uuid4()) for _ in range(len(df))]
+    df["id"] = [str(uuid.uuid4()) for _ in range(len(df))]
 
     df.to_sql(table_name, engine, if_exists="append", index=False, chunksize=500)
+
 
 if __name__ == "__main__":
 
