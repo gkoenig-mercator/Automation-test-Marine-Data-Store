@@ -4,4 +4,4 @@ pandas
 sqlalchemy
 psycopg2-binary
 dotenv
-zarr==3.0.0
+zarr>=3.0.0
