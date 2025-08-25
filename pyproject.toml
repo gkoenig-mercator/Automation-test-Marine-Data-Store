@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "test_availability_data"
+version = "0.1.0"
+description = "Script for testing availability of data of the Marine data store via the toolbox"
+authors = [
+  {name = "Guillaue Koenig", email = "gkoenig@mercator-ocean.fr"}
+]
+dependencies = [
+  "pandas>=1.5",
+  "copernicusmarine==2.0.0",
+  "sqlalchemy",
+  "psycopg2-binary",
+  "dotenv",
+  "zarr==3.0.0"
+]
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
