@@ -1,6 +1,7 @@
 # tests/downloading_datasets.py
 import pandas as pd
 from io import StringIO
+import pytest
 from test_availability_data.downloading_datasets import assign_regions, process_row_for_download, read_input_csv, write_output_csv,test_dataset_availability_and_save_it
 from test_availability_data.utils.download import Downloader
 
@@ -13,13 +14,29 @@ class FakeDownloader:
             "errors": [None, None, None],
         }
 
+@pytest.fixture
+def sample_df():
+    data = {
+        "dataset_id": [
+            "temperature_eu_2021",
+            "salinity_asia_2020",
+            "chlorophyll_global"
+        ]
+    }
+    return pd.DataFrame(data)
+
 def test_assign_regions(sample_df):
-    def fake_region(dataset_id, region_identifier):
-        return "region_x"
-    
-    df = assign_regions(sample_df.copy(), region_identifier="ignored")
+    region_dict = {
+        "Europe": {"keywords": ["eu"]},
+        "Asia": {"keywords": ["asia"]}
+    }
+
+    df = assign_regions(sample_df.copy(), region_dict)
+
     assert "region" in df.columns
-    assert all(df["region"] == "region_x")
+    # Example: if dataset_id has "eu", region should be Europe
+    assert all(df.loc[df["dataset_id"].str.contains("eu"), "region"] == "Europe")
+    assert all(df.loc[df["dataset_id"].str.contains("asia"), "region"] == "Asia")
 
 def test_process_row_with_downloader(monkeypatch, sample_df):
     row = sample_df.iloc[0]

@@ -20,6 +20,9 @@ def write_output_csv(df, data_dir, full_filename="downloaded_datasets.csv", redu
     )
 
 def assign_regions(df, region_identifier):
+    """ This function is a wrapper over the function determine_region of download. 
+    It is used to determine the regions for an entire pandas dataframe."""
+    
     df["region"] = df["dataset_id"].apply(lambda ds: determine_region(ds, region_identifier))
     return df
 
