@@ -1,0 +1,8 @@
+site_name: Copernicusmarine Data Store Automated Data testing script
+theme:
+  name: bootstrap386
+nav:
+  - Home: index.md
+  - Usage: usage.md
+  - Database: database_schema.md
+  - Further: further_development.md
