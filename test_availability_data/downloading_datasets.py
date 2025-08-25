@@ -22,11 +22,10 @@ def write_output_csv(df, data_dir, full_filename="downloaded_datasets.csv", redu
 def assign_regions(df, region_identifier):
     """ This function is a wrapper over the function determine_region of download. 
     It is used to determine the regions for an entire pandas dataframe."""
-    
     df["region"] = df["dataset_id"].apply(lambda ds: determine_region(ds, region_identifier))
     return df
 
-def process_row_for_download(row, data_dir, region_identifier):
+def process_row_for_download(row, data_dir, region_identifier, downloader_cls=Downloader):
     if pd.isnull(row["last_available_time"]):
         return {
             "downloadable": False,
@@ -40,7 +39,7 @@ def process_row_for_download(row, data_dir, region_identifier):
         }
 
     info = row.to_dict()
-    downloader = Downloader(data_dir)
+    downloader = downloader_cls(data_dir)
     attempts = build_attempts(info, region_identifier, data_dir)
     result = downloader.run(attempts)
 
@@ -88,7 +87,7 @@ def process_dataframe_parallel(df, data_dir, region_identifier, max_workers=4):
     
     return pd.concat([df, results_df], axis=1)
 
-def test_dataset_availability_and_save_it(data_dir, region_identifier, parallel=False, max_workers=4):
+def check_dataset_availability_and_save_it(data_dir, region_identifier, parallel=False, max_workers=4):
     df = read_input_csv(data_dir)
     df = assign_regions(df, region_identifier)
     
@@ -104,4 +103,4 @@ def test_dataset_availability_and_save_it(data_dir, region_identifier, parallel=
 if __name__ == "__main__":
 
     data_dir = get_data_directory_from_command_line()
-    test_dataset_availability_and_save_it(data_dir, region_identifier, parallel=True)
+    check_dataset_availability_and_save_it(data_dir, region_identifier, parallel=True)
