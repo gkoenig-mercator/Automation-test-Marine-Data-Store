@@ -2,12 +2,15 @@
 requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools.packages.find]
+where = ["src"]
+
 [project]
 name = "test_availability_data"
 version = "0.1.0"
 description = "Script for testing availability of data of the Marine data store via the toolbox"
 authors = [
-  {name = "Guillaue Koenig", email = "gkoenig@mercator-ocean.fr"}
+  {name = "Guillaume Koenig", email = "gkoenig@mercator-ocean.fr"}
 ]
 dependencies = [
   "pandas>=1.5",
