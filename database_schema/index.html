@@ -114,13 +114,17 @@
 <h1 id="database-schema-and-usage">Database Schema and Usage</h1>
 <p>Currently, the database contains a single table with rows describing each download attempt, including errors.</p>
 <h2 id="to-connect">To connect:</h2>
-<p>psql -h HOST -p PORT -U USERNAME -d DATABASE_NAME</p>
+<pre><code class="language-bash">psql -h HOST -p PORT -U USERNAME -d DATABASE_NAME
+</code></pre>
 <h2 id="list-tables">List tables:</h2>
-<p>\dt</p>
+<pre><code class="language-bash">\dt
+</code></pre>
 <h2 id="show-first-10-rows">Show first 10 rows:</h2>
-<p>SELECT * FROM my_table LIMIT 10;</p>
+<pre><code class="language-bash">SELECT * FROM my_table LIMIT 10;
+</code></pre>
 <h2 id="show-last-10-rows">Show last 10 rows:</h2>
-<p>SELECT * FROM my_table ORDER BY id DESC LIMIT 10;</p></div>
+<pre><code class="language-bash">SELECT * FROM my_table ORDER BY id DESC LIMIT 10;
+</code></pre></div>
                 </div>
         </div>
 
