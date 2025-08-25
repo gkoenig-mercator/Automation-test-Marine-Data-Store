@@ -18,7 +18,7 @@ dependencies = [
   "sqlalchemy",
   "psycopg2-binary",
   "dotenv",
-  "zarr==3.0.0"
+  "zarr>3.0.0"
 ]
 readme = "README.md"
 license = {text = "MIT"}
