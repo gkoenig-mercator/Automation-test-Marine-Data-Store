@@ -1,8 +1,9 @@
-from test_availability_data.downloading_datasets import test_dataset_availability_and_save_it
-from test_availability_data.extract_datasets_from_describe import collect_and_store_dataset_informations
-from test_availability_data.Add_data_in_database import append_data_in_db
-from test_availability_data.check_if_download_errors import no_error_in_download
-from test_availability_data.utils.general import get_data_directory_from_command_line
+from src.test_availability_data.downloading_datasets import check_dataset_availability_and_save_it
+from src.test_availability_data.extract_datasets_from_describe import collect_and_store_dataset_informations
+from src.test_availability_data.Add_data_in_database import append_data_in_db
+from src.test_availability_data.check_if_download_errors import no_error_in_download
+from src.test_availability_data.utils.general import get_data_directory_from_command_line
+from src.test_availability_data.utils.region_config import region_identifier
 
 import copernicusmarine
 import os
@@ -18,7 +19,7 @@ def main():
         force_overwrite=True,
     )
     collect_and_store_dataset_informations(data_dir)
-    test_dataset_availability_and_save_it(data_dir)
+    check_dataset_availability_and_save_it(data_dir, region_identifier)
     append_data_in_db(data_dir)
     print(no_error_in_download(data_dir))
 

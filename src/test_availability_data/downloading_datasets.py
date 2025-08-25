@@ -2,9 +2,9 @@ import pandas as pd
 import os
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from test_availability_data.utils.download import determine_region, Downloader, build_attempts
-from test_availability_data.utils.region_config import region_identifier
-from test_availability_data.utils.general import get_data_directory_from_command_line
+from src.test_availability_data.utils.download import determine_region, Downloader, build_attempts
+from src.test_availability_data.utils.region_config import region_identifier
+from src.test_availability_data.utils.general import get_data_directory_from_command_line
 
 logging.getLogger("copernicusmarine").setLevel("DEBUG")
 

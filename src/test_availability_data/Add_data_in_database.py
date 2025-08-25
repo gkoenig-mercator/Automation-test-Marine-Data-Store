@@ -3,7 +3,7 @@ from sqlalchemy import create_engine
 import os
 import uuid
 from dotenv import load_dotenv
-from test_availability_data.utils.general import get_data_directory_from_command_line
+from src.test_availability_data.utils.general import get_data_directory_from_command_line
 
 load_dotenv()
 
