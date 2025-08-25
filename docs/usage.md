@@ -6,6 +6,7 @@ To run a script:
 ```bash
 python script_name.py --data-dir path_to_storage
 Where path_to_storage is the directory where results will be stored.
+```
 
 ## Scripts Overview
 
