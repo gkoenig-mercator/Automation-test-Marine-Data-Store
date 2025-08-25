@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>Usage - Copernicusmarine Data Store Automated Data testing script</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../css/bootstrap-theme.min.css" rel="stylesheet">
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.3/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+        <script src="../js/jquery-1.10.2.min.js"></script>
+        <script src="../js/bootstrap.min.js"></script>
+        
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="..">Copernicusmarine Data Store Automated Data testing script</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+            <!-- Main navigation -->
+            <ul class="nav navbar-nav">
+            
+            
+                <li >
+                    <a href="..">Home</a>
+                </li>
+            
+            
+            
+                <li class="active">
+                    <a href="./">Usage</a>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="../database_schema/">Database</a>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="../further_development/">Further</a>
+                </li>
+            
+            
+            </ul>
+
+            <!-- Search, Navigation and Repo links -->
+            <ul class="nav navbar-nav navbar-right">
+                    <li >
+                        <a rel="next" href="..">
+                            <i class="fa fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="prev" href="../database_schema/">
+                            Next <i class="fa fa-arrow-right"></i>
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+</div>
+
+        <div class="container">
+                <div class="row">
+                    <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+      
+    
+        <li class="main active"><a href="#usage">Usage</a></li>
+        
+            <li><a href="#scripts-overview">Scripts Overview</a></li>
+        
+    
+    
+    </ul>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="usage">Usage</h1>
+<p>Most of the scripts can be run independently.  </p>
+<p>To run a script:
+```bash
+python script_name.py --data-dir path_to_storage
+Where path_to_storage is the directory where results will be stored.</p>
+<h2 id="scripts-overview">Scripts Overview</h2>
+<ul>
+<li>
+<p>add_data_in_database
+Takes the data from a CSV file containing download attempts (downloaded_datasets) and inserts results into a database.</p>
+</li>
+<li>
+<p>check_if_download_errors
+Searches the downloaded_datasets CSV for failed downloads and returns False if any are found.</p>
+</li>
+<li>
+<p>extracts_datasets_from_describe
+Creates a CSV containing dataset information using the copernicusmarine.describe command.</p>
+</li>
+</ul>
+<p>r- etrieve_from_describe_test_availabilibity_and_push_in_db
+Master script. Loads datasets from describe, attempts downloads, stores results in a database, and returns False if downloads fail.</p>
+<ul>
+<li>
+<p>test_downloading_datasets
+Reads list_of_informations_from_the_describe.csv and tries to download all datasets listed.</p>
+</li>
+<li>
+<p>treating_outputs
+Reads the downloaded_datasets CSV and provides basic statistics by region.</p>
+</li>
+</ul>
+<h3 id="execution-order">Execution Order</h3>
+<p>Some scripts depend on others having been run first:</p>
+<ol>
+<li>
+<p>retrieve_from_describe_test_availabilibity_and_push_in_db – standalone</p>
+</li>
+<li>
+<p>extracts_datasets_from_describe – standalone</p>
+</li>
+<li>
+<p>test_downloading_datasets – requires step 2</p>
+</li>
+<li>
+<p>check_if_download_errors – requires step 3</p>
+</li>
+<li>
+<p>add_data_in_database – requires step 3</p>
+</li>
+<li>
+<p>treating_outputs – requires step 3</p>
+</li>
+</ol></div>
+                </div>
+        </div>
+
+    <hr>
+    <footer class="container">
+        
+        <center>Documentation built with <a href="http://www.mkdocs.org">MkDocs</a> and <a href="http://kristopolous.github.io/BOOTSTRA.386">BOOTSTRA.386</a>.</center>
+    </footer>
+        <script src="../../search/main.js"></script>
+    </body>
+</html>
