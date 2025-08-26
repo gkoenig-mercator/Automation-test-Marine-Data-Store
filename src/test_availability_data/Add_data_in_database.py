@@ -1,9 +1,10 @@
 import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, insert
 import os
 import uuid
 from dotenv import load_dotenv
 from src.test_availability_data.utils.general import get_data_directory_from_command_line
+from src.test_availability_data.database_management.create_database_table import testing_metadata
 
 load_dotenv()
 
@@ -27,6 +28,19 @@ def append_data_in_db(data_dir):
     df["id"] = [str(uuid.uuid4()) for _ in range(len(df))]
 
     df.to_sql(table_name, engine, if_exists="append", index=False, chunksize=500)
+
+def append_test_metadata_in_db(start_time, end_time, linux_version, toolbox_version, script_version):
+
+    with engine.begin() as conn:
+        test_run = {
+            "start_time": start_time,
+            "end_time": end_time,
+            "linux_version": linux_version,
+            "toolbox_version": toolbox_version,
+            "script_version": script_version,
+        }
+        result = conn.execute(insert(testing_metadata).values(test_run))
+        test_id = result.inserted_primary_key[0]  # UUID of the new test run
 
 
 if __name__ == "__main__":
