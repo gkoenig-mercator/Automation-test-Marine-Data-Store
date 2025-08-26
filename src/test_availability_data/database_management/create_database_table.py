@@ -1,13 +1,13 @@
 from sqlalchemy import (
-    Table,
-    Column,
-    String,
-    MetaData,
-    create_engine,
+    Table, Column, String, Boolean, MetaData, DateTime, ForeignKey, Text, create_engine
 )
 import uuid
 import os
 import logging
+from datetime import datetime
+from dotenv import load_dotenv
+
+load_dotenv()
 
 logging.basicConfig()
 logging.getLogger("sqlalchemy.engine").setLevel(logging.DEBUG)
@@ -19,41 +19,53 @@ database_url = os.environ.get(
 )
 database_name = os.environ.get("DATABASE_NAME", "defaultdb")
 
-name = "List_of_datasets"
 engine = create_engine(
     f"postgresql+psycopg2://{username}:{password}@{database_url}:5432/{database_name}"
 )
 
+metadata = MetaData(schema="public")
 
-def create_table(engine, name):
-    metadata = MetaData()
-    table = Table(
-        name,
-        metadata,
-        Column("id", String, primary_key=True, default=lambda: str(uuid.uuid4())),
-        Column("dataset_id", String),
-        Column("dataset_version", String),
-        Column("version_part", String),
-        Column("service_name", String),
-        Column("variable_name", String),
-        Column("has_time_coordinate", String),
-        Column("last_available_time", String),
-        Column("region", String),
-        Column("downloadable", String),
-        Column("last_downloadable_time", String),
-        Column("first_command", String),
-        Column("first_error", String),
-        Column("second_command", String),
-        Column("second_error", String),
-        Column("third_command", String),
-        Column("third_error", String),
-        schema="public",
-    )
+# --- 1. Testing metadata ---
+testing_metadata = Table(
+    "testing_metadata",
+    metadata,
+    Column("id", String, primary_key=True, default=lambda: str(uuid.uuid4())),
+    Column("start_time", DateTime, default=datetime.utcnow),
+    Column("end_time", DateTime),
+    Column("linux_version", String),
+    Column("toolbox_version", String),
+    Column("script_version", String),
+)
 
+# --- 2. Datasets tested ---
+datasets_tested = Table(
+    "datasets_tested",
+    metadata,
+    Column("id", String, primary_key=True, default=lambda: str(uuid.uuid4())),
+    Column("test_id", String, ForeignKey("public.testing_metadata.id")),
+    Column("dataset_id", String),
+    Column("dataset_version", String),
+    Column("version_part", String),
+    Column("service_name", String),
+    Column("variable_name", String),
+    Column("command", Text),
+    Column("test_time", DateTime, default=datetime.utcnow),
+    Column("subsettable", Boolean),
+)
+
+# --- 3. Errors ---
+errors = Table(
+    "errors",
+    metadata,
+    Column("id", String, primary_key=True, default=lambda: str(uuid.uuid4())),
+    Column("dataset_test_id", String, ForeignKey("public.datasets_tested.id")),
+    Column("command", Text),
+    Column("error_message", Text),
+)
+
+def create_schema(engine):
     metadata.create_all(engine)
 
-    return table
-
-
 if __name__ == "__main__":
-    create_table(engine, name)
+    create_schema(engine)
+
