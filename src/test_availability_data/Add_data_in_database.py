@@ -4,7 +4,7 @@ import os
 import uuid
 from dotenv import load_dotenv
 from src.test_availability_data.utils.general import get_data_directory_from_command_line
-from src.test_availability_data.database_management.create_database_table import testing_metadata
+from src.test_availability_data.database_management.create_database_table import testing_metadata, errors
 
 load_dotenv()
 
@@ -42,6 +42,33 @@ def append_test_metadata_in_db(start_time, end_time, linux_version, toolbox_vers
         result = conn.execute(insert(testing_metadata).values(test_run))
         test_id = result.inserted_primary_key[0]  # UUID of the new test run
 
+def append_errors_in_db(data_dir):
+    # Suppose each row has a dataset_test_id (UUID) already from datasets_tested
+    # If not, you can generate it or link manually for now
+    file_path = os.path.join(data_dir, "downloaded_datasets.csv")
+    df = pd.read_csv(file_path)
+    
+    df["dataset_test_id"] = [str(uuid.uuid4()) for _ in range(len(df))]  # simple example
+
+    # Insert errors
+    with engine.begin() as conn:
+        for _, row in df.iterrows():
+            dataset_id = row["dataset_test_id"]
+        
+            # Check each error column
+            for error_col, cmd_col in zip(
+                ["first_error", "second_error", "third_error"],
+                ["first_command", "second_command", "third_command"]
+             ):
+                error_msg = row[error_col]
+                if pd.notnull(error_msg) and error_msg != "None":  # only insert real errors
+                    error_row = {
+                    "id": str(uuid.uuid4()),  # unique ID for this error
+                    "dataset_test_id": dataset_id,
+                    "command": row[cmd_col],
+                    "error_message": error_msg
+                    }
+        conn.execute(insert(errors).values(error_row))
 
 if __name__ == "__main__":
 
