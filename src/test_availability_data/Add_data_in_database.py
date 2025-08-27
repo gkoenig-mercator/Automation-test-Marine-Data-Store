@@ -4,7 +4,7 @@ import os
 import uuid
 from dotenv import load_dotenv
 from src.test_availability_data.utils.general import get_data_directory_from_command_line
-from src.test_availability_data.database_management.create_database_table import testing_metadata, errors
+from src.test_availability_data.database_management.create_database_table import testing_metadata, errors, datasets_tested
 
 load_dotenv()
 
@@ -41,6 +41,8 @@ def append_test_metadata_in_db(start_time, end_time, linux_version, toolbox_vers
         }
         result = conn.execute(insert(testing_metadata).values(test_run))
         test_id = result.inserted_primary_key[0]  # UUID of the new test run
+
+    return test_id
 
 # Recommended version for your use case - pandas-based bulk operations
 def append_errors_in_db(data_dir):
@@ -90,6 +92,23 @@ def append_errors_in_db(data_dir):
     else:
         print("No error records to insert")
         return 0
+
+def append_dataset_downloadable_status_in_db(data_dir, test_id):
+    """
+    Pandas-optimized version - perfect for teams comfortable with pandas
+    and datasets up to a few thousand rows
+    """
+    
+    file_path = os.path.join(data_dir, "downloaded_datasets.csv")
+    df = pd.read_csv(file_path)
+    df = df[["dataset_id", "dataset_version", "version_part","service_name",
+             "variable_name","first_command","last_downloadable_time",
+             "downloadable"]]
+    df["test_id"] = test_id
+    df["id"] = [str(uuid.uuid4()) for _ in range(len(df))]
+    df = df.rename(columns={"first_command":"command"})
+
+    df.to_sql("datasets_tested", engine, if_exists="append", index=False, chunksize=500)
 
 if __name__ == "__main__":
 

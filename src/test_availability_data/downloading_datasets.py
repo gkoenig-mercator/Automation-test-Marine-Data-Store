@@ -96,6 +96,10 @@ def check_dataset_availability_and_save_it(data_dir, region_identifier, parallel
     else:
         df = process_dataframe(df, data_dir, region_identifier)
 
+    # Adds an uuid to identify uniquely each try, it will be necessary for comparison with the database 
+    # And error identification
+    df["id"] = [str(uuid.uuid4()) for _ in range(len(df))]
+
     write_output_csv(df, data_dir)
     return df
 

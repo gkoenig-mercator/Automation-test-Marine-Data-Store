@@ -1,6 +1,6 @@
 from src.test_availability_data.downloading_datasets import check_dataset_availability_and_save_it
 from src.test_availability_data.extract_datasets_from_describe import collect_and_store_dataset_informations
-from src.test_availability_data.Add_data_in_database import append_data_in_db, append_test_metadata_in_db, append_errors_in_db
+from src.test_availability_data.Add_data_in_database import append_data_in_db, append_test_metadata_in_db, append_errors_in_db, append_dataset_downloadable_status_in_db
 from src.test_availability_data.check_if_download_errors import no_error_in_download
 from src.test_availability_data.utils.general import get_data_directory_from_command_line
 from src.test_availability_data.utils.region_config import region_identifier
@@ -26,12 +26,13 @@ def main():
     check_dataset_availability_and_save_it(data_dir, region_identifier)
     end_time = datetime.utcnow()
     versions = get_versions()
-    append_test_metadata_in_db(start_time, end_time, 
+    run_id = append_test_metadata_in_db(start_time, end_time, 
                                versions['linux_version'],
                                versions['toolbox_version'], 
                                versions['script_version'])
     append_data_in_db(data_dir)
     append_errors_in_db(data_dir)
+    append_dataset_downloadable_status_in_db(data_dir, run_id)
     print(no_error_in_download(data_dir))
 
 
