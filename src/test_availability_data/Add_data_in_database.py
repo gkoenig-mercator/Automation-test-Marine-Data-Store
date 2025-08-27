@@ -25,7 +25,6 @@ def append_data_in_db(data_dir):
 
     file_path = os.path.join(data_dir, "downloaded_datasets.csv")
     df = pd.read_csv(file_path)
-    df["id"] = [str(uuid.uuid4()) for _ in range(len(df))]
 
     df.to_sql(table_name, engine, if_exists="append", index=False, chunksize=500)
 
@@ -59,7 +58,7 @@ def append_errors_in_db(data_dir):
     error_rows = []
     
     for _, row in df.iterrows():
-        dataset_id = row["dataset_test_id"]
+        dataset_id = row["id"]
         
         for error_col, cmd_col in zip(
             ["first_error", "second_error", "third_error"],
@@ -105,7 +104,6 @@ def append_dataset_downloadable_status_in_db(data_dir, test_id):
              "variable_name","first_command","last_downloadable_time",
              "downloadable"]]
     df["test_id"] = test_id
-    df["id"] = [str(uuid.uuid4()) for _ in range(len(df))]
     df = df.rename(columns={"first_command":"command"})
 
     df.to_sql("datasets_tested", engine, if_exists="append", index=False, chunksize=500)
