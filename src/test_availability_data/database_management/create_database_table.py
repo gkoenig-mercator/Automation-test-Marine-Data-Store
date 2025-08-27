@@ -49,8 +49,8 @@ datasets_tested = Table(
     Column("service_name", String),
     Column("variable_name", String),
     Column("command", Text),
-    Column("test_time", DateTime, default=datetime.utcnow),
-    Column("subsettable", Boolean),
+    Column("last_downloadable_time", DateTime, default=datetime.utcnow),
+    Column("downloadable", Boolean),
 )
 
 # --- 3. Errors ---

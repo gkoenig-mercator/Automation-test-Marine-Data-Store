@@ -42,33 +42,54 @@ def append_test_metadata_in_db(start_time, end_time, linux_version, toolbox_vers
         result = conn.execute(insert(testing_metadata).values(test_run))
         test_id = result.inserted_primary_key[0]  # UUID of the new test run
 
+# Recommended version for your use case - pandas-based bulk operations
 def append_errors_in_db(data_dir):
-    # Suppose each row has a dataset_test_id (UUID) already from datasets_tested
-    # If not, you can generate it or link manually for now
+    """
+    Pandas-optimized version - perfect for teams comfortable with pandas
+    and datasets up to a few thousand rows
+    """
     file_path = os.path.join(data_dir, "downloaded_datasets.csv")
     df = pd.read_csv(file_path)
     
-    df["dataset_test_id"] = [str(uuid.uuid4()) for _ in range(len(df))]  # simple example
-
-    # Insert errors
-    with engine.begin() as conn:
-        for _, row in df.iterrows():
-            dataset_id = row["dataset_test_id"]
+    df["dataset_test_id"] = [str(uuid.uuid4()) for _ in range(len(df))]
+    
+    # Reshape data to have one row per error using pandas operations
+    error_rows = []
+    
+    for _, row in df.iterrows():
+        dataset_id = row["dataset_test_id"]
         
-            # Check each error column
-            for error_col, cmd_col in zip(
-                ["first_error", "second_error", "third_error"],
-                ["first_command", "second_command", "third_command"]
-             ):
-                error_msg = row[error_col]
-                if pd.notnull(error_msg) and error_msg != "None":  # only insert real errors
-                    error_row = {
-                    "id": str(uuid.uuid4()),  # unique ID for this error
+        for error_col, cmd_col in zip(
+            ["first_error", "second_error", "third_error"],
+            ["first_command", "second_command", "third_command"]
+        ):
+            error_msg = row[error_col]
+            if pd.notnull(error_msg) and error_msg != "None":
+                error_rows.append({
+                    "id": str(uuid.uuid4()),
                     "dataset_test_id": dataset_id,
                     "command": row[cmd_col],
                     "error_message": error_msg
-                    }
-        conn.execute(insert(errors).values(error_row))
+                })
+    
+    if error_rows:
+        # Convert to DataFrame and use pandas to_sql for bulk insert
+        errors_df = pd.DataFrame(error_rows)
+        
+        # Use pandas to_sql - handles all SQL generation automatically
+        errors_df.to_sql(
+            name='errors',  # Replace with your actual table name
+            con=engine,
+            if_exists='append',
+            index=False,
+            method='multi'  # Optimized multi-row INSERTs
+        )
+        
+        print(f"Successfully inserted {len(errors_df)} error records")
+        return len(errors_df)
+    else:
+        print("No error records to insert")
+        return 0
 
 if __name__ == "__main__":
 
