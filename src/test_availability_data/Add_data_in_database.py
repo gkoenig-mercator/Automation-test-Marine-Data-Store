@@ -46,19 +46,16 @@ def append_test_metadata_in_db(start_time, end_time, linux_version, toolbox_vers
 # Recommended version for your use case - pandas-based bulk operations
 def append_errors_in_db(data_dir):
     """
-    Pandas-optimized version - perfect for teams comfortable with pandas
-    and datasets up to a few thousand rows
+    Parse downloaded_datasets.csv, extract errors, and insert them into the DB.
+    Each command with an error becomes one row in the `errors` table.
     """
     file_path = os.path.join(data_dir, "downloaded_datasets.csv")
     df = pd.read_csv(file_path)
     
-    df["dataset_test_id"] = [str(uuid.uuid4()) for _ in range(len(df))]
-    
-    # Reshape data to have one row per error using pandas operations
     error_rows = []
     
     for _, row in df.iterrows():
-        dataset_id = row["id"]
+        dataset_test_id = row["id"]  # <-- use CSV's "id" column
         
         for error_col, cmd_col in zip(
             ["first_error", "second_error", "third_error"],
@@ -67,29 +64,27 @@ def append_errors_in_db(data_dir):
             error_msg = row[error_col]
             if pd.notnull(error_msg) and error_msg != "None":
                 error_rows.append({
-                    "id": str(uuid.uuid4()),
-                    "dataset_test_id": dataset_id,
+                    "id": str(uuid.uuid4()),             # unique ID for error row
+                    "dataset_test_id": dataset_test_id,  # link back to test row
                     "command": row[cmd_col],
                     "error_message": error_msg
                 })
     
     if error_rows:
-        # Convert to DataFrame and use pandas to_sql for bulk insert
         errors_df = pd.DataFrame(error_rows)
         
-        # Use pandas to_sql - handles all SQL generation automatically
         errors_df.to_sql(
-            name='errors',  # Replace with your actual table name
+            name="errors",
             con=engine,
-            if_exists='append',
+            if_exists="append",
             index=False,
-            method='multi'  # Optimized multi-row INSERTs
+            method="multi"
         )
         
-        print(f"Successfully inserted {len(errors_df)} error records")
+        print(f"✅ Successfully inserted {len(errors_df)} error records")
         return len(errors_df)
     else:
-        print("No error records to insert")
+        print("ℹ️ No error records to insert")
         return 0
 
 def append_dataset_downloadable_status_in_db(data_dir, test_id):
@@ -100,7 +95,7 @@ def append_dataset_downloadable_status_in_db(data_dir, test_id):
     
     file_path = os.path.join(data_dir, "downloaded_datasets.csv")
     df = pd.read_csv(file_path)
-    df = df[["dataset_id", "dataset_version", "version_part","service_name",
+    df = df[["id","dataset_id", "dataset_version", "version_part","service_name",
              "variable_name","first_command","last_downloadable_time",
              "downloadable"]]
     df["test_id"] = test_id
