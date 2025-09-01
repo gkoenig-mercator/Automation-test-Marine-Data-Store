@@ -31,8 +31,8 @@ def main():
                                versions['toolbox_version'], 
                                versions['script_version'])
     append_data_in_db(data_dir)
-    append_errors_in_db(data_dir)
     append_dataset_downloadable_status_in_db(data_dir, run_id)
+    append_errors_in_db(data_dir)
     print(no_error_in_download(data_dir))
 
 
