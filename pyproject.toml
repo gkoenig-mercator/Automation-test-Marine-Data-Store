@@ -25,4 +25,4 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["mkdocs", "mkdocs-bootstrap386"]
+dev = ["mkdocs"]

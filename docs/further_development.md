@@ -2,8 +2,7 @@
 
 ## Planned Features
 
-- Automated delivery of test results via email notifications  
-- More advanced database schema to support historical trend analysis  
+- Automated delivery of test results via email notifications   
 - Long-term comparison of dataset quality and availability  
 
 ## Vision

@@ -19,7 +19,7 @@ Searches the downloaded_datasets CSV for failed downloads and returns False if a
 - extracts_datasets_from_describe
 Creates a CSV containing dataset information using the copernicusmarine.describe command.
 
-r- etrieve_from_describe_test_availabilibity_and_push_in_db
+- retrieve_from_describe_test_availabilibity_and_push_in_db
 Master script. Loads datasets from describe, attempts downloads, stores results in a database, and returns False if downloads fail.
 
 - test_downloading_datasets
