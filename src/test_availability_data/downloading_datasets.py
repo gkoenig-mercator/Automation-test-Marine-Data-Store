@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import logging
+import uuid
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from src.test_availability_data.utils.download import determine_region, Downloader, build_attempts
 from src.test_availability_data.utils.region_config import region_identifier
