@@ -53,10 +53,18 @@
     <li class="toctree-l2"><a class="reference internal" href="#to-connect">To connect:</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#list-tables">List tables:</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#tables-columns">Tables columns:</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#show-first-10-rows">Show first 10 rows:</a>
+        </ul>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#show-last-10-rows">Show last 10 rows:</a>
+    <li class="toctree-l2"><a class="reference internal" href="#consulting-tables">Consulting tables</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#simple-consultation">Simple consultation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#consultation-of-complex-schema">Consultation of complex schema</a>
+    </li>
+        </ul>
     </li>
     </ul>
                 </li>
@@ -89,18 +97,99 @@
             <div class="section" itemprop="articleBody">
               
                 <h1 id="database-schema-and-usage">Database Schema and Usage</h1>
-<p>Currently, the database contains a single table with rows describing each download attempt, including errors.</p>
+<p>Currently, the database contains two schema: </p>
+<ul>
+<li>
+<p>A simple one with a single table with rows describing each download attempt, including errors. This one is rigid and can only contain three errors.</p>
+</li>
+<li>
+<p>A more complex one with three tables: One containing the main information to reproduce a serie of tests ( OS used, version of the toolbox, version of the script, dates of execution), one containing all the datasets that have been tested, the service, version and variables that have been tested and if they were downloadable during the runs and one containing the errors associated with the datasets. The tables are linked between them via uuid (https://developer.mozilla.org/en-US/docs/Glossary/UUID). The collection of tests has a uuid, which is used as a foreign key in the datasets table to connect it with the first table, and each row of the dataset table has another uuid, which are used as foreign keys in the error table.</p>
+</li>
+</ul>
 <h2 id="to-connect">To connect:</h2>
+<p>Both the schema are on the same database. You will need information given in the readme of the database present in the project "project-test-datasets-subsetting-toolbox". The following command will ask a password that will also be given in the readme of the database.</p>
 <pre><code class="language-bash">psql -h HOST -p PORT -U USERNAME -d DATABASE_NAME
 </code></pre>
 <h2 id="list-tables">List tables:</h2>
+<p>There should be four tables:
+- <strong>"List_of_datasets"</strong> ( the '"' are necessary to access this table). This is the table of the simple schema.
+- <strong>testing_metadata</strong> containing the information about the test conditions.
+- <strong>datasets_tested</strong> containing the informations about the datasets tested.
+- <strong>errors</strong> containg the different errors.</p>
+<h3 id="tables-columns">Tables columns:</h3>
+<p><strong>List_of_datasets</strong>:
+-id: UUID associated with each dataset (<strong>uuid</strong>)
+-dataset_id: Dataset identifier as can be used in the copernicusmarine toolbox (<strong>String</strong>)
+-dataset_version: Version of the dataset (<strong>String</strong>)
+-version_part: Part of the version tested (<strong>String</strong>)
+-service_name: Name of the service tested (<strong>String</strong>)
+-variable_name: Variable tested (<strong>String</strong>)
+-has_time_coordinate: Presence of time coordinate for the variable (<strong>Boolean</strong>)
+-last_available_time: Last available time for which there is data from the describe command (<strong>String</strong>)
+-region: Region of the dataset (<strong>String</strong>)
+-downloadable: If the dataset was downloadable (<strong>Boolean</strong>)
+-last_downloadable_time: Last available time for which there is from the subset command (<strong>String</strong>)
+-first_command: Command launched for the first try (<strong>String</strong>)
+-first_error: (Optional) Error if the first try did not work (<strong>String</strong>)
+-second_command: (Optional) Command launched for the second try (<strong>String</strong>)
+-second_error: (Optional) Error if the second try did not work (<strong>String</strong>)
+-third_command: (Optional) Command launched for the third try (<strong>String</strong>)
+-third_error: (Optional) Error if the third try did not work (<strong>String</strong>)</p>
+<p><strong>testing_metadata</strong>
+-id: UUID associated which each run of the script (<strong>uuid</strong>)
+-start_time: Time of the start of the script's run (<strong>DateTime</strong>)
+-end_time: Time of the end of the script's run (<strong>DateTime</strong>)
+-linux_version: Version of the OS used for the run (<strong>String</strong>)
+-toolbox_version: Version of the toolbox used for the run (<strong>String</strong>)
+-script_version: Version of the script used for the run (<strong>String</strong>)</p>
+<p><strong>datasets_tested</strong>
+-id: UUID associated with each dataset tested, not the same as the id of <strong>testing_metadata</strong> (<strong>uuid</strong>)
+-test_id: Foreign key connecting to the testing_metadata table, <strong>same as the id of testing_metadata for the run</strong> (<strong>uuid</strong>)
+-dataset_id: Identifier of the dataset as used with the copernicusmarine toolbox (<strong>String</strong>)
+-dataset_version: Version of the dataset (<strong>String</strong>)
+-version_part: Part of the version tested (<strong>String</strong>)
+-service_name: Name of the service tested (<strong>String</strong>)
+-variable_name: Variable tested (<strong>String</strong>)
+-command: Command launched for the first try (<strong>Text</strong>)
+-last_downloadable_time: Last available time for which there is from the subset command (<strong>DateTime</strong>)
+-downloadable: If the dataset was downloadable (<strong>Boolean</strong>)</p>
+<p><strong>errors</strong>
+-id: UUID associated with each error, not the same as the id of <strong>datasets_tested</strong> or <strong>testing_metadata</strong> (<strong>uuid</strong>)
+-dataset_test_id: Foreign key connecting to the datasets_tested table, <strong>same as the id of datasets_tested for the dataset</strong> (<strong>uuid</strong>)
+-command: Command associated for the error (<strong>Text</strong>)
+-error_message: Message associated with the error (<strong>Text</strong>)</p>
+<h2 id="consulting-tables">Consulting tables</h2>
+<h3 id="simple-consultation">Simple consultation</h3>
+<p>You can see the list of tables, once connected, with the following command:</p>
 <pre><code class="language-bash">\dt
 </code></pre>
-<h2 id="show-first-10-rows">Show first 10 rows:</h2>
+<p>You can look a bit better at the tables with the following commands. To see the first ten rows for example:</p>
 <pre><code class="language-bash">SELECT * FROM my_table LIMIT 10;
 </code></pre>
-<h2 id="show-last-10-rows">Show last 10 rows:</h2>
+<p>Or the last ten rows:</p>
 <pre><code class="language-bash">SELECT * FROM my_table ORDER BY id DESC LIMIT 10;
+</code></pre>
+<h3 id="consultation-of-complex-schema">Consultation of complex schema</h3>
+<p>If you want to consult the errors associated with a given run, you can run the following command, with <RUN_ID> replaced by the id found the in the table <strong>testing_metadata</strong>:</p>
+<pre><code class="language-bash">SELECT 
+    tm.id AS run_id,
+    tm.start_time,
+    tm.end_time,
+    dt.dataset_id,
+    dt.dataset_version,
+    dt.version_part,
+    dt.service_name,
+    dt.variable_name,
+    e.id AS error_id,
+    e.command AS error_command,
+    e.error_message
+FROM testing_metadata tm
+JOIN datasets_tested dt 
+    ON tm.id = dt.test_id
+JOIN errors e 
+    ON dt.id = e.dataset_test_id
+WHERE tm.id = &lt;RUN_ID&gt;
+ORDER BY dt.dataset_id, e.id;
 </code></pre>
               
             </div>
