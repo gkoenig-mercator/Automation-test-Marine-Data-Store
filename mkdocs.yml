@@ -1,6 +1,6 @@
 site_name: Copernicusmarine Data Store Automated Data testing script
 theme:
-  name: bootstrap386
+  name: readthedocs
 nav:
   - Home: index.md
   - Usage: usage.md

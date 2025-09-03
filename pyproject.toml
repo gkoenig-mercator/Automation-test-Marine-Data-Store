@@ -9,6 +9,9 @@ where = ["src"]
 name = "test_availability_data"
 version = "0.1.0"
 description = "Script for testing availability of data of the Marine data store via the toolbox"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
 authors = [
   {name = "Guillaume Koenig", email = "gkoenig@mercator-ocean.fr"}
 ]
@@ -20,8 +23,6 @@ dependencies = [
   "dotenv",
   "zarr>=2.18"
 ]
+
 [project.optional-dependencies]
 dev = ["mkdocs", "mkdocs-bootstrap386"]
-readme = "README.md"
-license = {text = "MIT"}
-requires-python = ">=3.10"
