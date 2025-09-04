@@ -5,7 +5,7 @@ from src.test_availability_data.check_if_download_errors import no_error_in_down
 from src.test_availability_data.utils.general import get_data_directory_from_command_line
 from src.test_availability_data.utils.region_config import region_identifier
 from src.test_availability_data.obtaining_environment_versions import get_versions
-from src.test_availability_data.script_to_markdown import create_markdown_file_from_csv
+from src.test_availability_data.script_to_markdown import create_markdown_file_from_csv, deploy_on_gh_pages
 
 import copernicusmarine
 import os
@@ -26,6 +26,7 @@ def main():
     collect_and_store_dataset_informations(data_dir)
     check_dataset_availability_and_save_it(data_dir, region_identifier)
     create_markdown_file_from_csv(data_dir)
+    deploy_on_gh_pages()
     end_time = datetime.utcnow()
     versions = get_versions()
     run_id = append_test_metadata_in_db(start_time, end_time, 
