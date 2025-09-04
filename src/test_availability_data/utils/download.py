@@ -38,6 +38,22 @@ def build_subset_kwargs(
         **({"variables": variables} if variables else {}),
     }
 
+def build_command(kwargs):
+    # Convert kwargs dict items to a list so we can handle the first item separately
+    items = list(kwargs.items())
+
+    # Start command with the first key-value pair
+    command = f'copernicusmarine.subset({items[0][0]}="{items[0][1]}"'
+
+    # Add the rest of the key-value pairs
+    for key, value in items[1:]:
+        command += f', {key}="{value}"'
+
+    # Close the function call
+    command += ")"
+
+    return command
+
 def build_attempts(info: dict, region_dict: dict, data_dir: str) -> list[dict]:
     temp_file_dir = os.path.join(data_dir, "temp/")
     region = region_dict.get(info.get("region"))
@@ -49,7 +65,7 @@ def build_attempts(info: dict, region_dict: dict, data_dir: str) -> list[dict]:
         kwargs1 = build_subset_kwargs(info, region, temp_file_dir, [info["variable_name"]])
         attempts.append({
             "kwargs": kwargs1,
-            "command_repr": f"copernicusmarine.subset({kwargs1})"
+            "command_repr": build_command(kwargs1)
         })
 
     # Attempt 2: all variables
@@ -57,7 +73,7 @@ def build_attempts(info: dict, region_dict: dict, data_dir: str) -> list[dict]:
         kwargs2 = build_subset_kwargs(info, region, temp_file_dir)
         attempts.append({
             "kwargs": kwargs2,
-            "command_repr": f"copernicusmarine.subset(all variables: {kwargs2})"
+            "command_repr": build_command(kwargs2)
         })
 
     # Attempt 3: no region info
@@ -73,7 +89,7 @@ def build_attempts(info: dict, region_dict: dict, data_dir: str) -> list[dict]:
     }
     attempts.append({
         "kwargs": kwargs3,
-        "command_repr": f"copernicusmarine.subset(no region info: {kwargs3})"
+        "command_repr": build_command(kwargs3)
     })
 
     return attempts
