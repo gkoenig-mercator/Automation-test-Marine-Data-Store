@@ -21,7 +21,8 @@ dependencies = [
   "sqlalchemy",
   "psycopg2-binary",
   "dotenv",
-  "zarr>=2.18"
+  "zarr>=2.18",
+  "tabulate"
 ]
 
 [project.optional-dependencies]
