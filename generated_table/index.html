@@ -88,44 +88,63 @@
 <table>
 <thead>
 <tr>
-<th>dataset_id</th>
-<th>dataset_version</th>
-<th>version_part</th>
-<th>service_name</th>
-<th>variable_name</th>
-<th>has_time_coordinate</th>
-<th>last_available_time</th>
-<th>region</th>
-<th>downloadable</th>
-<th>last_downloadable_time</th>
-<th>first_command</th>
-<th>first_error</th>
-<th>second_command</th>
-<th>second_error</th>
-<th>third_command</th>
-<th>third_error</th>
-<th>id</th>
+<th style="text-align: left;">dataset_id</th>
+<th style="text-align: right;">dataset_version</th>
+<th style="text-align: left;">version_part</th>
+<th style="text-align: left;">service_name</th>
+<th style="text-align: left;">variable_name</th>
+<th style="text-align: left;">has_time_coordinate</th>
+<th style="text-align: left;">last_available_time</th>
+<th style="text-align: left;">region</th>
+<th style="text-align: left;">downloadable</th>
+<th style="text-align: right;">last_downloadable_time</th>
+<th style="text-align: left;">first_command</th>
+<th style="text-align: left;">first_error</th>
+<th style="text-align: left;">second_command</th>
+<th style="text-align: left;">second_error</th>
+<th style="text-align: left;">third_command</th>
+<th style="text-align: left;">third_error</th>
+<th style="text-align: left;">id</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td style="text-align: left;">cmems_mod_ibi_wav_my-aflux_0.027deg_P1H-i</td>
+<td style="text-align: right;">202411</td>
+<td style="text-align: left;">default</td>
+<td style="text-align: left;">arco-geo-series</td>
+<td style="text-align: left;">TAUX</td>
+<td style="text-align: left;">True</td>
+<td style="text-align: left;">2023-12-30 23:00:00</td>
+<td style="text-align: left;">Iberia-Biscay-Ireland</td>
+<td style="text-align: left;">False</td>
+<td style="text-align: right;">nan</td>
+<td style="text-align: left;">copernicusmarine.subset(dataset_id="cmems_mod_ibi_wav_my-aflux_0.027deg_P1H-i", start_datetime="2023-12-30 22:00:00", end_datetime="2023-12-30 23:00:00", output_directory="../test/temp/", output_filename="test.nc", maximum_depth=5, minimum_longitude=-4.5, maximum_longitude=-3, minimum_latitude=44, maximum_latitude=45, service="arco-geo-series", variables=['TAUX'])</td>
+<td style="text-align: left;">Python integer -100000 out of bounds for int16</td>
+<td style="text-align: left;">copernicusmarine.subset(dataset_id="cmems_mod_ibi_wav_my-aflux_0.027deg_P1H-i", start_datetime="2023-12-30 22:00:00", end_datetime="2023-12-30 23:00:00", output_directory="../test/temp/", output_filename="test.nc", maximum_depth=5, minimum_longitude=-4.5, maximum_longitude=-3, minimum_latitude=44, maximum_latitude=45, service="arco-geo-series")</td>
+<td style="text-align: left;">Python integer -100000 out of bounds for int16</td>
+<td style="text-align: left;">copernicusmarine.subset(dataset_id="cmems_mod_ibi_wav_my-aflux_0.027deg_P1H-i", start_datetime="2023-12-30 22:00:00", end_datetime="2023-12-30 23:00:00", variables=['TAUX'], output_directory="../test/temp/", output_filename="test.nc", service="arco-geo-series")</td>
+<td style="text-align: left;">Python integer -100000 out of bounds for int16</td>
+<td style="text-align: left;">d7237349-2d82-44cd-911f-36761ecce82c</td>
+</tr>
+<tr>
+<td style="text-align: left;">cmems_mod_ibi_wav_my-aflux_0.027deg_P1H-i</td>
+<td style="text-align: right;">202411</td>
+<td style="text-align: left;">default</td>
+<td style="text-align: left;">arco-time-series</td>
+<td style="text-align: left;">TAUX</td>
+<td style="text-align: left;">True</td>
+<td style="text-align: left;">2023-12-30 23:00:00</td>
+<td style="text-align: left;">Iberia-Biscay-Ireland</td>
+<td style="text-align: left;">False</td>
+<td style="text-align: right;">nan</td>
+<td style="text-align: left;">copernicusmarine.subset(dataset_id="cmems_mod_ibi_wav_my-aflux_0.027deg_P1H-i", start_datetime="2023-12-30 22:00:00", end_datetime="2023-12-30 23:00:00", output_directory="../test/temp/", output_filename="test.nc", maximum_depth=5, minimum_longitude=-4.5, maximum_longitude=-3, minimum_latitude=44, maximum_latitude=45, service="arco-time-series", variables=['TAUX'])</td>
+<td style="text-align: left;">Python integer -100000 out of bounds for int16</td>
+<td style="text-align: left;">copernicusmarine.subset(dataset_id="cmems_mod_ibi_wav_my-aflux_0.027deg_P1H-i", start_datetime="2023-12-30 22:00:00", end_datetime="2023-12-30 23:00:00", output_directory="../test/temp/", output_filename="test.nc", maximum_depth=5, minimum_longitude=-4.5, maximum_longitude=-3, minimum_latitude=44, maximum_latitude=45, service="arco-time-series")</td>
+<td style="text-align: left;">Python integer -100000 out of bounds for int16</td>
+<td style="text-align: left;">copernicusmarine.subset(dataset_id="cmems_mod_ibi_wav_my-aflux_0.027deg_P1H-i", start_datetime="2023-12-30 22:00:00", end_datetime="2023-12-30 23:00:00", variables=['TAUX'], output_directory="../test/temp/", output_filename="test.nc", service="arco-time-series")</td>
+<td style="text-align: left;">Python integer -100000 out of bounds for int16</td>
+<td style="text-align: left;">3ff7b54e-3532-467b-9b4d-f741a1e1c823</td>
 </tr>
 </tbody>
 </table>
