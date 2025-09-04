@@ -47,7 +47,10 @@ def build_command(kwargs):
 
     # Add the rest of the key-value pairs
     for key, value in items[1:]:
-        command += f', {key}="{value}"'
+        if type(value)==str:
+            command += f', {key}="{value}"'
+        else:
+            command += f', {key}={value}' 
 
     # Close the function call
     command += ")"
