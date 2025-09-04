@@ -14,11 +14,16 @@ def read_input_csv(data_dir, filename="list_of_informations_from_the_describe.cs
     path = os.path.join(data_dir, filename)
     return pd.read_csv(path)
 
-def write_output_csv(df, data_dir, full_filename="downloaded_datasets.csv", reduced_filename="downloaded_datasets_reduced.csv"):
+def write_output_csv(df, data_dir, full_filename="downloaded_datasets.csv",
+                     reduced_filename="downloaded_datasets_reduced.csv",
+                     error_filename="datasets_not_downloaded.csv"):
     df.to_csv(os.path.join(data_dir, full_filename), index=False)
     df[["dataset_id", "dataset_version", "version_part", "downloadable"]].to_csv(
         os.path.join(data_dir, reduced_filename), index=False
     )
+    df_with_error = df.copy()
+    df_with_error = df_with_error[df_with_error["downloadable"]==False]
+    df_with_error.to_csv(os.path.join(data_dir, error_filename), index=False)
 
 def assign_regions(df, region_identifier):
     """ This function is a wrapper over the function determine_region of download. 

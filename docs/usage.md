@@ -25,6 +25,9 @@ Master script. Loads datasets from describe, attempts downloads, stores results 
 - test_downloading_datasets
 Reads list_of_informations_from_the_describe.csv and tries to download all datasets listed.
 
+- script_to_markdown
+Creates a markdown page for printing the results of the script
+
 - treating_outputs
 Reads the downloaded_datasets CSV and provides basic statistics by region.
 
@@ -40,6 +43,12 @@ Some scripts depend on others having been run first:
 
 4. check_if_download_errors – requires step 3
 
-5. add_data_in_database – requires step 3
+5. script_to_markdown - requires step 3
 
-6. treating_outputs – requires step 3
+6. add_data_in_database – requires step 3
+
+7. treating_outputs – requires step 3
+
+### Login
+
+The script_to_markdown script requires login to github. So far it is down because the login are stored with the command "git config --global credential.helper store"
