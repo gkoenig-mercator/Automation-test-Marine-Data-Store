@@ -68,6 +68,11 @@ There should be four tables:
 -command: Command associated for the error (**Text**)
 -error_message: Message associated with the error (**Text**)
 
+The relationships between the tables is summarized in the following schema:
+
+
+![Database_schema](Database_schema.png)
+
 ## Consulting tables
 ### Simple consultation
 You can see the list of tables, once connected, with the following command:
