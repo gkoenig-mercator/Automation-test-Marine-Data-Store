@@ -1,6 +1,7 @@
 import pandas as pd
 from sqlalchemy import create_engine, insert
 import os
+import csv
 import uuid
 from dotenv import load_dotenv
 from src.test_availability_data.utils.general import get_data_directory_from_command_line
@@ -20,12 +21,15 @@ engine = create_engine(
     f"postgresql+psycopg2://{username}:{password}@{database_url}:{database_port}/{database_name}"
 )
 
-def append_test_metadata_in_db(start_time, end_time, linux_version, toolbox_version, script_version):
+def append_test_metadata_in_db(start_time, end_time, linux_version, toolbox_version,
+                               script_version, run_duration, number_of_datasets):
 
     with engine.begin() as conn:
         test_run = {
             "start_time": start_time,
             "end_time": end_time,
+            "run_duration_seconds": run_duration,
+            "numbers_of_datasets": number_of_datasets,
             "linux_version": linux_version,
             "toolbox_version": toolbox_version,
             "script_version": script_version,
@@ -63,16 +67,8 @@ def append_errors_in_db(data_dir):
                 })
     
     if error_rows:
-        errors_df = pd.DataFrame(error_rows)
-        
-        errors_df.to_sql(
-            name="errors",
-            con=engine,
-            if_exists="append",
-            index=False,
-            method="multi"
-        )
-        
+        with engine.begin() as conn:
+            conn.execute(insert(errors), error_rows)
         print(f"✅ Successfully inserted {len(errors_df)} error records")
         return len(errors_df)
     else:
@@ -86,14 +82,29 @@ def append_dataset_downloadable_status_in_db(data_dir, test_id):
     """
     
     file_path = os.path.join(data_dir, "downloaded_datasets.csv")
-    df = pd.read_csv(file_path)
-    df = df[["id","dataset_id", "dataset_version", "version_part","service_name",
-             "variable_name","first_command","last_downloadable_time",
-             "downloadable"]]
-    df["test_id"] = test_id
-    df = df.rename(columns={"first_command":"command"})
+    dataset_rows = []
 
-    df.to_sql("datasets_tested", engine, if_exists="append", index=False, chunksize=500)
+    # Read CSV and prepare rows
+    with open(file_path, newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            dataset_rows.append({
+                "id": str(uuid.uuid4()),          # unique ID for this dataset_test row
+                "test_id": test_id,               # link to the test_run
+                "dataset_id": row["dataset_id"],
+                "dataset_version": row["dataset_version"],
+                "version_part": row["version_part"],
+                "service_name": row["service_name"],
+                "variable_name": row["variable_name"],
+                "command": row["first_command"],  # rename column on the fly
+                "last_downloadable_time": row["last_downloadable_time"],
+                "downloadable": bool(row["downloadable"])
+             })
+
+    # Insert into database
+    if dataset_rows:
+        with engine.begin() as conn:
+            conn.execute(insert(datasets_tested), dataset_rows)
 
 if __name__ == "__main__":
 
