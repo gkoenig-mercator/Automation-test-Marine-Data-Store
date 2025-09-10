@@ -23,11 +23,11 @@ engine = create_engine(
     f"postgresql+psycopg2://{username}:{password}@{database_url}:5432/{database_name}"
 )
 
-metadata = MetaData(schema="public")
+metadata = MetaData(schema="testing")
 
 # --- 1. Testing metadata ---
 testing_metadata = Table(
-    "testing_metadata",
+    "test_runs",
     metadata,
     Column("id", String, primary_key=True, default=lambda: str(uuid.uuid4())),
     Column("start_time", DateTime, default=datetime.utcnow),
@@ -39,7 +39,7 @@ testing_metadata = Table(
 
 # --- 2. Datasets tested ---
 datasets_tested = Table(
-    "datasets_tested",
+    "test_run_datasets",
     metadata,
     Column("id", String, primary_key=True, default=lambda: str(uuid.uuid4())),
     Column("test_id", String, ForeignKey("public.testing_metadata.id")),
@@ -55,7 +55,7 @@ datasets_tested = Table(
 
 # --- 3. Errors ---
 errors = Table(
-    "errors",
+    "test_run_dataset_errors",
     metadata,
     Column("id", String, primary_key=True, default=lambda: str(uuid.uuid4())),
     Column("dataset_test_id", String, ForeignKey("public.datasets_tested.id")),
