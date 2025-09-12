@@ -69,7 +69,7 @@ def append_errors_in_db(data_dir):
     if error_rows:
         with engine.begin() as conn:
             conn.execute(insert(errors), error_rows)
-        print(f"✅ Successfully inserted {len(errors_df)} error records")
+        print(f"✅ Successfully inserted {len(errors)} error records")
         return len(errors_df)
     else:
         print("ℹ️ No error records to insert")
@@ -89,7 +89,7 @@ def append_dataset_downloadable_status_in_db(data_dir, test_id):
         reader = csv.DictReader(f)
         for row in reader:
             dataset_rows.append({
-                "id": str(uuid.uuid4()),          # unique ID for this dataset_test row
+                "id": row["id"],          # unique ID for this dataset_test row
                 "test_id": test_id,               # link to the test_run
                 "dataset_id": row["dataset_id"],
                 "dataset_version": row["dataset_version"],

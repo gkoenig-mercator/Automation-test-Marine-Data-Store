@@ -1,5 +1,5 @@
 from sqlalchemy import (
-    Table, Column, String, Boolean, Integer, MetaData, DateTime, ForeignKey, Text, create_engine
+    Table, Column, String, Boolean, Integer, MetaData, DateTime, ForeignKey, Text, create_engine, text
 )
 import uuid
 import os
@@ -51,7 +51,7 @@ datasets_tested = Table(
     Column("service_name", String),
     Column("variable_name", String),
     Column("command", Text),
-    Column("last_downloadable_time", DateTime, default=datetime.utcnow),
+    Column("last_downloadable_time", String),
     Column("downloadable", Boolean)
 )
 
@@ -66,7 +66,8 @@ errors = Table(
 )
 
 def create_schema(engine):
-    engine.execute(text("CREATE SCHEMA IF NOT EXISTS testing"))
+    with engine.begin() as conn:
+        conn.execute(text("CREATE SCHEMA IF NOT EXISTS testing"))
     metadata.create_all(engine)
 
 if __name__ == "__main__":
