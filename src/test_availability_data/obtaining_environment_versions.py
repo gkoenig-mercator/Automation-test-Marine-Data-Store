@@ -19,7 +19,7 @@ def get_toolbox_version():
 def get_versions():
     return {
         "linux_version": get_linux_version(),
-        "script_version": "0.1.0",
+        "script_version": "0.1.1",
         "toolbox_version": get_toolbox_version(),
     }
 
