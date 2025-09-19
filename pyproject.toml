@@ -16,16 +16,18 @@ authors = [
   {name = "Guillaume Koenig", email = "gkoenig@mercator-ocean.fr"}
 ]
 dependencies = [
-  "pandas==2.0.0",
   "copernicusmarine==2.3.0b0",
-  "sqlalchemy==2.0.0",
-  "psycopg2-binary==2.9.10",
+  "pandas>=2.0,<3",
+  "numpy>=1.23,<3",
+  "sqlalchemy>=2.0,<3",
+  "psycopg2-binary>=2.9,<3",
   "dotenv==0.9.9",
-  "zarr==3.0.0",
-  "tabulate==0.9.0",
+  "zarr>=3.0.1",
+  "tabulate>=0.9,<1",
   "distro==1.9.0",
-  "mkdocs==1.6.1"
-]
+  "mkdocs==1.6.1",
+  "xarray>2024.9.0"
+  ]
 
 [project.optional-dependencies]
 dev = ["mkdocs"]
