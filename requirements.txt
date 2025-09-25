@@ -1,7 +1,0 @@
-# To ensure app dependencies are ported from your virtual environment/host machine into your container, run 'pip freeze > requirements.txt' in the terminal to overwrite this file
-copernicusmarine==2.0.0
-pandas
-sqlalchemy
-psycopg2-binary
-dotenv
-zarr>=3.0.0
