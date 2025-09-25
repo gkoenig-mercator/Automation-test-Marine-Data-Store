@@ -26,25 +26,15 @@ def create_markdown_file_from_csv(data_dir):
             f.write("No error for this run")
 
 def deploy_on_gh_pages():
-    # Load .env variables
-    load_dotenv()
+    """Deploy documentation to GitHub Pages using mkdocs.
 
-    token = os.getenv("GITHUB_TOKEN")
-    username = os.getenv("GITHUB_USERNAME")
-
-    if not token or not username:
-        raise ValueError("❌ Missing one or more required environment variables")
-
-    # Run mkdocs deploy
+    Assumes that Git is already authenticated (via SSH or credential helper).
+    """
     try:
-        subprocess.run([
-            "mkdocs", "gh-deploy",
-            "--force"  # optional, see discussion earlier
-        ], check=True)
+        subprocess.run(["mkdocs", "gh-deploy", "--force"], check=True)
         print("✅ Docs deployed successfully")
     except subprocess.CalledProcessError as e:
         print("❌ Deployment failed:", e)
-
 
 if __name__ == "__main__":
 
