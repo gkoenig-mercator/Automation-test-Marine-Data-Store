@@ -30,6 +30,9 @@ def deploy_on_gh_pages():
 
     Assumes that Git is already authenticated (via SSH or credential helper).
     """
+    # Add GitHub host key (safe, only once)
+    subprocess.run("ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts", shell=True, check=True)
+
     try:
         subprocess.run(["mkdocs", "gh-deploy", "--force"], check=True)
         print("✅ Docs deployed successfully")
