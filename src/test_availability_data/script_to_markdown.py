@@ -26,18 +26,38 @@ def create_markdown_file_from_csv(data_dir):
             f.write("No error for this run")
 
 def deploy_on_gh_pages():
-    """Deploy documentation to GitHub Pages using mkdocs.
-
-    Assumes that Git is already authenticated (via SSH or credential helper).
     """
-    # Add GitHub host key (safe, only once)
-    subprocess.run("ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts", shell=True, check=True)
+    Deploy documentation to GitHub Pages using mkdocs via HTTPS + Personal Access Token.
+    
+    Requires:
+      - GH_TOKEN environment variable to be set (your GitHub PAT)
+      - mkdocs installed and configured with gh-pages
+    
+    Example:
+      export GH_TOKEN="ghp_XXXXXXXXXXXXXXXX"
+      deploy_on_gh_pages("username", "repository")
+    """
+    token = os.environ.get("GH_TOKEN")
+    repo_name = os.environ.get("GH_REPO")
+    repo_user = os.environ.get("GH_USER")
+
+    if not token:
+        print("❌ Error: GH_TOKEN environment variable is not set.")
+        sys.exit(1)
+
+    repo_url = f"https://{token}@github.com/{repo_user}/{repo_name}.git"
 
     try:
+        # Update remote URL to use token authentication
+        subprocess.run(["git", "remote", "set-url", "origin", repo_url], check=True)
+        
+        # Deploy documentation
         subprocess.run(["mkdocs", "gh-deploy", "--force"], check=True)
+        
         print("✅ Docs deployed successfully")
     except subprocess.CalledProcessError as e:
         print("❌ Deployment failed:", e)
+        sys.exit(1)
 
 if __name__ == "__main__":
 
