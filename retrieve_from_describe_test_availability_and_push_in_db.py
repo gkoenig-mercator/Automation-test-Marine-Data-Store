@@ -6,6 +6,7 @@ from src.test_availability_data.utils.general import get_data_directory_from_com
 from src.test_availability_data.utils.region_config import region_identifier
 from src.test_availability_data.obtaining_environment_versions import get_versions
 from src.test_availability_data.script_to_markdown import create_markdown_file_from_csv, deploy_on_gh_pages
+from src.test_availability_data.email_sending import email_sending
 
 import copernicusmarine
 import os
@@ -40,7 +41,8 @@ def main():
                                 )
     append_dataset_downloadable_status_in_db(data_dir, run_id)
     append_errors_in_db(data_dir)
-    print(no_error_in_download(data_dir))
+    if no_error_in_download(data_dir):
+        email_sending()
 
 
 if __name__ == "__main__":
