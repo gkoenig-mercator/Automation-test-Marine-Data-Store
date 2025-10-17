@@ -8,7 +8,7 @@ def sending_mail():
     recipient = "gkoenig@mercator-ocean.fr"
     password = os.environ["EMAIL_PASSWORD"]
 
-    msg = MIMEText("Your script has finished running!")
+    msg = MIMEText("Your script has finished running! But there was an issue, you should check the page: https://gkoenig-mercator.github.io/Automation-test-Marine-Data-Store/generated_table/ to know more about this!")
     msg["Subject"] = "Script Complete"
     msg["From"] = sender
     msg["To"] = recipient
