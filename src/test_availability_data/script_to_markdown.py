@@ -2,6 +2,7 @@ import pandas as pd
 import os
 import subprocess
 from dotenv import load_dotenv
+import sys
 from src.test_availability_data.utils.general import get_data_directory_from_command_line
 
 def create_markdown_file_from_csv(data_dir):
