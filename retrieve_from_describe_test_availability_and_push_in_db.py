@@ -27,11 +27,12 @@ def main():
     versions = get_versions()
     collect_and_store_dataset_informations(data_dir)
     check_dataset_availability_and_save_it(data_dir, region_identifier)
-    create_markdown_file_from_csv(data_dir,versions['toolbox_version'])
-    deploy_on_gh_pages()
     end_time = datetime.utcnow()
     run_duration = get_duration_in_seconds_from_two_utc(start_time, end_time)
     number_of_datasets = get_number_of_datasets_downloaded(data_dir)
+    number_of_datasets_with_errors = get_number_of_datasets_downloaded(data_dir,
+                                                           filename="datasets_not_downloaded.csv")
+    percentage_with_error = (number_of_datasets_with_errors/number_of_datasets)*100
     test_get_capabilities()
     run_id = append_test_metadata_in_db(start_time, end_time, 
                                versions['linux_version'],
@@ -42,6 +43,10 @@ def main():
                                 )
     append_dataset_downloadable_status_in_db(data_dir, run_id)
     append_errors_in_db(data_dir)
+    create_markdown_file_from_csv(data_dir,versions['toolbox_version'],
+                                  number_of_datasets,
+                                  percentage_with_error)
+    deploy_on_gh_pages()
     if not no_error_in_download(data_dir):
         sending_mail()
 

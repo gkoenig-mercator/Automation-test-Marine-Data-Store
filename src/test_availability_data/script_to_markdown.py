@@ -6,7 +6,9 @@ from dotenv import load_dotenv
 import sys
 from src.test_availability_data.utils.general import get_data_directory_from_command_line
 
-def create_markdown_file_from_csv(data_dir, toolbox_version="2.2.0", error_percentage="NA"):
+def create_markdown_file_from_csv(data_dir, toolbox_version="2.2.0",
+                                  number_of_datasets_tested="NA", 
+                                  error_percentage="NA"):
     
     # Read CSV file
     file_path = os.path.join(data_dir, "datasets_not_downloaded.csv")
