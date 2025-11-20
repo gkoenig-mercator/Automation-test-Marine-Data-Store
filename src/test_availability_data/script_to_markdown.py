@@ -15,6 +15,9 @@ def create_markdown_file_from_csv(data_dir, toolbox_version="2.2.0",
     try:
         df = pd.read_csv(file_path)
 
+        df = df[["dataset_id","first_command","first_error","second_command",
+                 "second_error","third_command","third_error"]]
+
         # Convert dataframe to markdown table
         markdown_table = df.to_markdown(index=False)
 
