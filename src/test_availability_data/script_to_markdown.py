@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import sys
 from src.test_availability_data.utils.general import get_data_directory_from_command_line
 
-def create_markdown_file_from_csv(data_dir, toolbox_version="2.2.0"):
+def create_markdown_file_from_csv(data_dir, toolbox_version="2.2.0", error_percentage="NA"):
     
     # Read CSV file
     file_path = os.path.join(data_dir, "datasets_not_downloaded.csv")
@@ -21,6 +21,7 @@ def create_markdown_file_from_csv(data_dir, toolbox_version="2.2.0"):
             f.write("# List of Datasets With Errors\n\n")
             f.write(f"Generated at: {datetime.utcnow().isoformat()}\n\n")
             f.write(f"Toolbox version: {toolbox_version}\n\n")
+            f.write(f"Percentage of non-downloadable datasets : {error_percentage})
             f.write(markdown_table)
 
     except pd.errors.EmptyDataError:
