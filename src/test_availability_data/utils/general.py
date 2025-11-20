@@ -73,7 +73,15 @@ def get_data_directory_from_command_line():
         help="Path to the directory containing csv files",
     )
     args = parser.parse_args()
-    return args.data_dir
+
+    # If path exists but is a file → error
+    if os.path.exists(data_dir) and not os.path.isdir(data_dir):
+        raise NotADirectoryError(f"❌ '{data_dir}' exists but is not a directory.")
+
+    # Create directory if needed (including parents)
+    os.makedirs(data_dir, exist_ok=True)
+
+    return data_dir
 
 def get_duration_in_seconds_from_two_utc(start_time, end_time):
     duration = end_time - start_time
