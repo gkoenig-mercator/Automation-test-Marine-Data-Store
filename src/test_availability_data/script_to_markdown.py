@@ -21,7 +21,7 @@ def create_markdown_file_from_csv(data_dir, toolbox_version="2.2.0",
         # Save into a markdown file inside docs/
         with open("docs/generated_table.md", "w") as f:
             f.write("# List of Datasets With Errors\n\n")
-            f.write(f"Generated at: {datetime.utcnow().isoformat()}\n\n")
+            f.write(f"Generated at: {datetime.utcnow().strftime("%B %d, %Y at %H:%M UTC")}\n\n")
             f.write(f"Toolbox version: {toolbox_version}\n\n")
             f.write(f"Number of datasets tested: {number_of_datasets_tested}\n\n")
             f.write(f"Percentage of non-downloadable datasets : {error_percentage} % \n\n")
