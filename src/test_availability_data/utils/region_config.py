@@ -32,6 +32,8 @@ region_identifier = {
             "north_nrt",
             "nrt_nh",
             "TIMESERIES-NH",
+            "SEAICE",
+            "ARC"
         ],
         "min_lon": -45,
         "max_lon": -44,
