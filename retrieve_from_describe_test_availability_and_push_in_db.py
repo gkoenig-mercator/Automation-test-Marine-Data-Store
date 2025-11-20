@@ -7,6 +7,7 @@ from src.test_availability_data.utils.region_config import region_identifier
 from src.test_availability_data.obtaining_environment_versions import get_versions
 from src.test_availability_data.script_to_markdown import create_markdown_file_from_csv, deploy_on_gh_pages
 from src.test_availability_data.email_sending import sending_mail
+from script_get_testing import test_get_capabilities
 
 import copernicusmarine
 import os
@@ -17,21 +18,21 @@ from datetime import datetime
 def main():
     start_time = datetime.utcnow()
     load_dotenv()
-    
     data_dir = get_data_directory_from_command_line()
     copernicusmarine.login(
         username=os.environ["COPERNICUS_MARINE_USERNAME"],
         password=os.environ["COPERNICUS_SERVICE_PASSWORD"],
         force_overwrite=True,
     )
+    versions = get_versions()
     collect_and_store_dataset_informations(data_dir)
     check_dataset_availability_and_save_it(data_dir, region_identifier)
-    create_markdown_file_from_csv(data_dir)
+    create_markdown_file_from_csv(data_dir,versions['toolbox_version'])
     deploy_on_gh_pages()
     end_time = datetime.utcnow()
     run_duration = get_duration_in_seconds_from_two_utc(start_time, end_time)
     number_of_datasets = get_number_of_datasets_downloaded(data_dir)
-    versions = get_versions()
+    test_get_capabilities()
     run_id = append_test_metadata_in_db(start_time, end_time, 
                                versions['linux_version'],
                                versions['toolbox_version'], 
