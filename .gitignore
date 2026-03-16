@@ -1,1 +1,17 @@
 .vscode
+
+
+# notebooks
+.ipynb_checkpoints
+
+# python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# asdf
+.tool-versions
+
+# environment variables
+.env

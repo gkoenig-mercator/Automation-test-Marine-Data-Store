@@ -1,0 +1,48 @@
+{
+  configuration: {
+    gpu: {
+      enabled: false,
+    },
+    containerImage: {
+      imageIsBuilt: false,
+      tag: '',
+      path: 'deploy/process/Dockerfile',
+    },
+    python: {
+      entrypointPath: '',
+      environmentPath: '',
+    },
+  },
+  metadata: {
+    id: 'my-process',
+    version: '0.0.1',
+    description: '',
+    icon: '',
+    home: '',
+    keywords: [],
+    appVersion: '',
+  },
+  git: {
+    enabled: true,
+    name: 'renaudjester',
+    email: '',
+    cache: '0',
+    token: '',
+    repository: 'https://github.com/gkoenig-mercator/Automation-test-Marine-Data-Store',
+    branch: 'main',
+  },
+  copernicusMarine: {
+    enabled: false,
+  },
+  processInputs: [],
+  resources: {
+    requests: {
+      cpu: '100m',
+      memory: '1Gi',
+    },
+    limits: {
+      cpu: '1000m',
+      memory: '4Gi',
+    },
+  },
+}
