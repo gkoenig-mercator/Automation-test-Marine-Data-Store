@@ -14,7 +14,7 @@
     },
   },
   metadata: {
-    id: 'my-process',
+    id: 'copernicusmarine-toolbox-test-bank',
     version: '0.0.1',
     description: '',
     icon: '',
@@ -29,7 +29,7 @@
     cache: '0',
     token: '',
     repository: 'https://github.com/gkoenig-mercator/Automation-test-Marine-Data-Store',
-    branch: 'main',
+    branch: 'create-a-process',
   },
   copernicusMarine: {
     enabled: false,
