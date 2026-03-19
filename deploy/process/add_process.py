@@ -1,4 +1,5 @@
 import os
+from urllib import response
 
 import dotenv
 import json5
@@ -37,7 +38,6 @@ class Authentificator:
         }
         response = requests.post(self.url, data=data)
         response.raise_for_status()
-        print("response:", response.json())
         return response.json().get("access_token", "")
 
 
@@ -56,8 +56,8 @@ class Client:
         headers = {"Authorization": f"Bearer {self.token}"}
         if self.project:
             headers["ONYXIA-PROJECT"] = self.project
-        response = requests.post(self.url, json=payload, headers=headers)
-        print("Response status code:", response.json())
+        response = requests.put(self.url, json=payload, headers=headers)
+        print("Response status code:", response)
         response.raise_for_status()
         return response
 
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     )
 
     token = authentificator.get_token()
-    url = "https://api.dive.edito.eu/processes/processes/add-your-process/execution"
+    url = "https://datalab.dive.edito.eu/api/my-lab/app"
     client = Client(
         token=token,
         url=url,

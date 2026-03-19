@@ -1,48 +1,57 @@
 {
-  configuration: {
-    gpu: {
-      enabled: false,
+  "catalogId": "edito-contribution",
+  "packageName": "add-your-process",
+  "packageVersion": "2.0.0",
+  "name": "add-your-process",
+  "friendlyName": "test-renaud",
+  "share": false,
+  "options": {
+    "configuration": {
+      "gpu": {
+        "enabled": false
+      },
+      "containerImage": {
+        "imageIsBuilt": false,
+        "tag": "",
+        "path": "deploy/process/Dockerfile"
+      },
+      "python": {
+        "entrypointPath": "",
+        "environmentPath": ""
+      }
     },
-    containerImage: {
-      imageIsBuilt: false,
-      tag: '',
-      path: 'deploy/process/Dockerfile',
+    "metadata": {
+      "id": "test-renaud-deploy",
+      "version": "0.0.1",
+      "description": "",
+      "icon": "",
+      "home": "",
+      "keywords": [],
+      "appVersion": ""
     },
-    python: {
-      entrypointPath: '',
-      environmentPath: '',
+    "git": {
+      "enabled": true,
+      "name": "vgaubin",
+      "email": "",
+      "cache": "0",
+      "token": "",
+      "repository": "https://github.com/gkoenig-mercator/Automation-test-Marine-Data-Store",
+      "branch": "create-a-process"
     },
-  },
-  metadata: {
-    id: 'copernicusmarine-toolbox-test-bank',
-    version: '0.0.1',
-    description: '',
-    icon: '',
-    home: '',
-    keywords: [],
-    appVersion: '',
-  },
-  git: {
-    enabled: true,
-    name: 'renaudjester',
-    email: '',
-    cache: '0',
-    token: '',
-    repository: 'https://github.com/gkoenig-mercator/Automation-test-Marine-Data-Store',
-    branch: 'create-a-process',
-  },
-  copernicusMarine: {
-    enabled: false,
-  },
-  processInputs: [],
-  resources: {
-    requests: {
-      cpu: '100m',
-      memory: '1Gi',
+    "copernicusMarine": {
+      "enabled": false
     },
-    limits: {
-      cpu: '1000m',
-      memory: '4Gi',
-    },
+    "processInputs": [],
+    "resources": {
+      "requests": {
+        "cpu": "100m",
+        "memory": "1Gi"
+      },
+      "limits": {
+        "cpu": "1000m",
+        "memory": "4Gi"
+      }
+    }
   },
+  "dryRun": false
 }

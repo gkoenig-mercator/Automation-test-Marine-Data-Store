@@ -1,3 +1,3 @@
-FROM atlassian/ubuntu-minimal:latest
+FROM ubuntu
 
 CMD ["echo", "Hello world!"]
