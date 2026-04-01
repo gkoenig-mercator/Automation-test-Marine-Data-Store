@@ -18,6 +18,9 @@ def collect_dataset_information() -> pd.DataFrame:
     dataset_informations = []
 
     for product in datasets_copernicus.products:
+        if product.product_id is "INSITU_GLO_PHY_TS_DISCRETE_MY_013_001":
+            continue
+
         for dataset in product.datasets:
             for version in dataset.versions:
                 for part in version.parts[:1]:
