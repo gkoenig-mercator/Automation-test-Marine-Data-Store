@@ -16,7 +16,7 @@ authors = [
   {name = "Guillaume Koenig", email = "gkoenig@mercator-ocean.fr"}
 ]
 dependencies = [
-  "copernicusmarine==2.3.0b0",
+  "copernicusmarine==2.4.0b2",
   "pandas>=2.0,<3",
   "numpy>=1.23,<3",
   "sqlalchemy>=2.0,<3",
