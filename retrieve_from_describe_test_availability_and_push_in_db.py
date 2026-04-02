@@ -43,12 +43,12 @@ def main():
                                 )
     append_dataset_downloadable_status_in_db(data_dir, run_id)
     append_errors_in_db(data_dir)
-    create_markdown_file_from_csv(data_dir,versions['toolbox_version'],
-                                  number_of_datasets,
-                                  percentage_with_error)
-    deploy_on_gh_pages()
-    if not no_error_in_download(data_dir):
-        sending_mail()
+#    create_markdown_file_from_csv(data_dir,versions['toolbox_version'],
+#                                  number_of_datasets,
+#                                  percentage_with_error)
+#    deploy_on_gh_pages()
+#    if not no_error_in_download(data_dir):
+#        sending_mail()
 
 
 if __name__ == "__main__":
