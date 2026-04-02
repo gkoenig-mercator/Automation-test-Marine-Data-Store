@@ -69,11 +69,6 @@ def append_errors_in_db(data_dir):
     if error_rows:
         with engine.begin() as conn:
             conn.execute(insert(errors), error_rows)
-        print(f"✅ Successfully inserted {len(errors)} error records")
-        return len(errors_df)
-    else:
-        print("ℹ️ No error records to insert")
-        return 0
 
 def append_dataset_downloadable_status_in_db(data_dir, test_id):
     """
