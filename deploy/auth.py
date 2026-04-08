@@ -3,12 +3,17 @@ import os
 import dotenv
 import requests
 
+from deploy.urls import AUTH_URL
+
 dotenv.load_dotenv()
 
 
-class Authentificator:
+class Authenticator:
     def __init__(
-        self, username: str | None, password: str | None, client_id: str | None
+        self,
+        username: str | None = None,
+        password: str | None = None,
+        client_id: str | None = None,
     ) -> None:
         if not username:
             username = os.getenv("EDITO_USERNAME")
@@ -24,7 +29,6 @@ class Authentificator:
         self.username = username
         self.password = password
         self.client_id = client_id
-        self.url = "https://auth.dive.edito.eu/auth/realms/datalab/protocol/openid-connect/token"
 
     def get_token(self) -> str:
         data = {
@@ -34,17 +38,6 @@ class Authentificator:
             "password": self.password,
             "scope": "openid",
         }
-        response = requests.post(self.url, data=data)
+        response = requests.post(AUTH_URL, data=data)
         response.raise_for_status()
-        print("response:", response.json())
         return response.json().get("access_token", "")
-
-
-if __name__ == "__main__":
-    authentificator = Authentificator(
-        username=os.getenv("EDITO_USERNAME"),
-        password=os.getenv("EDITO_PASSWORD"),
-        client_id=os.getenv("EDITO_CLIENT_ID"),
-    )
-    token = authentificator.get_token()
-    print("Access Token:", token)

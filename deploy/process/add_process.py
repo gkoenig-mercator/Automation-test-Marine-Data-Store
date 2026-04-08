@@ -1,81 +1,38 @@
+import argparse
 import os
-from urllib import response
 
-import dotenv
 import json5
-import requests
 
-dotenv.load_dotenv()
-
-
-class Authentificator:
-    def __init__(
-        self, username: str | None, password: str | None, client_id: str | None
-    ) -> None:
-        if not username:
-            username = os.getenv("EDITO_USERNAME")
-        if not password:
-            password = os.getenv("EDITO_PASSWORD")
-        if not client_id:
-            client_id = os.getenv("EDITO_CLIENT_ID")
-
-        if not username or not password or not client_id:
-            raise ValueError(
-                "Username, password, and client_id must be provided either as arguments or environment variables."
-            )
-        self.username = username
-        self.password = password
-        self.client_id = client_id
-        self.url = "https://auth.dive.edito.eu/auth/realms/datalab/protocol/openid-connect/token"
-
-    def get_token(self) -> str:
-        data = {
-            "grant_type": "password",
-            "client_id": self.client_id,
-            "username": self.username,
-            "password": self.password,
-            "scope": "openid",
-        }
-        response = requests.post(self.url, data=data)
-        response.raise_for_status()
-        return response.json().get("access_token", "")
-
-
-class Client:
-    """
-    Requests client with
-    authentified calls through bearer token.
-    """
-
-    def __init__(self, token: str, url: str, project: str | None) -> None:
-        self.token = token
-        self.url = url
-        self.project = project
-
-    def start_process(self, payload: dict) -> requests.Response:
-        headers = {"Authorization": f"Bearer {self.token}"}
-        if self.project:
-            headers["ONYXIA-PROJECT"] = self.project
-        response = requests.put(self.url, json=payload, headers=headers)
-        print("Response status code:", response)
-        response.raise_for_status()
-        return response
-
+from deploy.auth import Authenticator
+from deploy.client import EditoClient
+from deploy.urls import DATALAB_API_URL, PROCESS_NAME
 
 if __name__ == "__main__":
-    authentificator = Authentificator(
-        username=os.getenv("EDITO_USERNAME"),
-        password=os.getenv("EDITO_PASSWORD"),
-        client_id="onyxia",
-    )
+    parser = argparse.ArgumentParser(description="Create an EDITO process.")
 
-    token = authentificator.get_token()
-    url = "https://datalab.dive.edito.eu/api/my-lab/app"
-    client = Client(
-        token=token,
-        url=url,
-        project=os.getenv("EDITO_PROJECT"),
+    parser.add_argument(
+        "--version", default=None, help="Process version (default: 0.0.5)"
     )
+    args = parser.parse_args()
+    if not args.version:
+        raise ValueError(
+            "Version is required. Use --version to specify it "
+            "or as an env variable if you are using a Make command."
+        )
+    authentificator = Authenticator(client_id="onyxia")
+    token = authentificator.get_token()
+
+    client = EditoClient(token=token, project=os.getenv("EDITO_PROJECT"))
+
+    # first delete the process if it already exists
+    process_name = "add-your-process"
+    client.delete(url=DATALAB_API_URL, params={"path": process_name})
+    print(f"Process '{process_name}' deleted successfully.")
+
+    # then create the process
+    # TODO: check if the version already exists before overwriting and raise in this case
     payload = json5.load(open("deploy/process/add_process_payload.json5"))
-    response = client.start_process(payload=payload)
-    print("Process started successfully:", response.json())
+    payload["options"]["metadata"]["version"] = args.version
+    payload["options"]["metadata"]["id"] = PROCESS_NAME
+    response = client.put(url=DATALAB_API_URL, payload=payload)
+    print("Process added successfully:", response.json())

@@ -21,8 +21,8 @@
       }
     },
     "metadata": {
-      "id": "test-renaud-deploy",
-      "version": "0.0.1",
+      // "id": "test-renaud-deploy", Set in the code
+      // "version": "0.0.5", Set as argument of the command
       "description": "",
       "icon": "",
       "home": "",
@@ -51,7 +51,8 @@
         "cpu": "1000m",
         "memory": "4Gi"
       }
-    }
+    },
+    "catalogType": "Process"
   },
   "dryRun": false
 }

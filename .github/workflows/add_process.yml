@@ -1,10 +1,14 @@
-name: Deploy Database
+name: Add Process
 
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: "Version of the process to add"
+        required: true
 
 jobs:
-  deploy-database:
+  add-process:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,10 +26,9 @@ jobs:
       - name: Install dependencies
         run: poetry install --only deploy
 
-      - name: Start PostgreSQL database
+      - name: Add process
         env:
           EDITO_USERNAME: ${{ secrets.EDITO_USERNAME }}
           EDITO_PASSWORD: ${{ secrets.EDITO_PASSWORD }}
-          EDITO_CLIENT_ID: ${{ secrets.EDITO_CLIENT_ID }}
           EDITO_PROJECT: ${{ secrets.EDITO_PROJECT }}
-        run: make start-database
+        run: make add-process VERSION="${{ inputs.version }}"

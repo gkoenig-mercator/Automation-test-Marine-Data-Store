@@ -1,0 +1,39 @@
+{
+    "metadata": {
+        "project": "project-test-datasets-subsetting-toolbox"
+    },
+    "processInputs": {
+        "onyxia": {
+            "friendlyName": "test-renaud",
+            "share": false
+        },
+        "resources": {
+            "limits": {
+                "cpu": "500m",
+                "memory": "1Gi"
+            },
+            "requests": {
+                "cpu": "100m",
+                "memory": "200m"
+            }
+        },
+        "vault": {
+            "enabled": true,
+            "token": "",
+            "url": "",
+            "mount": "",
+            "directory": "",
+            "secret": ""
+        },
+        "s3": {
+            "enable": true,
+            "accessKeyId": "",
+            "endpoint": "",
+            "bucketName": "",
+            "defaultRegion": "",
+            "secretAccessKey": "",
+            "sessionToken": ""
+        },
+        "inputs": {}
+    }
+}

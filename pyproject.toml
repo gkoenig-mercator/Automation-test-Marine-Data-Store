@@ -31,6 +31,8 @@ python-dotenv = "^1.2.2"
 
 [tool.poetry.group.dev.dependencies]
 mkdocs = "==1.6.1"
+responses = ">=0.25.0"
+pytest = "^9.0.3"
 
 [tool.poetry.group.deploy.dependencies]
 requests = "^2.32.5"
