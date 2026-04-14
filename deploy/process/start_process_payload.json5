@@ -1,6 +1,6 @@
 {
     "metadata": {
-        "project": "project-test-datasets-subsetting-toolbox"
+        "project": "test-datasets-subsetting-toolbox" // "project-" is added by the API
     },
     "processInputs": {
         "onyxia": {
@@ -18,7 +18,7 @@
             }
         },
         "vault": {
-            "enabled": true,
+            "enabled": false,
             "token": "",
             "url": "",
             "mount": "",
@@ -26,11 +26,11 @@
             "secret": ""
         },
         "s3": {
-            "enable": true,
+            "enabled": true,
             "accessKeyId": "",
-            "endpoint": "",
+            "endpoint": "minio.dive.edito.eu",
             "bucketName": "",
-            "defaultRegion": "",
+            "defaultRegion": "waw3-1",
             "secretAccessKey": "",
             "sessionToken": ""
         },

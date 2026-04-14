@@ -30,6 +30,11 @@ class EditoClient:
         response.raise_for_status()
         return response
 
+    def get(self, url: str, params: dict | None = None) -> requests.Response:
+        response = requests.get(url, headers=self._headers(), params=params)
+        response.raise_for_status()
+        return response
+
     def delete(self, url: str, params: dict | None = None) -> requests.Response:
         response = requests.delete(url, headers=self._headers(), params=params)
         response.raise_for_status()

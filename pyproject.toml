@@ -16,9 +16,6 @@ authors = [
   {name = "Guillaume Koenig", email = "gkoenig@mercator-ocean.fr"}
 ]
 
-[tool.poetry]
-package-mode = false
-
 [tool.poetry.dependencies]
 copernicusmarine = "==2.3.0"
 pandas = "==2.3.3"
