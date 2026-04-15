@@ -1,0 +1,39 @@
+{
+    "metadata": {
+        "project": "test-datasets-subsetting-toolbox" // "project-" is added by the API
+    },
+    "processInputs": {
+        "onyxia": {
+            "friendlyName": "test-renaud",
+            "share": false
+        },
+        "resources": {
+            "limits": {
+                "cpu": "500m",
+                "memory": "1Gi"
+            },
+            "requests": {
+                "cpu": "100m",
+                "memory": "200m"
+            }
+        },
+        "vault": {
+            "enabled": false,
+            "token": "",
+            "url": "",
+            "mount": "",
+            "directory": "",
+            "secret": ""
+        },
+        "s3": {
+            "enabled": true,
+            "accessKeyId": "",
+            "endpoint": "minio.dive.edito.eu",
+            "bucketName": "",
+            "defaultRegion": "waw3-1",
+            "secretAccessKey": "",
+            "sessionToken": ""
+        },
+        "inputs": {}
+    }
+}

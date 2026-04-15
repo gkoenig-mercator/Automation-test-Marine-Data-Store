@@ -1,0 +1,34 @@
+name: Add Process
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version of the process to add"
+        required: true
+
+jobs:
+  add-process:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install Poetry
+        run: pipx install poetry
+
+      - name: Install dependencies
+        run: poetry install --only deploy
+
+      - name: Add process
+        env:
+          EDITO_USERNAME: ${{ secrets.EDITO_USERNAME }}
+          EDITO_PASSWORD: ${{ secrets.EDITO_PASSWORD }}
+          EDITO_PROJECT: ${{ secrets.EDITO_PROJECT }}
+        run: make add-process VERSION="${{ inputs.version }}"
