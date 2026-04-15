@@ -12,12 +12,12 @@ from src.test_availability_data.utils.general import (
 ALLOWED_SERVICES = ["arco-geo-series", "arco-time-series"]
 
 
-def collect_dataset_information() -> pd.DataFrame:
+def collect_dataset_information(max_products: Optional[int] = None) -> pd.DataFrame:
 
     datasets_copernicus = copernicusmarine.describe()
     dataset_informations = []
 
-    for product in datasets_copernicus.products:
+    for product in datasets_copernicus.products[:max_products] if max_products else datasets_copernicus.products:
         if product.product_id is "INSITU_GLO_PHY_TS_DISCRETE_MY_013_001":
             continue
 
@@ -59,8 +59,8 @@ def collect_dataset_information() -> pd.DataFrame:
     return pd.DataFrame(dataset_informations)
 
 
-def collect_and_store_dataset_informations(data_dir):
-    df = collect_dataset_information()
+def collect_and_store_dataset_informations(data_dir, max_products: Optional[int] = None):
+    df = collect_dataset_information(max_products)
     output_path = os.path.join(data_dir, "list_of_informations_from_the_describe.csv")
     df.to_csv(output_path, index=False)
     print(f"Saved dataset into {output_path}")
