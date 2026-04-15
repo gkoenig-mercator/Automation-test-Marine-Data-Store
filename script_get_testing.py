@@ -1,6 +1,7 @@
 import os
 import copernicusmarine
 import pandas as pd
+from typing import Optional
 
 ALLOWED_SERVICES = {'original-files', 'wmts'}
 EXCLUDED_PRODUCTS = ["INSITU_GLO_PHY_TS_DISCRETE_MY_013_001", "INSITU_GLO_PHY_TS_OA_MY_013_052"]
