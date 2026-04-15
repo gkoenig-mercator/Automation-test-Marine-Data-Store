@@ -24,12 +24,12 @@ def get_filename(result_get):
     except:
         return 'No file name found'
 
-def test_get_capabilities():
+def test_get_capabilities(max_products: Optional[int] = None):
     datasets_copernicus = copernicusmarine.describe()
     dataset_informations_dry_run = []
     dataset_informations_download = []
 
-    for product in datasets_copernicus.products:
+    for product in datasets_copernicus.products[:max_products] if max_products else datasets_copernicus.products:
         if product.product_id in EXCLUDED_PRODUCTS:
             continue
         for dataset in product.datasets:
