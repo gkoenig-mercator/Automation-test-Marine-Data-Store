@@ -1,137 +1,175 @@
-import copernicusmarine
-from copernicusmarine import CopernicusMarineService
-from typing import Optional, Generator
 import os
+import copernicusmarine
 import pandas as pd
 
-ALLOWED_SERVICES = ['original-files','wmts']
-EXCLUDED_PRODUCTS = ["INSITU_GLO_PHY_TS_DISCRETE_MY_013_001","INSITU_GLO_PHY_TS_OA_MY_013_052"]
+ALLOWED_SERVICES = {'original-files', 'wmts'}
+EXCLUDED_PRODUCTS = ["INSITU_GLO_PHY_TS_DISCRETE_MY_013_001", "INSITU_GLO_PHY_TS_OA_MY_013_052"]
+MAX_SIZE_MB = 2000
 
-def filter_allowed_services(
-    services: list[CopernicusMarineService],
-    allowed_services: Optional[list[str]] = None,
-) -> Generator[CopernicusMarineService, None, None]:
-    """Yield services in the authorized list"""
-    for service in services:
-        if service.service_name not in allowed_services:
-            continue
-        else:
-            yield service
 
-def get_filename(result_get):
+def do_dry_run(base_info):
+    """Step 1: Basic dry run with just dataset_id."""
     try:
-        return result_get.files[0].filename
-    except:
-        return 'No file name found'
+        result = copernicusmarine.get(
+            dataset_id=base_info["dataset_id"],
+            dry_run=True,
+            disable_progress_bar=True
+        )
+        record = {
+            **base_info,
+            "status_message": f"{result.status} + {result.message}",
+            "number_of_files": result.number_of_files_to_download,
+            "total_size": result.total_size,
+            "first_file": result.files[0].filename if result.files else "",
+            "error": False,
+            "error_message": ""
+        }
+        return record, result
+    except Exception as e:
+        record = {
+            **base_info,
+            "status_message": "Failed",
+            "number_of_files": 0,
+            "total_size": 0.0,
+            "first_file": "",
+            "error": True,
+            "error_message": str(e)
+        }
+        return record, None
+
+
+def check_size_limit(base_info, filename, max_size_mb):
+    """Step 2: Check specific file size. Returns (result, error_record)."""
+    try:
+        result = copernicusmarine.get(
+            dataset_id=base_info["dataset_id"],
+            dataset_version=base_info["dataset_version"],
+            dataset_part=base_info["version_part"],
+            filter=f"*{filename}*",
+            dry_run=True,
+            disable_progress_bar=True
+        )
+        
+        if result.total_size > max_size_mb:
+            error_record = {
+                **base_info,
+                "status_message": "Too big",
+                "number_of_files": result.number_of_files_to_download,
+                "total_size": result.total_size,
+                "first_file": filename,
+                "error": True,
+                "error_message": f"File too big: {result.total_size}MB > {max_size_mb}MB"
+            }
+            return None, error_record
+            
+        return result, None
+        
+    except Exception as e:
+        error_record = {
+            **base_info,
+            "status_message": "Size check failed",
+            "number_of_files": 0,
+            "total_size": 0.0,
+            "first_file": filename,
+            "error": True,
+            "error_message": str(e)
+        }
+        return None, error_record
+
+
+def do_download(base_info, filename):
+    """Step 3: Download file and cleanup. Returns record for logging."""
+    try:
+        result = copernicusmarine.get(
+            dataset_id=base_info["dataset_id"],
+            dataset_version=base_info["dataset_version"],
+            dataset_part=base_info["version_part"],
+            filter=f"*{filename}*",
+            output_directory="./",
+            no_directories=True,
+            disable_progress_bar=True
+        )
+        
+        # Cleanup downloaded file
+        try:
+            filepath = os.path.join("./", filename)
+            if os.path.exists(filepath):
+                os.remove(filepath)
+        except:
+            pass
+            
+        return {
+            **base_info,
+            "status_message": f"{result.status} + {result.message}",
+            "number_of_files": result.number_of_files_to_download,
+            "total_size": result.total_size,
+            "first_file": result.files[0].filename if result.files else filename,
+            "error": False,
+            "error_message": ""
+        }
+        
+    except Exception as e:
+        return {
+            **base_info,
+            "status_message": "Download failed",
+            "number_of_files": 0,
+            "total_size": 0.0,
+            "first_file": filename,
+            "error": True,
+            "error_message": str(e)
+        }
+
 
 def test_get_capabilities():
-    datasets_copernicus = copernicusmarine.describe()
-    dataset_informations_dry_run = []
-    dataset_informations_download = []
+    datasets = copernicusmarine.describe()
+    dry_run_records = []
+    download_records = []
 
-    for product in datasets_copernicus.products:
+    for product in datasets.products:
         if product.product_id in EXCLUDED_PRODUCTS:
             continue
+            
         for dataset in product.datasets:
             for version in dataset.versions:
-                for part in version.parts[:1]:
-                    for service in filter_allowed_services(
-                        part.services, ALLOWED_SERVICES):
-                        try:
-                            result_dry_run = copernicusmarine.get(dataset_id=dataset.dataset_id, dry_run=True,
-                                                             disable_progress_bar=True)
-                            print(dataset.dataset_id)
-                            dataset_informations_dry_run.append(
-                                {"dataset_id": dataset.dataset_id,
-                                 "dataset_version": version.label,
-                                 "version_part": part.name,
-                                 "service_name": service.service_name,
-                                 "result_dry_run": f"{result_dry_run.status} + {result_dry_run.message}",
-                                 "number_of_files":result_dry_run.number_of_files_to_download,
-                                 "total_size_to_download":result_dry_run.total_size,
-                                 "first_file_to_download":get_filename(result_dry_run),
-                                 "error":False})
-                        except Exception as e:
-                            dataset_informations_dry_run.append(
-                                {"dataset_id": dataset.dataset_id,
-                                 "dataset_version": version.label,
-                                 "version_part": part.name,
-                                 "service_name": service.service_name,
-                                 "result_dry_run": f"{result_dry_run.status} + {result_dry_run.message}",
-                                 "number_of_files":result_dry_run.number_of_files_to_download,
-                                 "total_size_to_download":result_dry_run.total_size,
-                                 "first_file_to_download":get_filename(result_dry_run),
-                                 "error":True})
-                        try:
-                            result_size_file = copernicusmarine.get(dataset_id= dataset.dataset_id,
-                                                                    dataset_version= version.label,
-                                                                    dataset_part= part.name,
-                                                                    filter=f"*{result_dry_run.files[0].filename}*",
-                                                                    dry_run=True)
-                        except Exception as e:
-                            dataset_informations_download.append(
-                                {"dataset_id": dataset.dataset_id,
-                                 "dataset_version": version.label,
-                                 "version_part": part.name,
-                                 "service_name": service.service_name,
-                                 "result_dry_run": f"No file",
-                                 "number_of_files":0,
-                                 "total_size_to_download":0,
-                                 "first_file_to_download":"",
-                                 "error":True,
-                                 "error_message":"No file associated"})
+                for part in version.parts[:1]:  # Only first part
+                    
+                    # Filter services inline
+                    for service in [s for s in part.services if s.service_name in ALLOWED_SERVICES]:
+                        
+                        print(f"Processing: {dataset.dataset_id}")
+                        
+                        # Common info used in all records
+                        base_info = {
+                            "dataset_id": dataset.dataset_id,
+                            "dataset_version": version.label,
+                            "version_part": part.name,
+                            "service_name": service.service_name,
+                        }
+                        
+                        # STEP 1: Dry run
+                        dry_record, dry_result = do_dry_run(base_info)
+                        dry_run_records.append(dry_record)
+                        
+                        if not dry_result or not dry_result.files:
+                            continue
+                            
+                        filename = dry_result.files[0].filename
+                        
+                        # STEP 2: Size check
+                        size_result, error_record = check_size_limit(base_info, filename, MAX_SIZE_MB)
+                        if error_record:
+                            download_records.append(error_record)
                             continue
                         
-                        if result_size_file.total_size > 2000: #Size is in Mb here
-                            dataset_informations_download.append(
-                                {"dataset_id": dataset.dataset_id,
-                                 "dataset_version": version.label,
-                                 "version_part": part.name,
-                                 "service_name": service.service_name,
-                                 "result_dry_run": f"{result_size_file.status} + {result_size_file.message}",
-                                 "number_of_files":result_size_file.number_of_files_to_download,
-                                 "total_size_to_download":result_size_file.total_size,
-                                 "first_file_to_download":get_filename(result_size_file),
-                                 "error":True,
-                                 "error_message":"File too big"})
-                            continue
-                        
-                        try:
-                            result = copernicusmarine.get(dataset_id= dataset.dataset_id, dataset_version= version.label,
-                                                          dataset_part= part.name, output_directory='./',
-                                                          filter=f"*{result_dry_run.files[0].filename}*",
-                                                          no_directories=True)
-                            dataset_informations_download.append(
-                                {"dataset_id": dataset.dataset_id,
-                                 "dataset_version": version.label,
-                                 "version_part": part.name,
-                                 "service_name": service.service_name,
-                                 "result_dry_run": f"{result.status} + {result.message}",
-                                 "number_of_files":result.number_of_files_to_download,
-                                 "total_size_to_download":result.total_size,
-                                 "first_file_to_download":get_filename(result),
-                                 "error":False,
-                                 "error_message":""})
-                            os.remove(result_dry_run.files[0].filename)
-                        except Exception as e:
-                            dataset_informations_download.append(
-                                {"dataset_id": dataset.dataset_id,
-                                 "dataset_version": version.label,
-                                 "version_part": part.name,
-                                 "service_name": service.service_name,
-                                 "result_dry_run": f"{result.status} + {result.message}",
-                                 "number_of_files":result.number_of_files_to_download,
-                                 "total_size_to_download":result.total_size,
-                                 "first_file_to_download":'',
-                                 "error":True,
-                                 "error_message":e})
+                        # STEP 3: Download
+                        dl_record = do_download(base_info, filename)
+                        download_records.append(dl_record)
 
+    # Save results
+    pd.DataFrame(dry_run_records).to_csv("get_products_dry_run.csv", index=False)
+    pd.DataFrame(download_records).to_csv("get_products_downloaded.csv", index=False)
+    print(f"Done: {len(dry_run_records)} dry runs, {len(download_records)} download attempts")
 
-    df_dry_run = pd.DataFrame(dataset_informations_dry_run)
-    df_information_download = pd.DataFrame(dataset_informations_download)
-
-    df_dry_run.to_csv("get_products_dry_run.csv", index=False)
-    df_information_download.to_csv("get_products_downloaded.csv", index=True)
 
 if __name__ == "__main__":
     test_get_capabilities()
