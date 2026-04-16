@@ -1,6 +1,7 @@
 import os
 import copernicusmarine
 import pandas as pd
+from typing import Optional
 
 ALLOWED_SERVICES = {'original-files', 'wmts'}
 EXCLUDED_PRODUCTS = ["INSITU_GLO_PHY_TS_DISCRETE_MY_013_001", "INSITU_GLO_PHY_TS_OA_MY_013_052"]
@@ -36,7 +37,6 @@ def do_dry_run(base_info):
             "error_message": str(e)
         }
         return record, None
-
 
 def check_size_limit(base_info, filename, max_size_mb):
     """Step 2: Check specific file size. Returns (result, error_record)."""
@@ -120,12 +120,12 @@ def do_download(base_info, filename):
         }
 
 
-def test_get_capabilities():
-    datasets = copernicusmarine.describe()
+def test_get_capabilities(max_products: Optional[int] = None):
+    datasets_copernicus = copernicusmarine.describe()
     dry_run_records = []
     download_records = []
 
-    for product in datasets.products:
+    for product in datasets_copernicus.products[:max_products] if max_products else datasets_copernicus.products:
         if product.product_id in EXCLUDED_PRODUCTS:
             continue
             

@@ -4,7 +4,7 @@ import subprocess
 from datetime import datetime
 from dotenv import load_dotenv
 import sys
-from src.test_availability_data.utils.general import get_data_directory_from_command_line
+from src.test_availability_data.utils.general import get_configuration_from_command_line
 
 def create_markdown_file_from_csv(data_dir, toolbox_version="2.2.0",
                                   number_of_datasets_tested="NA", 
@@ -72,6 +72,6 @@ def deploy_on_gh_pages():
 
 if __name__ == "__main__":
 
-    data_dir = get_data_directory_from_command_line()
+    data_dir, max_products = get_configuration_from_command_line()
     create_markdown_file_from_csv(data_dir)
     deploy_on_gh_pages()
