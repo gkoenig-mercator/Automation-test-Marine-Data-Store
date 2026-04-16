@@ -38,7 +38,6 @@ def do_dry_run(base_info):
         }
         return record, None
 
-
 def check_size_limit(base_info, filename, max_size_mb):
     """Step 2: Check specific file size. Returns (result, error_record)."""
     try:
