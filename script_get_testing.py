@@ -120,12 +120,12 @@ def do_download(base_info, filename):
         }
 
 
-def test_get_capabilities():
-    datasets = copernicusmarine.describe()
-    dry_run_records = []
-    download_records = []
+def test_get_capabilities(max_products: Optional[int] = None):
+    datasets_copernicus = copernicusmarine.describe()
+    dataset_informations_dry_run = []
+    dataset_informations_download = []
 
-    for product in datasets.products:
+    for product in datasets_copernicus.products[:max_products] if max_products else datasets_copernicus.products:
         if product.product_id in EXCLUDED_PRODUCTS:
             continue
             
