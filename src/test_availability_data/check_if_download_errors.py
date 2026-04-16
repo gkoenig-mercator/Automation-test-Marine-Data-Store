@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-from src.test_availability_data.utils.general import get_data_directory_from_command_line
+from src.test_availability_data.utils.general import get_configuration_from_command_line
 
 
 def no_error_in_download(data_dir):
@@ -11,5 +11,5 @@ def no_error_in_download(data_dir):
 
 
 if __name__ == "__main__":
-    data_dir = get_data_directory_from_command_line()
+    data_dir, max_products = get_configuration_from_command_line()
     print(no_error_in_download(data_dir))

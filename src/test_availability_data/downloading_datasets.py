@@ -5,7 +5,7 @@ import uuid
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from src.test_availability_data.utils.download import determine_region, Downloader, build_attempts
 from src.test_availability_data.utils.region_config import region_identifier
-from src.test_availability_data.utils.general import get_data_directory_from_command_line
+from src.test_availability_data.utils.general import get_configuration_from_command_line
 
 logging.getLogger("copernicusmarine").setLevel("DEBUG")
 
@@ -112,5 +112,5 @@ def check_dataset_availability_and_save_it(data_dir, region_identifier, parallel
 
 if __name__ == "__main__":
 
-    data_dir = get_data_directory_from_command_line()
+    data_dir, max_products = get_configuration_from_command_line()
     check_dataset_availability_and_save_it(data_dir, region_identifier, parallel=True)
