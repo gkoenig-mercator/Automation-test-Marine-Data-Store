@@ -1,9 +1,9 @@
 import pandas as pd
 import os
-from utils.general import get_data_directory_from_command_line
+from utils.general import get_configuration_from_command_line
 
 
-data_dir = get_data_directory_from_command_line()
+data_dir, max_products = get_configuration_from_command_line()
 
 # --- Load dataset ---
 csv_path = os.path.join(data_dir, "downloaded_datasets.csv")

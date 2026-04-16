@@ -4,7 +4,7 @@ import os
 import csv
 import uuid
 from dotenv import load_dotenv
-from src.test_availability_data.utils.general import get_data_directory_from_command_line
+from src.test_availability_data.utils.general import get_configuration_from_command_line
 from src.test_availability_data.database_management.create_database_table import testing_metadata, errors, datasets_tested
 
 load_dotenv()
@@ -103,5 +103,5 @@ def append_dataset_downloadable_status_in_db(data_dir, test_id):
 
 if __name__ == "__main__":
 
-    data_dir = get_data_directory_from_command_line()
+    data_dir, max_products = get_configuration_from_command_line()
     append_data_in_db(data_dir)

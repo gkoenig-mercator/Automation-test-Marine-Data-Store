@@ -7,7 +7,7 @@ from src.test_availability_data.utils.general import (
     filter_allowed_services,
     check_if_there_is_time_coordinate,
     get_first_variable_with_a_time_coordinate,
-    get_data_directory_from_command_line,
+    get_configuration_from_command_line,
 )
 
 ALLOWED_SERVICES = ["arco-geo-series", "arco-time-series"]
@@ -68,5 +68,5 @@ def collect_and_store_dataset_informations(data_dir, max_products: Optional[int]
 
 
 if __name__ == "__main__":
-    data_dir = get_data_directory_from_command_line()
-    collect_and_store_dataset_informations(data_dir)
+    data_dir, max_products = get_configuration_from_command_line()
+    collect_and_store_dataset_informations(data_dir, max_products)

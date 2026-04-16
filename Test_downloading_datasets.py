@@ -4,7 +4,7 @@ import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from utils.download import determine_region, Downloader, build_attempts
 from utils.region_config import region_identifier
-from utils.general import get_data_directory_from_command_line
+from utils.general import get_configuration_from_command_line
 
 logging.getLogger("copernicusmarine").setLevel("DEBUG")
 
@@ -100,5 +100,5 @@ def test_dataset_availability_and_save_it(data_dir, parallel=False, max_workers=
 
 if __name__ == "__main__":
 
-    data_dir = get_data_directory_from_command_line()
+    data_dir, max_products = get_configuration_from_command_line()
     test_dataset_availability_and_save_it(data_dir, parallel=False)
