@@ -33,7 +33,7 @@ def main():
     number_of_datasets_with_errors = get_number_of_datasets_downloaded(data_dir,
                                                            filename="datasets_not_downloaded.csv")
     percentage_with_error = (number_of_datasets_with_errors/number_of_datasets)*100
-    test_get_capabilities(max_products)
+    test_get_capabilities(data_dir, max_products)
     run_id = append_test_metadata_in_db(start_time, end_time, 
                                versions['linux_version'],
                                versions['toolbox_version'], 

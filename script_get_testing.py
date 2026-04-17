@@ -1,6 +1,7 @@
 import os
 import copernicusmarine
 import pandas as pd
+from src.test_availability_data.utils.general import get_configuration_from_command_line
 from typing import Optional
 
 ALLOWED_SERVICES = {'original-files', 'wmts'}
@@ -120,7 +121,7 @@ def do_download(base_info, filename):
         }
 
 
-def test_get_capabilities(max_products: Optional[int] = None):
+def test_get_capabilities(data_dir, max_products: Optional[int] = None):
     datasets_copernicus = copernicusmarine.describe()
     dry_run_records = []
     download_records = []
@@ -166,10 +167,13 @@ def test_get_capabilities(max_products: Optional[int] = None):
                         download_records.append(dl_record)
 
     # Save results
-    pd.DataFrame(dry_run_records).to_csv("get_products_dry_run.csv", index=False)
-    pd.DataFrame(download_records).to_csv("get_products_downloaded.csv", index=False)
+    dry_run_path = os.path.join(data_dir, "get_products_dry_run.csv")
+    products_downloaded_path = os.path.join(data_dir, "get_products_downloaded.csv")
+    pd.DataFrame(dry_run_records).to_csv(dry_run_path, index=False)
+    pd.DataFrame(download_records).to_csv(products_downloaded_path, index=False)
     print(f"Done: {len(dry_run_records)} dry runs, {len(download_records)} download attempts")
 
 
 if __name__ == "__main__":
-    test_get_capabilities()
+    data_dir, max_products = get_configuration_from_command_line()
+    test_get_capabilities(data_dir, max_products)
