@@ -2,6 +2,16 @@
 
 This repository contains automated testing scripts designed to monitor and verify the quality and availability of data from the Copernicus Data Store. A more detailed documentation can be found here: https://gkoenig-mercator.github.io/Automation-test-Marine-Data-Store/
 
+## Uses
+
+2) Set up an environment and activate it: python -m venv copernicusmarinetoolboxtestsuite && source copernicusmarinetoolboxtestsuite/bin/activate
+3) Clone the latest version of the script: git clone https://github.com/gkoenig-mercator/Automation-test-Marine-Data-Store.git
+4) Install the dependencies: cd Automation-test_Marine-Data-Store && pip .
+5) Fill the .env file to ask from the contacts
+6) Run the master script: python retrieve_from_describe_test_availability_and_push_in_db.py --data-dir data
+
+The results will be stored in the folder "data" as csv files and in the database
+
 ## Purpose
 
 The primary focus of these tests is **not** to validate the functionalities of the Copernicus Marine Toolbox commands themselves, but rather to:
@@ -23,7 +33,7 @@ The initial suite of tests includes:
 - Comparison between current and historical datasets to detect any unintended modifications  (**To be implemented**)
 - Measurement and logging of data download speeds  (**To be implemented**)
 
-## Uses and Scripts Descriptions
+## Scripts Descriptions
 
 Most of the script can be run independently. What they do is:
 
