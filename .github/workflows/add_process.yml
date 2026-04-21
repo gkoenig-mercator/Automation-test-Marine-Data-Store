@@ -30,5 +30,5 @@ jobs:
         env:
           EDITO_USERNAME: ${{ secrets.EDITO_USERNAME }}
           EDITO_PASSWORD: ${{ secrets.EDITO_PASSWORD }}
-          EDITO_PROJECT: ${{ secrets.EDITO_PROJECT }}
-        run: make add-process VERSION="${{ inputs.version }}"
+          EDITO_PROJECT: ${{ secrets.EDITO_PROJECT }} 
+        run: make add-process EDITO_PROCESS_VERSION="${{ inputs.version }}" CODE_VERSION="${{ github.ref_name }}"

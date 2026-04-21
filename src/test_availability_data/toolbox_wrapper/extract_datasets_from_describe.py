@@ -1,25 +1,30 @@
-import pandas as pd
-import copernicusmarine
-from typing import Optional
 import os
+from typing import Optional
+
+import copernicusmarine
+import pandas as pd
+
 from test_availability_data.toolbox_wrapper.general import (
+    check_if_there_is_time_coordinate,
     extract_last_available_time,
     filter_allowed_services,
-    check_if_there_is_time_coordinate,
-    get_first_variable_with_a_time_coordinate,
     get_configuration_from_command_line,
+    get_first_variable_with_a_time_coordinate,
 )
 
 ALLOWED_SERVICES = ["arco-geo-series", "arco-time-series"]
 
 
 def collect_dataset_information(max_products: Optional[int] = None) -> pd.DataFrame:
-
     datasets_copernicus = copernicusmarine.describe()
     dataset_informations = []
 
-    for product in datasets_copernicus.products[:max_products] if max_products else datasets_copernicus.products:
-        if product.product_id is "INSITU_GLO_PHY_TS_DISCRETE_MY_013_001":
+    for product in (
+        datasets_copernicus.products[:max_products]
+        if max_products
+        else datasets_copernicus.products
+    ):
+        if product.product_id == "INSITU_GLO_PHY_TS_DISCRETE_MY_013_001":
             continue
 
         for dataset in product.datasets:
@@ -37,9 +42,12 @@ def collect_dataset_information(max_products: Optional[int] = None) -> pd.DataFr
                                     service.variables
                                 )
                             )
-                            last_time = extract_last_available_time(
-                                service.variables[idx]
-                            )
+                            if idx is not None:
+                                last_time = extract_last_available_time(
+                                    service.variables[idx]
+                                )
+                            else:
+                                continue
 
                         dataset_informations.append(
                             {
@@ -60,7 +68,9 @@ def collect_dataset_information(max_products: Optional[int] = None) -> pd.DataFr
     return pd.DataFrame(dataset_informations)
 
 
-def collect_and_store_dataset_informations(data_dir, max_products: Optional[int] = None):
+def collect_and_store_dataset_informations(
+    data_dir, max_products: Optional[int] = None
+):
     df = collect_dataset_information(max_products)
     output_path = os.path.join(data_dir, "list_of_informations_from_the_describe.csv")
     df.to_csv(output_path, index=False)

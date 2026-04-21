@@ -1,7 +1,10 @@
-import pandas as pd
 import os
-from test_availability_data.toolbox_wrapper.general import get_configuration_from_command_line
 
+import pandas as pd
+
+from test_availability_data.toolbox_wrapper.general import (
+    get_configuration_from_command_line,
+)
 
 data_dir, max_products = get_configuration_from_command_line()
 

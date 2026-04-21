@@ -1,11 +1,19 @@
-import pandas as pd
-from sqlalchemy import create_engine, insert
-import os
 import csv
+import os
 import uuid
+
+import pandas as pd
 from dotenv import load_dotenv
-from test_availability_data.toolbox_wrapper.general import get_configuration_from_command_line
-from test_availability_data.database_management.schemas import testing_metadata, errors, datasets_tested
+from sqlalchemy import create_engine, insert
+
+from test_availability_data.database_management.schemas import (
+    datasets_tested,
+    errors,
+    testing_metadata,
+)
+from test_availability_data.toolbox_wrapper.general import (
+    get_configuration_from_command_line,
+)
 
 load_dotenv()
 
@@ -21,9 +29,16 @@ engine = create_engine(
     f"postgresql+psycopg2://{username}:{password}@{database_url}:{database_port}/{database_name}"
 )
 
-def append_test_metadata_in_db(start_time, end_time, linux_version, toolbox_version,
-                               script_version, run_duration, number_of_datasets):
 
+def append_test_metadata_in_db(
+    start_time,
+    end_time,
+    linux_version,
+    toolbox_version,
+    script_version,
+    run_duration,
+    number_of_datasets,
+):
     with engine.begin() as conn:
         test_run = {
             "start_time": start_time,
@@ -35,9 +50,13 @@ def append_test_metadata_in_db(start_time, end_time, linux_version, toolbox_vers
             "script_version": script_version,
         }
         result = conn.execute(insert(testing_metadata).values(test_run))
-        test_id = result.inserted_primary_key[0]  # UUID of the new test run
+        if result.inserted_primary_key:
+            test_id = result.inserted_primary_key[0]  # UUID of the new test run
+        else:
+            raise Exception("Failed to retrieve test_id after inserting test metadata.")
 
     return test_id
+
 
 # Recommended version for your use case - pandas-based bulk operations
 def append_errors_in_db(data_dir):
@@ -47,35 +66,38 @@ def append_errors_in_db(data_dir):
     """
     file_path = os.path.join(data_dir, "downloaded_datasets.csv")
     df = pd.read_csv(file_path)
-    
+
     error_rows = []
-    
+
     for _, row in df.iterrows():
         dataset_test_id = row["id"]  # <-- use CSV's "id" column
-        
+
         for error_col, cmd_col in zip(
             ["first_error", "second_error", "third_error"],
-            ["first_command", "second_command", "third_command"]
+            ["first_command", "second_command", "third_command"],
         ):
             error_msg = row[error_col]
             if pd.notnull(error_msg) and error_msg != "None":
-                error_rows.append({
-                    "id": str(uuid.uuid4()),             # unique ID for error row
-                    "dataset_test_id": dataset_test_id,  # link back to test row
-                    "command": row[cmd_col],
-                    "error_message": error_msg
-                })
-    
+                error_rows.append(
+                    {
+                        "id": str(uuid.uuid4()),  # unique ID for error row
+                        "dataset_test_id": dataset_test_id,  # link back to test row
+                        "command": row[cmd_col],
+                        "error_message": error_msg,
+                    }
+                )
+
     if error_rows:
         with engine.begin() as conn:
             conn.execute(insert(errors), error_rows)
+
 
 def append_dataset_downloadable_status_in_db(data_dir, test_id):
     """
     Pandas-optimized version - perfect for teams comfortable with pandas
     and datasets up to a few thousand rows
     """
-    
+
     file_path = os.path.join(data_dir, "downloaded_datasets.csv")
     dataset_rows = []
 
@@ -83,25 +105,27 @@ def append_dataset_downloadable_status_in_db(data_dir, test_id):
     with open(file_path, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            dataset_rows.append({
-                "id": row["id"],          # unique ID for this dataset_test row
-                "test_id": test_id,               # link to the test_run
-                "dataset_id": row["dataset_id"],
-                "dataset_version": row["dataset_version"],
-                "version_part": row["version_part"],
-                "service_name": row["service_name"],
-                "variable_name": row["variable_name"],
-                "command": row["first_command"],  # rename column on the fly
-                "last_downloadable_time": row["last_downloadable_time"],
-                "downloadable": bool(row["downloadable"])
-             })
+            dataset_rows.append(
+                {
+                    "id": row["id"],  # unique ID for this dataset_test row
+                    "test_id": test_id,  # link to the test_run
+                    "dataset_id": row["dataset_id"],
+                    "dataset_version": row["dataset_version"],
+                    "version_part": row["version_part"],
+                    "service_name": row["service_name"],
+                    "variable_name": row["variable_name"],
+                    "command": row["first_command"],  # rename column on the fly
+                    "last_downloadable_time": row["last_downloadable_time"],
+                    "downloadable": bool(row["downloadable"]),
+                }
+            )
 
     # Insert into database
     if dataset_rows:
         with engine.begin() as conn:
             conn.execute(insert(datasets_tested), dataset_rows)
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     data_dir, max_products = get_configuration_from_command_line()
-    append_data_in_db(data_dir)
+    append_errors_in_db(data_dir)

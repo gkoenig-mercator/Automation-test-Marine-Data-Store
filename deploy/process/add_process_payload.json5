@@ -13,7 +13,7 @@
       "containerImage": {
         "imageIsBuilt": false,
         "tag": "",
-        "path": "deploy/process/Dockerfile"
+        "path": "src/Dockerfile"
       },
       "python": {
         "entrypointPath": "",
@@ -36,7 +36,7 @@
       "cache": "0",
       "token": "",
       "repository": "https://github.com/gkoenig-mercator/Automation-test-Marine-Data-Store",
-      "branch": "create-a-process"
+      // "branch": "main" # Set as argument of the command
     },
     "copernicusMarine": {
       "enabled": false
