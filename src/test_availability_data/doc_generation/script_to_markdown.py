@@ -4,7 +4,7 @@ import subprocess
 from datetime import datetime
 from dotenv import load_dotenv
 import sys
-from test_availability_data.utils.general import get_configuration_from_command_line
+from test_availability_data.toolbox_wrapper.general import get_configuration_from_command_line
 
 def create_markdown_file_from_csv(data_dir, toolbox_version="2.2.0",
                                   number_of_datasets_tested="NA", 

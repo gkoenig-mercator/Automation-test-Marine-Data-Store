@@ -3,9 +3,9 @@ import os
 import logging
 import uuid
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from test_availability_data.utils.download import determine_region, Downloader, build_attempts
-from test_availability_data.utils.region_config import region_identifier
-from test_availability_data.utils.general import get_configuration_from_command_line
+from test_availability_data.toolbox_wrapper.download import determine_region, Downloader, build_attempts
+from test_availability_data.config.region_config import region_identifier
+from test_availability_data.toolbox_wrapper.general import get_configuration_from_command_line
 
 logging.getLogger("copernicusmarine").setLevel("DEBUG")
 

@@ -1,0 +1,17 @@
+dataset_id,dataset_version,version_part,service_name,variable_name,has_time_coordinate,last_available_time
+cmems_mod_arc_bgc_anfc_ecosmo_P1D-m,202105,default,arco-geo-series,chl,True,2026-04-29 00:00:00
+cmems_mod_arc_bgc_anfc_ecosmo_P1D-m,202105,default,arco-time-series,chl,True,2026-04-29 00:00:00
+cmems_mod_arc_bgc_anfc_ecosmo_P1M-m,202211,default,arco-geo-series,chl,True,2026-03-01 00:00:00
+cmems_mod_arc_bgc_anfc_ecosmo_P1M-m,202211,default,arco-time-series,chl,True,2026-03-01 00:00:00
+cmems_mod_arc_phy_anfc_6km_detided_P1D-m,202311,default,arco-geo-series,bottomT,True,2026-04-29 00:00:00
+cmems_mod_arc_phy_anfc_6km_detided_P1D-m,202311,default,arco-time-series,bottomT,True,2026-04-29 00:00:00
+cmems_mod_arc_phy_anfc_6km_detided_P1M-m,202311,default,arco-geo-series,bottomT,True,2026-03-01 00:00:00
+cmems_mod_arc_phy_anfc_6km_detided_P1M-m,202311,default,arco-time-series,bottomT,True,2026-03-01 00:00:00
+cmems_mod_arc_phy_anfc_6km_detided_PT1H-i,202311,default,arco-geo-series,siconc,True,2026-04-29 23:00:00
+cmems_mod_arc_phy_anfc_6km_detided_PT1H-i,202311,default,arco-time-series,siconc,True,2026-04-29 23:00:00
+cmems_mod_arc_phy_anfc_6km_detided_PT6H-m,202311,default,arco-geo-series,bottomT,True,2026-04-22 21:00:00
+cmems_mod_arc_phy_anfc_6km_detided_PT6H-m,202311,default,arco-time-series,bottomT,True,2026-04-22 21:00:00
+cmems_mod_arc_phy_anfc_nextsim_P1M-m,202311,default,arco-geo-series,si_ridge_ratio,True,2026-03-01 00:00:00
+cmems_mod_arc_phy_anfc_nextsim_P1M-m,202311,default,arco-time-series,si_ridge_ratio,True,2026-03-01 00:00:00
+cmems_mod_arc_phy_anfc_nextsim_hm,202311,default,arco-geo-series,si_ridge_ratio,True,2026-04-28 23:00:00
+cmems_mod_arc_phy_anfc_nextsim_hm,202311,default,arco-time-series,si_ridge_ratio,True,2026-04-28 23:00:00
