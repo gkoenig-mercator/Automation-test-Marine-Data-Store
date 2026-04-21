@@ -1,11 +1,10 @@
 import pandas as pd
 import os
 import logging
-import uuid
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from test_availability_data.utils.download import determine_region, Downloader, build_attempts
-from test_availability_data.utils.region_config import region_identifier
-from test_availability_data.utils.general import get_configuration_from_command_line
+from utils.download import determine_region, Downloader, build_attempts
+from utils.region_config import region_identifier
+from utils.general import get_configuration_from_command_line
 
 logging.getLogger("copernicusmarine").setLevel("DEBUG")
 
@@ -14,24 +13,17 @@ def read_input_csv(data_dir, filename="list_of_informations_from_the_describe.cs
     path = os.path.join(data_dir, filename)
     return pd.read_csv(path)
 
-def write_output_csv(df, data_dir, full_filename="downloaded_datasets.csv",
-                     reduced_filename="downloaded_datasets_reduced.csv",
-                     error_filename="datasets_not_downloaded.csv"):
+def write_output_csv(df, data_dir, full_filename="downloaded_datasets.csv", reduced_filename="downloaded_datasets_reduced.csv"):
     df.to_csv(os.path.join(data_dir, full_filename), index=False)
     df[["dataset_id", "dataset_version", "version_part", "downloadable"]].to_csv(
         os.path.join(data_dir, reduced_filename), index=False
     )
-    df_with_error = df.copy()
-    df_with_error = df_with_error[df_with_error["downloadable"]==False]
-    df_with_error.to_csv(os.path.join(data_dir, error_filename), index=False)
 
 def assign_regions(df, region_identifier):
-    """ This function is a wrapper over the function determine_region of download. 
-    It is used to determine the regions for an entire pandas dataframe."""
     df["region"] = df["dataset_id"].apply(lambda ds: determine_region(ds, region_identifier))
     return df
 
-def process_row_for_download(row, data_dir, region_identifier, downloader_cls=Downloader):
+def process_row_for_download(row, data_dir, region_identifier):
     if pd.isnull(row["last_available_time"]):
         return {
             "downloadable": False,
@@ -45,7 +37,7 @@ def process_row_for_download(row, data_dir, region_identifier, downloader_cls=Do
         }
 
     info = row.to_dict()
-    downloader = downloader_cls(data_dir)
+    downloader = Downloader(data_dir)
     attempts = build_attempts(info, region_identifier, data_dir)
     result = downloader.run(attempts)
 
@@ -93,7 +85,7 @@ def process_dataframe_parallel(df, data_dir, region_identifier, max_workers=4):
     
     return pd.concat([df, results_df], axis=1)
 
-def check_dataset_availability_and_save_it(data_dir, region_identifier, parallel=False, max_workers=4):
+def test_dataset_availability_and_save_it(data_dir, parallel=False, max_workers=4):
     df = read_input_csv(data_dir)
     df = assign_regions(df, region_identifier)
     
@@ -102,10 +94,6 @@ def check_dataset_availability_and_save_it(data_dir, region_identifier, parallel
     else:
         df = process_dataframe(df, data_dir, region_identifier)
 
-    # Adds an uuid to identify uniquely each try, it will be necessary for comparison with the database 
-    # And error identification
-    df["id"] = [str(uuid.uuid4()) for _ in range(len(df))]
-
     write_output_csv(df, data_dir)
     return df
 
@@ -113,4 +101,4 @@ def check_dataset_availability_and_save_it(data_dir, region_identifier, parallel
 if __name__ == "__main__":
 
     data_dir, max_products = get_configuration_from_command_line()
-    check_dataset_availability_and_save_it(data_dir, region_identifier, parallel=True)
+    test_dataset_availability_and_save_it(data_dir, parallel=False)
