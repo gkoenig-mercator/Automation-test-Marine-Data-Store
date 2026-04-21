@@ -2,7 +2,7 @@ import pandas as pd
 import copernicusmarine
 from typing import Optional
 import os
-from src.test_availability_data.utils.general import (
+from test_availability_data.utils.general import (
     extract_last_available_time,
     filter_allowed_services,
     check_if_there_is_time_coordinate,

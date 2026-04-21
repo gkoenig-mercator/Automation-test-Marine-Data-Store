@@ -4,8 +4,8 @@ import os
 import csv
 import uuid
 from dotenv import load_dotenv
-from src.test_availability_data.utils.general import get_configuration_from_command_line
-from src.test_availability_data.database_management.create_database_table import testing_metadata, errors, datasets_tested
+from test_availability_data.utils.general import get_configuration_from_command_line
+from test_availability_data.database_management.create_database_table import testing_metadata, errors, datasets_tested
 
 load_dotenv()
 
