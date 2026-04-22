@@ -73,7 +73,7 @@ def test_process_row_for_download(sample_df, region_dict):
     row = sample_df.iloc[0]
 
     result = process_row_for_download(
-        row, data_dir=".", region_identifier=region_dict, downloader_cls=FakeDownloader
+        row, data_dir=".", region_id=region_dict, downloader_cls=FakeDownloader
     )
 
     assert result["downloadable"] is True
@@ -83,6 +83,6 @@ def test_process_row_for_download(sample_df, region_dict):
 
 def test_process_row_missing_time(sample_df, region_dict):
     row = sample_df.iloc[1]  # last_available_time is None
-    result = process_row_for_download(row, data_dir=".", region_identifier=region_dict)
+    result = process_row_for_download(row, data_dir=".", region_id=region_dict)
     assert result["downloadable"] is False
     assert result["first_error"] == "No last_available_time available"

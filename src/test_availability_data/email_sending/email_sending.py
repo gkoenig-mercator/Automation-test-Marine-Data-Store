@@ -20,7 +20,3 @@ def sending_mail():
         server.send_message(msg)
 
     print("Email sent!")
-
-
-if __name__ == "__main__":
-    sending_mail()

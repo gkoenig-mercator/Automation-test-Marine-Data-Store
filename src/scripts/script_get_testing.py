@@ -4,7 +4,7 @@ from typing import Optional
 import copernicusmarine
 import pandas as pd
 
-from test_availability_data.toolbox_wrapper.general import (
+from test_availability_data.utils.miscellaneous import (
     get_configuration_from_command_line,
 )
 

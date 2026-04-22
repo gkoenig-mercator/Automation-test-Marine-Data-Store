@@ -11,9 +11,6 @@ from test_availability_data.database_management.schemas import (
     errors,
     testing_metadata,
 )
-from test_availability_data.toolbox_wrapper.general import (
-    get_configuration_from_command_line,
-)
 
 load_dotenv()
 
@@ -124,8 +121,3 @@ def append_dataset_downloadable_status_in_db(data_dir, test_id):
     if dataset_rows:
         with engine.begin() as conn:
             conn.execute(insert(datasets_tested), dataset_rows)
-
-
-if __name__ == "__main__":
-    data_dir, max_products = get_configuration_from_command_line()
-    append_errors_in_db(data_dir)

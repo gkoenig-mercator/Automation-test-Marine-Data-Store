@@ -8,7 +8,6 @@ from test_availability_data.toolbox_wrapper.general import (
     check_if_there_is_time_coordinate,
     extract_last_available_time,
     filter_allowed_services,
-    get_configuration_from_command_line,
     get_first_variable_with_a_time_coordinate,
 )
 
@@ -75,8 +74,3 @@ def collect_and_store_dataset_informations(
     output_path = os.path.join(data_dir, "list_of_informations_from_the_describe.csv")
     df.to_csv(output_path, index=False)
     print(f"Saved dataset into {output_path}")
-
-
-if __name__ == "__main__":
-    data_dir, max_products = get_configuration_from_command_line()
-    collect_and_store_dataset_informations(data_dir, max_products)
