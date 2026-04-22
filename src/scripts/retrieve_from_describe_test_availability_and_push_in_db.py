@@ -18,9 +18,11 @@ from test_availability_data.toolbox_wrapper.extract_datasets_from_describe impor
     collect_and_store_dataset_informations,
 )
 from test_availability_data.toolbox_wrapper.general import (
+    get_number_of_datasets_downloaded,
+)
+from test_availability_data.utils.miscellaneous import (
     get_configuration_from_command_line,
     get_duration_in_seconds_from_two_utc,
-    get_number_of_datasets_downloaded,
 )
 from test_availability_data.utils.obtaining_environment_versions import get_versions
 
