@@ -25,8 +25,6 @@ from test_availability_data.utils.miscellaneous import (
     get_duration_in_seconds_from_two_utc,
 )
 from test_availability_data.utils.obtaining_environment_versions import get_versions
-from test_availability_data.results.analysis import no_error_in_download
-
 
 def main():
     start_time = datetime.utcnow()
