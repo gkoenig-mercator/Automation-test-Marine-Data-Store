@@ -43,4 +43,5 @@ pandas-stubs = "^3.0.0.260204"
 [tool.poetry.group.deploy.dependencies]
 requests = "^2.32.5"
 json5 = "^0.13.0"
+responses ="^0.26.0"
 
