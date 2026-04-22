@@ -63,10 +63,3 @@ def get_first_variable_with_a_time_coordinate(
             if coordinate.coordinate_id == "time":
                 return variable.short_name, index
     return None, None
-
-def get_number_of_datasets_downloaded(data_dir, filename="downloaded_datasets.csv"):
-    file_path = os.path.join(data_dir, filename)
-    with open(file_path, "r", encoding="utf-8") as f:
-        num_rows = sum(1 for _ in f) - 1
-
-    return num_rows
