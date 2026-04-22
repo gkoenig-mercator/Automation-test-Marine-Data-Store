@@ -1,4 +1,3 @@
-import argparse
 import os
 import re
 from typing import Generator, Optional, Tuple
@@ -64,44 +63,6 @@ def get_first_variable_with_a_time_coordinate(
             if coordinate.coordinate_id == "time":
                 return variable.short_name, index
     return None, None
-
-
-def get_configuration_from_command_line():
-    parser = argparse.ArgumentParser(
-        description="Analyze dataset downloadability and timing."
-    )
-    parser.add_argument(
-        "--data-dir",
-        type=str,
-        required=True,
-        help="Path to the directory containing csv files",
-    )
-    parser.add_argument(
-        "--max-products",
-        type=int,
-        default=None,
-        help="Maximum number of products to test (default: all products)",
-    )
-
-    args = parser.parse_args()
-
-    # Validate data directory
-    if os.path.exists(args.data_dir) and not os.path.isdir(args.data_dir):
-        raise NotADirectoryError(f"❌ '{args.data_dir}' exists but is not a directory.")
-
-    # Create directory if needed
-    os.makedirs(args.data_dir, exist_ok=True)
-
-    return args.data_dir, args.max_products
-
-
-def get_duration_in_seconds_from_two_utc(start_time, end_time):
-    duration = end_time - start_time
-
-    duration_seconds = duration.total_seconds()
-
-    return int(duration_seconds)
-
 
 def get_number_of_datasets_downloaded(data_dir, filename="downloaded_datasets.csv"):
     file_path = os.path.join(data_dir, filename)
