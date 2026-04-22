@@ -3,9 +3,6 @@ import os
 import subprocess
 from datetime import datetime
 import sys
-from test_availability_data.toolbox_wrapper.general import (
-    get_configuration_from_command_line,
-)
 
 
 def create_markdown_file_from_csv(
@@ -86,9 +83,3 @@ def deploy_on_gh_pages():
     except subprocess.CalledProcessError as e:
         print("❌ Deployment failed:", e)
         sys.exit(1)
-
-
-if __name__ == "__main__":
-    data_dir, max_products = get_configuration_from_command_line()
-    create_markdown_file_from_csv(data_dir)
-    deploy_on_gh_pages()

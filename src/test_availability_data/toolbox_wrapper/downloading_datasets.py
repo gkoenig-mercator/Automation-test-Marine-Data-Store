@@ -11,9 +11,6 @@ from test_availability_data.toolbox_wrapper.download import (
     build_attempts,
     determine_region,
 )
-from test_availability_data.toolbox_wrapper.general import (
-    get_configuration_from_command_line,
-)
 
 logging.getLogger("copernicusmarine").setLevel("DEBUG")
 
@@ -35,7 +32,7 @@ def write_output_csv(
         os.path.join(data_dir, reduced_filename), index=False
     )
     df_with_error = df.copy()
-    df_with_error = df_with_error[not df_with_error["downloadable"]]
+    df_with_error = df_with_error[~df_with_error["downloadable"]]
     df_with_error.to_csv(os.path.join(data_dir, error_filename), index=False)
 
 
@@ -137,8 +134,3 @@ def check_dataset_availability_and_save_it(
 
     write_output_csv(df, data_dir)
     return df
-
-
-if __name__ == "__main__":
-    data_dir, max_products = get_configuration_from_command_line()
-    check_dataset_availability_and_save_it(data_dir, region_identifier, parallel=True)
