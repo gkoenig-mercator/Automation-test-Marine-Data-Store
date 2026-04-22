@@ -13,6 +13,11 @@ if __name__ == "__main__":
     parser.add_argument(
         "--version", default=None, help="Process version (default: 0.0.5)"
     )
+    parser.add_argument(
+        "--code-version",
+        default=None,
+        help="Version of the code to use or branch name.",
+    )
     args = parser.parse_args()
     if not args.version:
         raise ValueError(
@@ -34,5 +39,6 @@ if __name__ == "__main__":
     payload = json5.load(open("deploy/process/add_process_payload.json5"))
     payload["options"]["metadata"]["version"] = args.version
     payload["options"]["metadata"]["id"] = PROCESS_NAME
+    payload["options"]["git"]["branch"] = args.code_version
     response = client.put(url=DATALAB_API_URL, payload=payload)
     print("Process added successfully:", response.json())

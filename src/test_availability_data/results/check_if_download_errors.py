@@ -1,6 +1,8 @@
 import pandas as pd
 import os
-from test_availability_data.toolbox_wrapper.general import get_configuration_from_command_line
+from test_availability_data.toolbox_wrapper.general import (
+    get_configuration_from_command_line,
+)
 
 
 def no_error_in_download(data_dir):

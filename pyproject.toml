@@ -7,7 +7,7 @@ where = ["src"]
 
 [project]
 name = "test_availability_data"
-version = "0.1.1"
+version = "1.0.0"
 description = "Script for testing availability of data of the Marine data store via the toolbox"
 readme = "readme.md"
 license = {text = "MIT"}
@@ -15,6 +15,9 @@ requires-python = ">=3.13"
 authors = [
   {name = "Guillaume Koenig", email = "gkoenig@mercator-ocean.fr"}
 ]
+
+[tool.poetry]
+packages = [{include = "test_availability_data", from = "src"}]
 
 [tool.poetry.dependencies]
 copernicusmarine = "==2.3.0"
@@ -33,6 +36,9 @@ python-dotenv = "^1.2.2"
 mkdocs = "==1.6.1"
 responses = ">=0.25.0"
 pytest = "^9.0.3"
+ruff = "^0.11.0"
+pyright = "^1.1.0"
+pandas-stubs = "^3.0.0.260204"
 
 [tool.poetry.group.deploy.dependencies]
 requests = "^2.32.5"

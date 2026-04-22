@@ -2,6 +2,7 @@ import platform
 import distro
 import importlib.metadata
 
+
 def get_linux_version():
     try:
         return f"{distro.name()} {distro.version()} ({distro.codename()})"
@@ -22,6 +23,7 @@ def get_versions():
         "script_version": "0.1.1",
         "toolbox_version": get_toolbox_version(),
     }
+
 
 if __name__ == "__main__":
     versions = get_versions()

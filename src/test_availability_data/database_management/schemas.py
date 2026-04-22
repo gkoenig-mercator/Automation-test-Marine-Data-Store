@@ -1,5 +1,13 @@
 from sqlalchemy import (
-    Table, Column, String, Boolean, Integer, MetaData, DateTime, ForeignKey, Text, text
+    Table,
+    Column,
+    String,
+    Boolean,
+    Integer,
+    MetaData,
+    DateTime,
+    ForeignKey,
+    Text,
 )
 from datetime import datetime
 import uuid
@@ -33,7 +41,7 @@ datasets_tested = Table(
     Column("variable_name", String),
     Column("command", Text),
     Column("last_downloadable_time", String),
-    Column("downloadable", Boolean)
+    Column("downloadable", Boolean),
 )
 
 # --- 3. Errors ---

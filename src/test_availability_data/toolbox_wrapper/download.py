@@ -1,7 +1,8 @@
 import os
-import pandas as pd
-import copernicusmarine
 from typing import Optional
+
+import copernicusmarine
+import pandas as pd
 
 
 def determine_region(dataset_id: str, region_dict: dict) -> str:
@@ -10,10 +11,12 @@ def determine_region(dataset_id: str, region_dict: dict) -> str:
             return region
     return "Global"
 
+
 def remove_files(directory: str):
     for filename in os.listdir(directory):
         if filename.endswith((".csv", ".nc")):
             os.remove(os.path.join(directory, filename))
+
 
 def build_subset_kwargs(
     info: dict,
@@ -38,6 +41,7 @@ def build_subset_kwargs(
         **({"variables": variables} if variables else {}),
     }
 
+
 def build_command(kwargs):
     # Convert kwargs dict items to a list so we can handle the first item separately
     items = list(kwargs.items())
@@ -47,15 +51,16 @@ def build_command(kwargs):
 
     # Add the rest of the key-value pairs
     for key, value in items[1:]:
-        if type(value)==str:
+        if isinstance(value, str):
             command += f', {key}="{value}"'
         else:
-            command += f', {key}={value}' 
+            command += f", {key}={value}"
 
     # Close the function call
     command += ")"
 
     return command
+
 
 def build_attempts(info: dict, region_dict: dict, data_dir: str) -> list[dict]:
     temp_file_dir = os.path.join(data_dir, "temp/")
@@ -65,19 +70,15 @@ def build_attempts(info: dict, region_dict: dict, data_dir: str) -> list[dict]:
 
     # Attempt 1: single variable
     if region:
-        kwargs1 = build_subset_kwargs(info, region, temp_file_dir, [info["variable_name"]])
-        attempts.append({
-            "kwargs": kwargs1,
-            "command_repr": build_command(kwargs1)
-        })
+        kwargs1 = build_subset_kwargs(
+            info, region, temp_file_dir, [info["variable_name"]]
+        )
+        attempts.append({"kwargs": kwargs1, "command_repr": build_command(kwargs1)})
 
     # Attempt 2: all variables
     if region:
         kwargs2 = build_subset_kwargs(info, region, temp_file_dir)
-        attempts.append({
-            "kwargs": kwargs2,
-            "command_repr": build_command(kwargs2)
-        })
+        attempts.append({"kwargs": kwargs2, "command_repr": build_command(kwargs2)})
 
     # Attempt 3: no region info
     start_time = pd.Timestamp(info["last_available_time"]) - pd.Timedelta(hours=1)
@@ -90,12 +91,10 @@ def build_attempts(info: dict, region_dict: dict, data_dir: str) -> list[dict]:
         "output_filename": "test.nc",
         "service": info["service_name"],
     }
-    attempts.append({
-        "kwargs": kwargs3,
-        "command_repr": build_command(kwargs3)
-    })
+    attempts.append({"kwargs": kwargs3, "command_repr": build_command(kwargs3)})
 
     return attempts
+
 
 class Downloader:
     def __init__(self, data_dir: str):
@@ -117,16 +116,18 @@ class Downloader:
             - 'kwargs': dict for copernicusmarine.subset
             - 'command_repr': string describing the command
         """
-        self.commands = [None] * len(attempts)
-        self.errors = [None] * len(attempts)
+        self.commands: list[str | None] = [None] * len(attempts)
+        self.errors: list[str | None] = [None] * len(attempts)
 
         for i, attempt in enumerate(attempts):
             try:
-                self.commands[i] = attempt['command_repr']
-                copernicusmarine.subset(**attempt['kwargs'])
+                self.commands[i] = attempt["command_repr"]
+                copernicusmarine.subset(**attempt["kwargs"])
                 self._remove_temp_files()
                 self.downloadable = True
-                self.last_downloadable_time = attempt['kwargs'].get('end_datetime', pd.NaT)
+                self.last_downloadable_time = attempt["kwargs"].get(
+                    "end_datetime", pd.NaT
+                )
                 break
             except Exception as e:
                 self.errors[i] = str(e)

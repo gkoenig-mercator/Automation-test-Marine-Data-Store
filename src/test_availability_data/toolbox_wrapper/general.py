@@ -1,8 +1,9 @@
-import re
 import argparse
 import os
-from typing import Optional, Generator, Tuple
-from copernicusmarine import CopernicusMarineVariable, CopernicusMarineService
+import re
+from typing import Generator, Optional, Tuple
+
+from copernicusmarine import CopernicusMarineService, CopernicusMarineVariable
 
 
 # We need this function in case the datasets are not available at the good date
@@ -21,9 +22,9 @@ def extract_last_available_time(variable: CopernicusMarineVariable) -> Optional[
     for coordinate in variable.coordinates:
         if coordinate.coordinate_id == "time":
             if coordinate.maximum_value:
-                return coordinate.maximum_value
-            else:
-                return coordinate.values[-1]
+                return float(coordinate.maximum_value)
+            elif coordinate.values is not None and len(coordinate.values) > 0:
+                return float(coordinate.values[-1])
 
     return None
 
@@ -34,7 +35,10 @@ def filter_allowed_services(
 ) -> Generator[CopernicusMarineService, None, None]:
     """Yield services in the authorized list"""
     for service in services:
-        if service.service_name not in allowed_services:
+        if (
+            allowed_services is not None
+            and service.service_name not in allowed_services
+        ):
             continue
         else:
             yield service
@@ -98,9 +102,10 @@ def get_duration_in_seconds_from_two_utc(start_time, end_time):
 
     return int(duration_seconds)
 
+
 def get_number_of_datasets_downloaded(data_dir, filename="downloaded_datasets.csv"):
     file_path = os.path.join(data_dir, filename)
     with open(file_path, "r", encoding="utf-8") as f:
-         num_rows = sum(1 for _ in f) - 1 
+        num_rows = sum(1 for _ in f) - 1
 
     return num_rows

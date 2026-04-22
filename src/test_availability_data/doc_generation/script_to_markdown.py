@@ -2,21 +2,34 @@ import pandas as pd
 import os
 import subprocess
 from datetime import datetime
-from dotenv import load_dotenv
 import sys
-from test_availability_data.toolbox_wrapper.general import get_configuration_from_command_line
+from test_availability_data.toolbox_wrapper.general import (
+    get_configuration_from_command_line,
+)
 
-def create_markdown_file_from_csv(data_dir, toolbox_version="2.2.0",
-                                  number_of_datasets_tested="NA", 
-                                  error_percentage="NA"):
-    
+
+def create_markdown_file_from_csv(
+    data_dir,
+    toolbox_version="2.2.0",
+    number_of_datasets_tested="NA",
+    error_percentage="NA",
+):
     # Read CSV file
     file_path = os.path.join(data_dir, "datasets_not_downloaded.csv")
     try:
         df = pd.read_csv(file_path)
 
-        df = df[["dataset_id","first_command","first_error","second_command",
-                 "second_error","third_command","third_error"]]
+        df = df[
+            [
+                "dataset_id",
+                "first_command",
+                "first_error",
+                "second_command",
+                "second_error",
+                "third_command",
+                "third_error",
+            ]
+        ]
 
         # Convert dataframe to markdown table
         markdown_table = df.to_markdown(index=False)
@@ -24,26 +37,30 @@ def create_markdown_file_from_csv(data_dir, toolbox_version="2.2.0",
         # Save into a markdown file inside docs/
         with open("docs/generated_table.md", "w") as f:
             f.write("# List of Datasets With Errors\n\n")
-            f.write(f"Generated at: {datetime.utcnow().strftime("%B %d, %Y at %H:%M UTC")}\n\n")
+            f.write(
+                f"Generated at: {datetime.utcnow().strftime('%B %d, %Y at %H:%M UTC')}\n\n"
+            )
             f.write(f"Toolbox version: {toolbox_version}\n\n")
             f.write(f"Number of datasets tested: {number_of_datasets_tested}\n\n")
-            f.write(f"Percentage of non-downloadable datasets : {error_percentage} % \n\n")
+            f.write(
+                f"Percentage of non-downloadable datasets : {error_percentage} % \n\n"
+            )
             f.write(markdown_table)
 
     except pd.errors.EmptyDataError:
-
         with open("docs/generated_table.md", "w") as f:
             f.write("# List of Datasets With Errors\n\n")
             f.write("No error for this run")
 
+
 def deploy_on_gh_pages():
     """
     Deploy documentation to GitHub Pages using mkdocs via HTTPS + Personal Access Token.
-    
+
     Requires:
       - GH_TOKEN environment variable to be set (your GitHub PAT)
       - mkdocs installed and configured with gh-pages
-    
+
     Example:
       export GH_TOKEN="ghp_XXXXXXXXXXXXXXXX"
       deploy_on_gh_pages("username", "repository")
@@ -61,17 +78,17 @@ def deploy_on_gh_pages():
     try:
         # Update remote URL to use token authentication
         subprocess.run(["git", "remote", "set-url", "origin", repo_url], check=True)
-        
+
         # Deploy documentation
         subprocess.run(["mkdocs", "gh-deploy", "--force"], check=True)
-        
+
         print("✅ Docs deployed successfully")
     except subprocess.CalledProcessError as e:
         print("❌ Deployment failed:", e)
         sys.exit(1)
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     data_dir, max_products = get_configuration_from_command_line()
     create_markdown_file_from_csv(data_dir)
     deploy_on_gh_pages()
