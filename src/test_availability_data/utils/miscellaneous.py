@@ -9,6 +9,7 @@ def get_duration_in_seconds_from_two_utc(start_time, end_time):
 
     return int(duration_seconds)
 
+
 def get_configuration_from_command_line():
     parser = argparse.ArgumentParser(
         description="Analyze dataset downloadability and timing."
