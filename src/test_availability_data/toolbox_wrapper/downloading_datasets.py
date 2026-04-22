@@ -7,7 +7,6 @@ import pandas as pd
 
 from test_availability_data.toolbox_wrapper.download import (
     Downloader,
-    build_attempts,
     determine_region,
 )
 
@@ -35,14 +34,12 @@ def write_output_csv(
     df_with_error.to_csv(os.path.join(data_dir, error_filename), index=False)
 
 
-def assign_regions(df, region_id):
-    """This function is a wrapper over the function determine_region of download.
-    It is used to determine the regions for an entire pandas dataframe."""
-    df["region"] = df["dataset_id"].apply(lambda ds: determine_region(ds, region_id))
+def assign_regions(df, region_dict):
+    df["region"] = df["dataset_id"].apply(lambda ds: determine_region(ds, region_dict))
     return df
 
 
-def process_row_for_download(row, data_dir, region_id, downloader_cls=Downloader):
+def process_row_for_download(row, data_dir, region_dict, downloader_cls=Downloader):
     if pd.isnull(row["last_available_time"]):
         return {
             "downloadable": False,
@@ -56,25 +53,24 @@ def process_row_for_download(row, data_dir, region_id, downloader_cls=Downloader
         }
 
     info = row.to_dict()
-    downloader = downloader_cls(data_dir)
-    attempts = build_attempts(info, region_id, data_dir)
-    result = downloader.run(attempts)
+    downloader = downloader_cls(info, region_dict, data_dir)
+    result = downloader.run()
 
     return {
         "downloadable": result["downloadable"],
         "last_downloadable_time": result["last_downloadable_time"],
         "first_command": result["commands"][0],
         "first_error": result["errors"][0],
-        "second_command": result["commands"][1],
-        "second_error": result["errors"][1],
-        "third_command": result["commands"][2],
-        "third_error": result["errors"][2],
+        "second_command": result["commands"][1] if len(result["commands"]) > 1 else None,
+        "second_error": result["errors"][1] if len(result["errors"]) > 1 else None,
+        "third_command": result["commands"][2] if len(result["commands"]) > 2 else None,
+        "third_error": result["errors"][2] if len(result["errors"]) > 2 else None,
     }
 
 
-def process_dataframe(df, data_dir, region_id):
+def process_dataframe(df, data_dir, region_dict):
     results = df.apply(
-        lambda row: process_row_for_download(row, data_dir, region_id),
+        lambda row: process_row_for_download(row, data_dir, region_dict),
         axis=1,
         result_type="expand",
     )
@@ -82,26 +78,22 @@ def process_dataframe(df, data_dir, region_id):
     return df
 
 
-def process_dataframe_parallel(df, data_dir, region_id, max_workers=4):
+def process_dataframe_parallel(df, data_dir, region_dict, max_workers=4):
     results = []
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        # submit all tasks
         futures = {
-            executor.submit(process_row_for_download, row, data_dir, region_id): idx
+            executor.submit(process_row_for_download, row, data_dir, region_dict): idx
             for idx, row in df.iterrows()
         }
 
-        # collect results as they finish
         for future in as_completed(futures):
             idx = futures[future]
             try:
                 results.append((idx, future.result()))
             except Exception as e:
-                # in case something goes really wrong
                 results.append((idx, {"downloadable": False, "error": str(e)}))
 
-    # Rebuild into a DataFrame in the correct order
     results_sorted = [res for _, res in sorted(results, key=lambda x: x[0])]
     results_df = pd.DataFrame(results_sorted, index=df.index)
 
@@ -109,20 +101,16 @@ def process_dataframe_parallel(df, data_dir, region_id, max_workers=4):
 
 
 def check_dataset_availability_and_save_it(
-    data_dir, region_id, parallel=False, max_workers=4
+    data_dir, region_dict, parallel=False, max_workers=4
 ):
     df = read_input_csv(data_dir)
-    df = assign_regions(df, region_id)
+    df = assign_regions(df, region_dict)
 
     if parallel:
-        df = process_dataframe_parallel(
-            df, data_dir, region_id, max_workers=max_workers
-        )
+        df = process_dataframe_parallel(df, data_dir, region_dict, max_workers=max_workers)
     else:
-        df = process_dataframe(df, data_dir, region_id)
+        df = process_dataframe(df, data_dir, region_dict)
 
-    # Adds an uuid to identify uniquely each try, it will be necessary for comparison with the database
-    # And error identification
     df["id"] = [str(uuid.uuid4()) for _ in range(len(df))]
 
     write_output_csv(df, data_dir)

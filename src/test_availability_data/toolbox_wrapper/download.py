@@ -18,88 +18,72 @@ def remove_files(directory: str):
             os.remove(os.path.join(directory, filename))
 
 
-def build_subset_kwargs(
-    info: dict,
-    region: dict,
-    data_dir: str,
-    variables: Optional[list[str]] = None,
-    maximum_depth: Optional[float] = 5,
-):
-    start_time = pd.Timestamp(info["last_available_time"]) - pd.Timedelta(hours=1)
-    return {
-        "dataset_id": info["dataset_id"],
-        "start_datetime": start_time.strftime("%Y-%m-%d %X"),
-        "end_datetime": info["last_available_time"],
-        "output_directory": data_dir,
-        "output_filename": "test.nc",
-        "maximum_depth": maximum_depth,
-        "minimum_longitude": region["min_lon"],
-        "maximum_longitude": region["max_lon"],
-        "minimum_latitude": region["min_lat"],
-        "maximum_latitude": region["max_lat"],
-        "service": info["service_name"],
-        **({"variables": variables} if variables else {}),
-    }
+class AttemptBuilder:
+    def __init__(self, info: dict, region_dict: dict, data_dir: str):
+        self.info = info
+        self.region_dict = region_dict
+        self.temp_file_dir = os.path.join(data_dir, "temp/")
 
+    def _build_subset_kwargs(
+        self,
+        region: Optional[dict] = None,
+        variables: Optional[list[str]] = None,
+        maximum_depth: Optional[float] = 5,
+    ) -> dict:
+        start_time = pd.Timestamp(self.info["last_available_time"]) - pd.Timedelta(hours=1)
+        return {
+            "dataset_id": self.info["dataset_id"],
+            "start_datetime": start_time.strftime("%Y-%m-%d %X"),
+            "end_datetime": self.info["last_available_time"],
+            "output_directory": self.temp_file_dir,
+            "output_filename": "test.nc",
+            "maximum_depth": maximum_depth,
+            "service": self.info["service_name"],
+            **({"variables": variables} if variables else {}),
+            **(
+                {
+                    "minimum_longitude": region["min_lon"],
+                    "maximum_longitude": region["max_lon"],
+                    "minimum_latitude": region["min_lat"],
+                    "maximum_latitude": region["max_lat"],
+                }
+                if region is not None
+                else {}
+            ),
+        }
 
-def build_command(kwargs):
-    # Convert kwargs dict items to a list so we can handle the first item separately
-    items = list(kwargs.items())
+    def _build_command(self, kwargs: dict) -> str:
+        args = ", ".join(f"{key}={value!r}" for key, value in kwargs.items())
+        return f"copernicusmarine.subset({args})"
 
-    # Start command with the first key-value pair
-    command = f'copernicusmarine.subset({items[0][0]}="{items[0][1]}"'
+    def build(self) -> list[dict]:
+        region = self.region_dict.get(self.info.get("region"))
+        variable = [self.info["variable_name"]]
 
-    # Add the rest of the key-value pairs
-    for key, value in items[1:]:
-        if isinstance(value, str):
-            command += f', {key}="{value}"'
-        else:
-            command += f", {key}={value}"
+        attempt_configs = [
+            {"region": region, "variables": variable},
+            {"region": region, "variables": None},
+            {"region": None,   "variables": variable},
+        ]
 
-    # Close the function call
-    command += ")"
+        if not region:
+            attempt_configs = [c for c in attempt_configs if c["region"] is None]
 
-    return command
+        attempts = []
+        for config in attempt_configs:
+            kwargs = self._build_subset_kwargs(
+                region=config["region"], variables=config["variables"]
+            )
+            attempts.append({"kwargs": kwargs, "command_repr": self._build_command(kwargs)})
 
-
-def build_attempts(info: dict, region_dict: dict, data_dir: str) -> list[dict]:
-    temp_file_dir = os.path.join(data_dir, "temp/")
-    region = region_dict.get(info.get("region"))
-
-    attempts = []
-
-    # Attempt 1: single variable
-    if region:
-        kwargs1 = build_subset_kwargs(
-            info, region, temp_file_dir, [info["variable_name"]]
-        )
-        attempts.append({"kwargs": kwargs1, "command_repr": build_command(kwargs1)})
-
-    # Attempt 2: all variables
-    if region:
-        kwargs2 = build_subset_kwargs(info, region, temp_file_dir)
-        attempts.append({"kwargs": kwargs2, "command_repr": build_command(kwargs2)})
-
-    # Attempt 3: no region info
-    start_time = pd.Timestamp(info["last_available_time"]) - pd.Timedelta(hours=1)
-    kwargs3 = {
-        "dataset_id": info["dataset_id"],
-        "start_datetime": start_time.strftime("%Y-%m-%d %X"),
-        "end_datetime": info["last_available_time"],
-        "variables": [info["variable_name"]],
-        "output_directory": temp_file_dir,
-        "output_filename": "test.nc",
-        "service": info["service_name"],
-    }
-    attempts.append({"kwargs": kwargs3, "command_repr": build_command(kwargs3)})
-
-    return attempts
+        return attempts
 
 
 class Downloader:
-    def __init__(self, data_dir: str):
+    def __init__(self, info: dict, region_dict: dict, data_dir: str):
         self.data_dir = data_dir
         self.temp_file_dir = os.path.join(data_dir, "temp/")
+        self.builder = AttemptBuilder(info, region_dict, data_dir)
         self.downloadable = False
         self.last_downloadable_time = pd.NaT
         self.commands = []
@@ -109,13 +93,8 @@ class Downloader:
         if os.path.exists(self.temp_file_dir):
             remove_files(self.temp_file_dir)
 
-    def run(self, attempts: list[dict]):
-        """
-        Executes a list of attempts.
-        Each attempt is a dict with keys:
-            - 'kwargs': dict for copernicusmarine.subset
-            - 'command_repr': string describing the command
-        """
+    def run(self) -> dict:
+        attempts = self.builder.build()
         self.commands: list[str | None] = [None] * len(attempts)
         self.errors: list[str | None] = [None] * len(attempts)
 
@@ -125,9 +104,7 @@ class Downloader:
                 copernicusmarine.subset(**attempt["kwargs"])
                 self._remove_temp_files()
                 self.downloadable = True
-                self.last_downloadable_time = attempt["kwargs"].get(
-                    "end_datetime", pd.NaT
-                )
+                self.last_downloadable_time = attempt["kwargs"].get("end_datetime", pd.NaT)
                 break
             except Exception as e:
                 self.errors[i] = str(e)
