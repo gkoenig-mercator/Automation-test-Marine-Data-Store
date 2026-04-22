@@ -15,3 +15,6 @@ __pycache__/
 
 # environment variables
 .env
+
+#Data folder
+src/data/*
