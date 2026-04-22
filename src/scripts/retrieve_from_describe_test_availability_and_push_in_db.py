@@ -26,6 +26,7 @@ from test_availability_data.utils.miscellaneous import (
 )
 from test_availability_data.utils.obtaining_environment_versions import get_versions
 
+
 def main():
     start_time = datetime.utcnow()
     load_dotenv()
