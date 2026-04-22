@@ -5,7 +5,6 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import pandas as pd
 
-from test_availability_data.config.region_config import region_identifier
 from test_availability_data.toolbox_wrapper.download import (
     Downloader,
     build_attempts,
@@ -36,18 +35,14 @@ def write_output_csv(
     df_with_error.to_csv(os.path.join(data_dir, error_filename), index=False)
 
 
-def assign_regions(df, region_identifier):
+def assign_regions(df, region_id):
     """This function is a wrapper over the function determine_region of download.
     It is used to determine the regions for an entire pandas dataframe."""
-    df["region"] = df["dataset_id"].apply(
-        lambda ds: determine_region(ds, region_identifier)
-    )
+    df["region"] = df["dataset_id"].apply(lambda ds: determine_region(ds, region_id))
     return df
 
 
-def process_row_for_download(
-    row, data_dir, region_identifier, downloader_cls=Downloader
-):
+def process_row_for_download(row, data_dir, region_id, downloader_cls=Downloader):
     if pd.isnull(row["last_available_time"]):
         return {
             "downloadable": False,
@@ -62,7 +57,7 @@ def process_row_for_download(
 
     info = row.to_dict()
     downloader = downloader_cls(data_dir)
-    attempts = build_attempts(info, region_identifier, data_dir)
+    attempts = build_attempts(info, region_id, data_dir)
     result = downloader.run(attempts)
 
     return {
@@ -77,9 +72,9 @@ def process_row_for_download(
     }
 
 
-def process_dataframe(df, data_dir, region_identifier):
+def process_dataframe(df, data_dir, region_id):
     results = df.apply(
-        lambda row: process_row_for_download(row, data_dir, region_identifier),
+        lambda row: process_row_for_download(row, data_dir, region_id),
         axis=1,
         result_type="expand",
     )
@@ -87,15 +82,13 @@ def process_dataframe(df, data_dir, region_identifier):
     return df
 
 
-def process_dataframe_parallel(df, data_dir, region_identifier, max_workers=4):
+def process_dataframe_parallel(df, data_dir, region_id, max_workers=4):
     results = []
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         # submit all tasks
         futures = {
-            executor.submit(
-                process_row_for_download, row, data_dir, region_identifier
-            ): idx
+            executor.submit(process_row_for_download, row, data_dir, region_id): idx
             for idx, row in df.iterrows()
         }
 
@@ -116,17 +109,17 @@ def process_dataframe_parallel(df, data_dir, region_identifier, max_workers=4):
 
 
 def check_dataset_availability_and_save_it(
-    data_dir, region_identifier, parallel=False, max_workers=4
+    data_dir, region_id, parallel=False, max_workers=4
 ):
     df = read_input_csv(data_dir)
-    df = assign_regions(df, region_identifier)
+    df = assign_regions(df, region_id)
 
     if parallel:
         df = process_dataframe_parallel(
-            df, data_dir, region_identifier, max_workers=max_workers
+            df, data_dir, region_id, max_workers=max_workers
         )
     else:
-        df = process_dataframe(df, data_dir, region_identifier)
+        df = process_dataframe(df, data_dir, region_id)
 
     # Adds an uuid to identify uniquely each try, it will be necessary for comparison with the database
     # And error identification
