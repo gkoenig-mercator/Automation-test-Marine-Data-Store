@@ -3,7 +3,7 @@
   "packageName": "add-your-process",
   "packageVersion": "2.0.0",
   "name": "add-your-process",
-  "friendlyName": "test-renaud",
+  "friendlyName": "Adding Copernicusmarine-Toolbox-Catalogue-Check",
   "share": false,
   "options": {
     "configuration": {
@@ -41,7 +41,16 @@
     "copernicusMarine": {
       "enabled": false
     },
-    "processInputs": [],
+    "processInputs": {
+      "processInputs": {
+        "type": "object",
+        "properties": {
+          "DATABASE_URL": {
+            "type": "string",
+          }
+        }
+      }
+    },
     "resources": {
       "requests": {
         "cpu": "100m",

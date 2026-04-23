@@ -9,19 +9,20 @@ from deploy.urls import MY_SERVICES_URL
 dotenv.load_dotenv()
 
 
-def _get_service_info():
-    authentificator = Authenticator(client_id="onyxia")
-    token = authentificator.get_token()
-    client = EditoClient(token=token, project=os.getenv("EDITO_PROJECT"))
+def _get_service_info(client: EditoClient | None = None) -> dict:
+    if client is None:
+        authentificator = Authenticator(client_id="onyxia")
+        token = authentificator.get_token()
+        client = EditoClient(token=token, project=os.getenv("EDITO_PROJECT"))
     response = client.get(url=MY_SERVICES_URL)
     response.raise_for_status()
     return response.json()
 
 
-def get_postgres_url():
+def get_postgres_url(client: EditoClient | None = None) -> str:
     info = [
         app
-        for app in _get_service_info().get("apps", [])
+        for app in _get_service_info(client).get("apps", [])
         if "postgresql" in app.get("name", "").lower()
     ][0]
     if not info:

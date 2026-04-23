@@ -31,4 +31,5 @@ jobs:
           EDITO_USERNAME: ${{ secrets.EDITO_USERNAME }}
           EDITO_PASSWORD: ${{ secrets.EDITO_PASSWORD }}
           EDITO_PROJECT: ${{ secrets.EDITO_PROJECT }}
+          EDITO_VAULT_TOKEN: ${{ secrets.EDITO_VAULT_TOKEN }}
         run: make start-process VERSION="${{ inputs.version }}"

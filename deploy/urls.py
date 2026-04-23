@@ -8,7 +8,7 @@ PROCESS_API_BASE = "https://api.dive.edito.eu/processes/processes"
 
 MY_SERVICES_URL = "https://datalab.dive.edito.eu/api/my-lab/services"
 
-PROCESS_NAME = "test-renaud-deploy"
+PROCESS_NAME = "Copernicusmarine-Toolbox-Catalogue-Check"
 
 
 def process_execution_url(process_id: str, version: str) -> str:
