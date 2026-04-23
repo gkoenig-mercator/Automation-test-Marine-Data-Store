@@ -37,6 +37,11 @@ if __name__ == "__main__":
         )
     payload["processInputs"]["vault"]["token"] = vault_token
     payload["processInputs"]["inputs"]["DATABASE_URL"] = get_postgres_url(client)
-
+    payload["processInputs"]["inputs"]["COPERNICUSMARINE_USERNAME"] = os.getenv(
+        "COPERNICUSMARINE_USERNAME"
+    )
+    payload["processInputs"]["inputs"]["COPERNICUSMARINE_PASSWORD"] = os.getenv(
+        "COPERNICUSMARINE_PASSWORD"
+    )
     response = client.post(url=url, payload=payload)
     print("Process started successfully:", response.json())

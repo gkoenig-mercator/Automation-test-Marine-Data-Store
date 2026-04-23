@@ -4,7 +4,7 @@
   "packageVersion": "2.0.0",
   "name": "add-your-process",
   "friendlyName": "add-toolbox-catalogue-check",
-  "share": false,
+  "share": true,
   "options": {
     "configuration": {
       "gpu": {
@@ -41,7 +41,29 @@
     "copernicusMarine": {
       "enabled": false
     },
-    "processInputs": [],
+    "processInputs": [
+      {
+        name: 'DATABASE_URL',
+        description: 'Full URL to connect to the database',
+        defaultValue: '',
+        required: true,
+        type: 'string'
+      },
+      {
+        name: 'COPERNICUSMARINE_USERNAME',
+        description: 'Username for Copernicus Marine API',
+        defaultValue: '',
+        required: true,
+        type: 'string'
+      },
+      {
+        name: 'COPERNICUSMARINE_PASSWORD',
+        description: 'Password for Copernicus Marine API',
+        defaultValue: '',
+        required: true,
+        type: 'string'
+      }
+    ],
     "resources": {
       "requests": {
         "cpu": "100m",

@@ -5,7 +5,7 @@
     "processInputs": {
         "onyxia": {
             "friendlyName": "run-catalogue-check",
-            "share": false
+            "share": true
         },
         "resources": {
             "limits": {
@@ -36,6 +36,8 @@
         },
         "inputs": {
             // "DATABASE_URL": "postgresql://postgres: Set in the code
+            // "COPERNICUSMARINE_USERNAME": " Set as environment variable in the workflow
+            // "COPERNICUSMARINE_PASSWORD": " Set as environment variable in the workflow
         }
     }
 }
