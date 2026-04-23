@@ -26,4 +26,6 @@ jobs:
           
       - name: Run tests
         run: make run-tests
+        env:
+          DATABASE_URL: "dummy_database_url_for_tests"
 

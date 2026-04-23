@@ -49,6 +49,7 @@ pandas-stubs = "^3.0.0.260204"
 requests = "^2.32.5"
 json5 = "^0.13.0"
 responses ="^0.26.0"
+dotenv = "^0.9.9"
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]
