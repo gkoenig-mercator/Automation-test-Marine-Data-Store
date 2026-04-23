@@ -26,7 +26,9 @@ def filter_allowed_services(
     services: list[CopernicusMarineService],
     allowed_services: list[str] | None = None,
 ) -> list[CopernicusMarineService]:
-    """Return services that are in the allowed list, or all services if no filter is given."""
+    """
+    Return services that are in the allowed list, or all services if no filter is given.
+    """
     if allowed_services is None:
         return services
     return [s for s in services if s.service_name in allowed_services]

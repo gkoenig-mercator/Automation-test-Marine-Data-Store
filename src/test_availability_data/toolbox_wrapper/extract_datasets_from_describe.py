@@ -25,13 +25,7 @@ def collect_dataset_information(
     datasets_copernicus = copernicusmarine.describe()
     dataset_informations = []
 
-    products = (
-        datasets_copernicus.products[:max_products]
-        if max_products
-        else datasets_copernicus.products
-    )
-
-    for product in products:
+    for product in datasets_copernicus.products:
         if product.product_id in skipped_products:
             continue
 

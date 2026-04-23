@@ -1,4 +1,6 @@
 # tests/test_downloading_datasets.py
+import os
+
 import pandas as pd
 import pytest
 
@@ -6,6 +8,10 @@ from test_availability_data.toolbox_wrapper.download import Downloader
 from test_availability_data.toolbox_wrapper.downloading_datasets import (
     DatasetAvailabilityChecker,
 )
+
+os.environ["COPERNICUSMARINE_USERNAME"] = "fake_user"
+os.environ["COPERNICUSMARINE_PASSWORD"] = "fake_password"
+os.environ["DATABASE_URL"] = "dummy_database_url"
 
 
 class FakeDownloader(Downloader):
