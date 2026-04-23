@@ -38,6 +38,7 @@ def get_configuration_from_command_line():
 
     return args.data_dir, args.max_products
 
+
 def determine_region(dataset_id: str, region_dict: dict) -> str:
     for region, meta in region_dict.items():
         if any(keyword in dataset_id for keyword in meta["keywords"]):
