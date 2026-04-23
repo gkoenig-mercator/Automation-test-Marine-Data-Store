@@ -11,9 +11,12 @@ from test_availability_data.database_management.Add_data_in_database import (
     append_errors_in_db,
     append_test_metadata_in_db,
 )
+
 from test_availability_data.toolbox_wrapper.downloading_datasets import (
-    check_dataset_availability_and_save_it,
+    DatasetAvailabilityChecker,
 )
+from test_availability_data.utils.io import write_availability_results
+
 from test_availability_data.toolbox_wrapper.extract_datasets_from_describe import (
     collect_and_store_dataset_informations,
 )
@@ -38,7 +41,11 @@ def main():
     )
     versions = get_versions()
     collect_and_store_dataset_informations(data_dir, max_products)
-    check_dataset_availability_and_save_it(data_dir, region_identifier)
+    checker_dataset_availability_subset = DatasetAvailabilityChecker(
+        data_dir=data_dir, region_dict=region_identifier
+    )
+    subset_availability_dataframe = checker_dataset_availability_subset.run()
+    write_availability_results(subset_availability_dataframe, data_dir)
     end_time = datetime.utcnow()
     run_duration = get_duration_in_seconds_from_two_utc(start_time, end_time)
     number_of_datasets = get_number_of_datasets_downloaded(data_dir)

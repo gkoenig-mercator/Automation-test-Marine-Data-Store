@@ -1,21 +1,9 @@
 import os
-from typing import Optional
-
 import copernicusmarine
+
 import pandas as pd
 
-
-def determine_region(dataset_id: str, region_dict: dict) -> str:
-    for region, meta in region_dict.items():
-        if any(keyword in dataset_id for keyword in meta["keywords"]):
-            return region
-    return "Global"
-
-
-def remove_files(directory: str):
-    for filename in os.listdir(directory):
-        if filename.endswith((".csv", ".nc")):
-            os.remove(os.path.join(directory, filename))
+from test_availability_data.utils.miscellaneous import determine_region
 
 
 class AttemptBuilder:
@@ -26,11 +14,13 @@ class AttemptBuilder:
 
     def _build_subset_kwargs(
         self,
-        region: Optional[dict] = None,
-        variables: Optional[list[str]] = None,
-        maximum_depth: Optional[float] = 5,
+        region: dict | None = None,
+        variables: list[str] | None = None,
+        maximum_depth: float | None = 5,
     ) -> dict:
-        start_time = pd.Timestamp(self.info["last_available_time"]) - pd.Timedelta(hours=1)
+        start_time = pd.Timestamp(self.info["last_available_time"]) - pd.Timedelta(
+            hours=1
+        )
         return {
             "dataset_id": self.info["dataset_id"],
             "start_datetime": start_time.strftime("%Y-%m-%d %X"),
@@ -63,7 +53,7 @@ class AttemptBuilder:
         attempt_configs = [
             {"region": region, "variables": variable},
             {"region": region, "variables": None},
-            {"region": None,   "variables": variable},
+            {"region": None, "variables": variable},
         ]
 
         if not region:
@@ -74,7 +64,9 @@ class AttemptBuilder:
             kwargs = self._build_subset_kwargs(
                 region=config["region"], variables=config["variables"]
             )
-            attempts.append({"kwargs": kwargs, "command_repr": self._build_command(kwargs)})
+            attempts.append(
+                {"kwargs": kwargs, "command_repr": self._build_command(kwargs)}
+            )
 
         return attempts
 
@@ -89,9 +81,14 @@ class Downloader:
         self.commands = []
         self.errors = []
 
+    def remove_files(self):
+        for filename in os.listdir(self.temp_file_dir):
+            if filename.endswith((".csv", ".nc")):
+                os.remove(os.path.join(self.temp_file_dir, filename))
+
     def _remove_temp_files(self):
         if os.path.exists(self.temp_file_dir):
-            remove_files(self.temp_file_dir)
+            remove_files()
 
     def run(self) -> dict:
         attempts = self.builder.build()
@@ -104,7 +101,9 @@ class Downloader:
                 copernicusmarine.subset(**attempt["kwargs"])
                 self._remove_temp_files()
                 self.downloadable = True
-                self.last_downloadable_time = attempt["kwargs"].get("end_datetime", pd.NaT)
+                self.last_downloadable_time = attempt["kwargs"].get(
+                    "end_datetime", pd.NaT
+                )
                 break
             except Exception as e:
                 self.errors[i] = str(e)
