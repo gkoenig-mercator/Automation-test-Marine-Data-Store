@@ -5,10 +5,10 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import pandas as pd
 
-from test_availability_data.toolbox_wrapper.download import (
-    Downloader,
-    determine_region,
-)
+from test_availability_data.utils.miscellaneous import determine_region
+
+
+from test_availability_data.toolbox_wrapper.download import Downloader
 
 logging.getLogger("copernicusmarine").setLevel("DEBUG")
 
