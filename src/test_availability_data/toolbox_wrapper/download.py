@@ -3,8 +3,6 @@ import copernicusmarine
 
 import pandas as pd
 
-from test_availability_data.utils.miscellaneous import determine_region
-
 
 class AttemptBuilder:
     def __init__(self, info: dict, region_dict: dict, data_dir: str):
@@ -88,7 +86,7 @@ class Downloader:
 
     def _remove_temp_files(self):
         if os.path.exists(self.temp_file_dir):
-            remove_files()
+            self.remove_files()
 
     def run(self) -> dict:
         attempts = self.builder.build()
