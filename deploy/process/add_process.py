@@ -19,10 +19,11 @@ if __name__ == "__main__":
         help="Version of the code to use or branch name.",
     )
     args = parser.parse_args()
-    if not args.version:
+    if not args.version or not args.code_version:
         raise ValueError(
-            "Version is required. Use --version to specify it "
-            "or as an env variable if you are using a Make command."
+            "Version and code version are required. "
+            "Use --version and --code-version to specify them "
+            "or as env variables if you are using a Make command."
         )
     authentificator = Authenticator(client_id="onyxia")
     token = authentificator.get_token()
@@ -35,7 +36,7 @@ if __name__ == "__main__":
     print(f"Process '{process_name}' deleted successfully.")
 
     # then create the process
-    # TODO: check if the version already exists before overwriting and raise in this case
+    # TODO: check if the version already exists before overwriting; raise in this case
     payload = json5.load(open("deploy/process/add_process_payload.json5"))
     payload["options"]["metadata"]["version"] = args.version
     payload["options"]["metadata"]["id"] = PROCESS_NAME

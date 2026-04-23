@@ -1,16 +1,17 @@
+import uuid
+from datetime import datetime
+
 from sqlalchemy import (
-    Table,
-    Column,
-    String,
     Boolean,
-    Integer,
-    MetaData,
+    Column,
     DateTime,
     ForeignKey,
+    Integer,
+    MetaData,
+    String,
+    Table,
     Text,
 )
-from datetime import datetime
-import uuid
 
 metadata = MetaData(schema="testing")
 

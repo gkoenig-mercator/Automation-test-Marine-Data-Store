@@ -1,5 +1,4 @@
 import os
-from typing import Optional
 
 import copernicusmarine
 import pandas as pd
@@ -58,6 +57,7 @@ def check_size_limit(base_info, filename, max_size_mb):
         )
 
         if result.total_size > max_size_mb:
+            error_message = f"File too big: {result.total_size}MB > {max_size_mb}MB"
             error_record = {
                 **base_info,
                 "status_message": "Too big",
@@ -65,7 +65,7 @@ def check_size_limit(base_info, filename, max_size_mb):
                 "total_size": result.total_size,
                 "first_file": filename,
                 "error": True,
-                "error_message": f"File too big: {result.total_size}MB > {max_size_mb}MB",
+                "error_message": error_message,
             }
             return None, error_record
 
@@ -127,7 +127,7 @@ def do_download(base_info, filename):
         }
 
 
-def test_get_capabilities(data_dir, max_products: Optional[int] = None):
+def test_get_capabilities(data_dir, max_products: int | None = None):
     datasets_copernicus = copernicusmarine.describe()
     dry_run_records = []
     download_records = []
@@ -184,7 +184,8 @@ def test_get_capabilities(data_dir, max_products: Optional[int] = None):
     pd.DataFrame(dry_run_records).to_csv(dry_run_path, index=False)
     pd.DataFrame(download_records).to_csv(products_downloaded_path, index=False)
     print(
-        f"Done: {len(dry_run_records)} dry runs, {len(download_records)} download attempts"
+        f"Done: {len(dry_run_records)} dry runs, "
+        f"{len(download_records)} download attempts"
     )
 
 

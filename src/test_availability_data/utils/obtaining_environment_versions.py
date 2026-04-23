@@ -1,6 +1,7 @@
-import platform
-import distro
 import importlib.metadata
+import platform
+
+import distro
 
 
 def get_linux_version():

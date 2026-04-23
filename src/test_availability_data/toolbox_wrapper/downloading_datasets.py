@@ -4,10 +4,10 @@ import uuid
 
 import pandas as pd
 
-from test_availability_data.utils.miscellaneous import determine_region
 from test_availability_data.toolbox_wrapper.download import Downloader
+from test_availability_data.utils.miscellaneous import determine_region
 
-logging.getLogger("copernicusmarine").setLevel("DEBUG")
+logging.getLogger("copernicusmarine").setLevel("INFO")
 
 
 class DatasetAvailabilityChecker:
