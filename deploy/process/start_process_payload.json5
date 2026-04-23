@@ -4,7 +4,7 @@
     },
     "processInputs": {
         "onyxia": {
-            "friendlyName": "test-renaud",
+            "friendlyName": "run-catalogue-check",
             "share": false
         },
         "resources": {
@@ -34,7 +34,7 @@
             "secretAccessKey": "",
             "sessionToken": ""
         },
-        "processInputs": {
+        "inputs": {
             // "DATABASE_URL": "postgresql://postgres: Set in the code
         }
     }

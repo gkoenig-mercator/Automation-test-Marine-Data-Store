@@ -29,12 +29,14 @@ if __name__ == "__main__":
     payload = json5.load(open("deploy/process/start_process_payload.json5"))
     vault_token = os.getenv("EDITO_VAULT_TOKEN")
     if not vault_token:
+        # TODO: add a check for the vault because the token
+        # is rotated every month
         raise ValueError(
             "Vault token is required to start the process. "
             "Set the EDITO_VAULT_TOKEN environment variable."
         )
     payload["processInputs"]["vault"]["token"] = vault_token
-    payload["processInputs"]["processInputs"]["DATABASE_URL"] = get_postgres_url(client)
+    payload["processInputs"]["inputs"]["DATABASE_URL"] = get_postgres_url(client)
 
     response = client.post(url=url, payload=payload)
     print("Process started successfully:", response.json())

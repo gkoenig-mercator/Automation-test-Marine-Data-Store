@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 import copernicusmarine
 
 from test_availability_data.config.region_config import region_identifier
-from test_availability_data.database_management.Add_data_in_database import (
+from test_availability_data.database_management.add_data import (
     append_dataset_downloadable_status_in_db,
     append_errors_in_db,
     append_test_metadata_in_db,

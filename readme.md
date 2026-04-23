@@ -36,7 +36,7 @@ The initial suite of tests includes:
 
 Most of the script can be run independently. What they do is:
 
-- add_data_in_database: Takes the data from a csv file containing the tryouts ("downloaded_datasets") of data downloading and puts the results into a database
+- add_data: Takes the data from a csv file containing the tryouts ("downloaded_datasets") of data downloading and puts the results into a database
 - check_if_download_errors: Search the downloading csv file ("downloaded_datasets") for datasets that could not be downloaded and return "False" if it finds any
 - extracts_datasets_from_describe: Creates a csv file containing all the informations from datasets found with the copernicusmarine.describe command.
 - retrieve_from_describe_test_availabilibity_and_push_in_db: Master script that loads the datasets from the describe commands, tries to download them, puts the results into a database and then returns "False" if some datasets were not downloadable
@@ -49,7 +49,7 @@ There is an order: 1) retrieve_from_describe_test_availabilibity_and_push_in_db 
                    2) extracts_datasets_from_describe: Can be run in stand-alone
                    3) Test_downloading_datasets: Requires that extracts_datasets_from_describe has run
                    4) check_if_download_errors: Requires that Test_downloading_datasets has run
-                   5) add_data_in_database: Requires that Test_downloading_datasets has run
+                   5) add_data: Requires that Test_downloading_datasets has run
                    6) treating_outputs: Requires that Test_downloading_datasets has run
 
 ## Database schema and use

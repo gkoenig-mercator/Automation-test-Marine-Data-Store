@@ -3,7 +3,7 @@
   "packageName": "add-your-process",
   "packageVersion": "2.0.0",
   "name": "add-your-process",
-  "friendlyName": "Adding Copernicusmarine-Toolbox-Catalogue-Check",
+  "friendlyName": "add-toolbox-catalogue-check",
   "share": false,
   "options": {
     "configuration": {
@@ -41,16 +41,7 @@
     "copernicusMarine": {
       "enabled": false
     },
-    "processInputs": {
-      "processInputs": {
-        "type": "object",
-        "properties": {
-          "DATABASE_URL": {
-            "type": "string",
-          }
-        }
-      }
-    },
+    "processInputs": [],
     "resources": {
       "requests": {
         "cpu": "100m",

@@ -18,7 +18,13 @@ class EditoClient:
 
     def put(self, url: str, payload: dict) -> requests.Response:
         response = requests.put(url, json=payload, headers=self._headers())
-        response.raise_for_status()
+        try:
+            response.raise_for_status()
+        except Exception as e:
+            print(f"PUT request to {url} failed: {e}")
+            print(f"Response status code: {response.status_code}")
+            print(f"Response content: {response.text}")
+            raise
         return response
 
     def post(
@@ -27,7 +33,13 @@ class EditoClient:
         response = requests.post(
             url, json=payload, headers=self._headers(include_project=include_project)
         )
-        response.raise_for_status()
+        try:
+            response.raise_for_status()
+        except Exception as e:
+            print(f"POST request to {url} failed: {e}")
+            print(f"Response status code: {response.status_code}")
+            print(f"Response content: {response.text}")
+            raise
         return response
 
     def get(self, url: str, params: dict | None = None) -> requests.Response:

@@ -38,8 +38,9 @@ if __name__ == "__main__":
     # then create the process
     # TODO: check if the version already exists before overwriting; raise in this case
     payload = json5.load(open("deploy/process/add_process_payload.json5"))
-    payload["options"]["metadata"]["version"] = args.version
-    payload["options"]["metadata"]["id"] = PROCESS_NAME
-    payload["options"]["git"]["branch"] = args.code_version
+    payload["options"]["metadata"]["version"] = str(args.version)
+    payload["options"]["metadata"]["id"] = PROCESS_NAME.lower()  # id must be lowercase
+    payload["options"]["git"]["branch"] = str(args.code_version)
+
     response = client.put(url=DATALAB_API_URL, payload=payload)
     print("Process added successfully:", response.json())
