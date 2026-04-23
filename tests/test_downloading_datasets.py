@@ -1,19 +1,18 @@
-# tests/downloading_datasets.py
+# tests/test_downloading_datasets.py
 import pandas as pd
 import pytest
 
-from src.test_availability_data.toolbox_wrapper.downloading_datasets import (
-    Downloader,
-    assign_regions,
-    process_row_for_download,
+from test_availability_data.toolbox_wrapper.downloading_datasets import (
+    DatasetAvailabilityChecker,
 )
+from test_availability_data.toolbox_wrapper.download import Downloader
 
 
 class FakeDownloader(Downloader):
-    def __init__(self, data_dir):
+    def __init__(self, row_dict, region_dict, data_dir):
         pass
 
-    def run(self, attempts):
+    def run(self):
         return {
             "downloadable": True,
             "last_downloadable_time": "2023-01-01 01:00:00",
@@ -61,28 +60,34 @@ def sample_df():
 
 
 def test_assign_regions(sample_df, region_dict):
-    df = assign_regions(sample_df.copy(), region_dict)
+    checker = DatasetAvailabilityChecker(data_dir=".", region_dict=region_dict)
+    df = checker._assign_regions(sample_df.copy())
 
     assert "region" in df.columns
-    # Example: if dataset_id has "eu", region should be Europe
     assert all(df.loc[df["dataset_id"].str.contains("eu"), "region"] == "Europe")
     assert all(df.loc[df["dataset_id"].str.contains("asia"), "region"] == "Asia")
+    assert all(df.loc[df["dataset_id"].str.contains("global"), "region"] == "Global")
 
 
 def test_process_row_for_download(sample_df, region_dict):
-    row = sample_df.iloc[0]
-
-    result = process_row_for_download(
-        row, data_dir=".", region_id=region_dict, downloader_cls=FakeDownloader
+    checker = DatasetAvailabilityChecker(
+        data_dir=".", region_dict=region_dict, downloader_cls=FakeDownloader
     )
+    row = sample_df.iloc[0]  # temperature_eu_2021, has last_available_time
+    result = checker._process_row(row)
 
     assert result["downloadable"] is True
     assert result["first_command"] == "cmd1"
     assert result["first_error"] is None
+    assert result["second_command"] == "cmd2"
+    assert result["third_command"] == "cmd3"
 
 
 def test_process_row_missing_time(sample_df, region_dict):
-    row = sample_df.iloc[1]  # last_available_time is None
-    result = process_row_for_download(row, data_dir=".", region_id=region_dict)
+    checker = DatasetAvailabilityChecker(data_dir=".", region_dict=region_dict)
+    row = sample_df.iloc[1]  # salinity_asia_2020, last_available_time is None
+    result = checker._process_row(row)
+
     assert result["downloadable"] is False
     assert result["first_error"] == "No last_available_time available"
+    assert result["first_command"] is None
