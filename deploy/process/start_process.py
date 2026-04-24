@@ -35,11 +35,11 @@ if __name__ == "__main__":
             "environment variables must be set."
         )
     payload["processInputs"]["inputs"]["DATABASE_URL"] = get_postgres_url(client)
-    payload["processInputs"]["inputs"]["COPERNICUSMARINE_USERNAME"] = os.getenv(
+    payload["processInputs"]["inputs"][
         "COPERNICUSMARINE_USERNAME"
-    )
-    payload["processInputs"]["inputs"]["COPERNICUSMARINE_PASSWORD"] = os.getenv(
+    ] = copernicusmarine_username
+    payload["processInputs"]["inputs"][
         "COPERNICUSMARINE_PASSWORD"
-    )
+    ] = copernicusmarine_password
     response = client.post(url=url, payload=payload)
     print("Process started successfully:", response.json())
