@@ -18,12 +18,12 @@
             }
         },
         "vault": {
-            "enabled": true,
-            // token": "", // Set as environment variable in the workflow
-            "url": "https://vault.dive.edito.eu",
-            "mount": "secret-kv",
-            "directory": "project-test-datasets-subsetting-toolbox",
-            "secret": "cataloguechecks"
+            "enabled": false,
+            "token": "",
+            "url": "",
+            "mount": "",
+            "directory": "",
+            "secret": ""
         },
         "s3": {
             "enabled": true,

@@ -31,7 +31,6 @@ jobs:
           EDITO_USERNAME: ${{ secrets.EDITO_USERNAME }}
           EDITO_PASSWORD: ${{ secrets.EDITO_PASSWORD }}
           EDITO_PROJECT: ${{ secrets.EDITO_PROJECT }}
-          EDITO_VAULT_TOKEN: ${{ secrets.EDITO_VAULT_TOKEN }}
           COPERNICUSMARINE_USERNAME: ${{ secrets.COPERNICUSMARINE_USERNAME }}
           COPERNICUSMARINE_PASSWORD: ${{ secrets.COPERNICUSMARINE_PASSWORD }}
         run: make start-process VERSION="${{ inputs.version }}"

@@ -24,17 +24,11 @@ cataloguechecks = "test_availability_data.scripts.retrieve_from_describe_test_av
 packages = [{include = "test_availability_data", from = "src"}]
 
 [tool.poetry.dependencies]
-copernicusmarine = "==2.3.0"
-pandas = "==2.3.3"
-numpy = "==2.4.2"
+copernicusmarine = "==2.4.0"
 sqlalchemy = "==2.0.46"
-psycopg2-binary = "2.9.12"
-zarr = "==3.1.5"
-tabulate = "==0.9"
+psycopg2-binary = "==2.9.12"
 distro = "==1.9.0"
-xarray = "==2026.1.0"
-python-dotenv = "^1.2.2"
-h5py = "3.16.0"
+python-dotenv = "==1.2.2"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -49,7 +43,7 @@ pandas-stubs = "^3.0.0.260204"
 requests = "^2.32.5"
 json5 = "^0.13.0"
 responses ="^0.26.0"
-dotenv = "^0.9.9"
+python-dotenv = "==1.2.2"
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]

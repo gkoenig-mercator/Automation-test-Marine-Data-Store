@@ -20,13 +20,14 @@ def _get_service_info(client: EditoClient | None = None) -> dict:
 
 
 def get_postgres_url(client: EditoClient | None = None) -> str:
-    info = [
+    infos = [
         app
         for app in _get_service_info(client).get("apps", [])
         if "postgresql" in app.get("name", "").lower()
-    ][0]
-    if not info:
+    ]
+    if not infos:
         raise ValueError("No PostgreSQL service found in the services info.")
+    info = infos[0]
     # TODO: ask to have more info: port and host
     username = info["env"]["postgresql.auth.username"]
     password = info["env"]["postgresql.auth.password"]

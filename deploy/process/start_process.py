@@ -27,15 +27,13 @@ if __name__ == "__main__":
     client = EditoClient(token=token, project=os.getenv("EDITO_PROJECT"))
 
     payload = json5.load(open("deploy/process/start_process_payload.json5"))
-    vault_token = os.getenv("EDITO_VAULT_TOKEN")
-    if not vault_token:
-        # TODO: add a check for the vault because the token
-        # is rotated every month
+    copernicusmarine_username = os.getenv("COPERNICUSMARINE_USERNAME")
+    copernicusmarine_password = os.getenv("COPERNICUSMARINE_PASSWORD")
+    if not copernicusmarine_username or not copernicusmarine_password:
         raise ValueError(
-            "Vault token is required to start the process. "
-            "Set the EDITO_VAULT_TOKEN environment variable."
+            "COPERNICUSMARINE_USERNAME and COPERNICUSMARINE_PASSWORD "
+            "environment variables must be set."
         )
-    payload["processInputs"]["vault"]["token"] = vault_token
     payload["processInputs"]["inputs"]["DATABASE_URL"] = get_postgres_url(client)
     payload["processInputs"]["inputs"]["COPERNICUSMARINE_USERNAME"] = os.getenv(
         "COPERNICUSMARINE_USERNAME"
