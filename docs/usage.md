@@ -10,7 +10,7 @@ Where path_to_storage is the directory where results will be stored.
 
 ## Scripts Overview
 
-- add_data_in_database
+- add_data
 Takes the data from a CSV file containing download attempts (downloaded_datasets) and inserts results into a database.
 
 - check_if_download_errors
@@ -45,7 +45,7 @@ Some scripts depend on others having been run first:
 
 5. script_to_markdown - requires step 3
 
-6. add_data_in_database – requires step 3
+6. add_data – requires step 3
 
 7. treating_outputs – requires step 3
 

@@ -3,7 +3,7 @@
   "packageName": "add-your-process",
   "packageVersion": "2.0.0",
   "name": "add-your-process",
-  "friendlyName": "test-renaud",
+  "friendlyName": "add-toolbox-catalogue-check",
   "share": false,
   "options": {
     "configuration": {
@@ -41,7 +41,29 @@
     "copernicusMarine": {
       "enabled": false
     },
-    "processInputs": [],
+    "processInputs": [
+      {
+        name: 'DATABASE_URL',
+        description: 'Full URL to connect to the database',
+        defaultValue: '',
+        required: true,
+        type: 'string'
+      },
+      {
+        name: 'COPERNICUSMARINE_USERNAME',
+        description: 'Username for Copernicus Marine API',
+        defaultValue: '',
+        required: true,
+        type: 'string'
+      },
+      {
+        name: 'COPERNICUSMARINE_PASSWORD',
+        description: 'Password for Copernicus Marine API',
+        defaultValue: '',
+        required: true,
+        type: 'string'
+      }
+    ],
     "resources": {
       "requests": {
         "cpu": "100m",

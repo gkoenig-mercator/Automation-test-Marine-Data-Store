@@ -24,7 +24,8 @@ class Authenticator:
 
         if not username or not password or not client_id:
             raise ValueError(
-                "Username, password, and client_id must be provided either as arguments or environment variables."
+                "Username, password, and client_id must be provided either as "
+                "arguments or environment variables."
             )
         self.username = username
         self.password = password

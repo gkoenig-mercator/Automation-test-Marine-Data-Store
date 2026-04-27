@@ -1,9 +1,7 @@
 import logging
-import os
 import uuid
 from datetime import datetime
 
-from dotenv import load_dotenv
 from sqlalchemy import (
     Boolean,
     Column,
@@ -18,21 +16,12 @@ from sqlalchemy import (
     text,
 )
 
-load_dotenv()
+from test_availability_data.environment_variables import DATABASE_URL
 
 logging.basicConfig()
 logging.getLogger("sqlalchemy.engine").setLevel(logging.DEBUG)
 
-username = os.environ["DATABASE_USERNAME"]
-password = os.environ["DATABASE_PASSWORD"]
-database_url = os.environ.get(
-    "DATABASE_URL", "postgresql-238316.project-test-datasets-subsetting-toolbox"
-)
-database_name = os.environ.get("DATABASE_NAME", "defaultdb")
-
-engine = create_engine(
-    f"postgresql+psycopg2://{username}:{password}@{database_url}:5432/{database_name}"
-)
+engine = create_engine(DATABASE_URL)
 
 metadata = MetaData(schema="testing")
 

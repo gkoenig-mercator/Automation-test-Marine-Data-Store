@@ -26,4 +26,8 @@ jobs:
           
       - name: Run tests
         run: make run-tests
+        env:
+          DATABASE_URL: "dummy_database_url_for_tests"
+          COPERNICUSMARINE_USERNAME: "fake_user_for_tests"
+          COPERNICUSMARINE_PASSWORD: "fake_password_for_tests"
 

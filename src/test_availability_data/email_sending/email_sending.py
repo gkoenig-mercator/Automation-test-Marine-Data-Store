@@ -1,15 +1,22 @@
+import os
 import smtplib
 from email.mime.text import MIMEText
-import os
 
 
 def sending_mail():
     sender = "gkoenigmercatorocean@gmail.com"
     recipient = "gkoenig@mercator-ocean.fr"
     password = os.environ["EMAIL_PASSWORD"]
-
+    link = (
+        "https://gkoenig-mercator.github.io/"
+        "Automation-test-Marine-Data-Store/generated_table/"
+    )
     msg = MIMEText(
-        "Your script has finished running! But there was an issue, you should check the page: https://gkoenig-mercator.github.io/Automation-test-Marine-Data-Store/generated_table/ to know more about this!"
+        "Your script has finished running! "
+        "But there was an issue, "
+        "you should check the page: "
+        f"{link} "
+        "to know more about this!"
     )
     msg["Subject"] = "Script Complete"
     msg["From"] = sender

@@ -30,7 +30,26 @@ type-check: ## Run type checking with pyright
 	poetry run pyright
 	
 build-image: ## Build the Docker image for the process
-	docker build -t toolbox-catalogue-check:latest .
+	docker build -f src/Dockerfile -t toolbox-catalogue-check:latest .
 
 run-catalogue-check: ## Pass through the catalogue with the Toolbox
 	echo "Running catalogue check script..."
+	docker run --env-file .env toolbox-catalogue-check:latest
+
+
+# Create local database
+restart-postgres-docker:
+	docker restart somedb
+
+delete-postgres-database:
+	(docker exec -it somedb psql -U postgres -c "DROP DATABASE IF EXISTS testavailabilitydb;") || true
+
+setup-postgres-docker-locally: delete-postgres-database
+# 	(docker stop somedb && docker rm somedb) || true
+	docker pull postgres:latest
+	docker run -d -p 5432:5432 --name somedb -e POSTGRES_PASSWORD=lolo postgres
+	sleep 5 # wait for postgres to start
+	${MAKE} create-postgres-database
+
+create-postgres-database:
+	docker exec -it somedb psql -U postgres -c "CREATE DATABASE testavailabilitydb;"

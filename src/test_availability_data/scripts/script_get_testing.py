@@ -1,9 +1,12 @@
 import os
-from typing import Optional
 
 import copernicusmarine
 import pandas as pd
 
+from test_availability_data.environment_variables import (
+    COPERNICUSMARINE_PASSWORD,
+    COPERNICUSMARINE_USERNAME,
+)
 from test_availability_data.utils.miscellaneous import (
     get_configuration_from_command_line,
 )
@@ -20,7 +23,11 @@ def do_dry_run(base_info):
     """Step 1: Basic dry run with just dataset_id."""
     try:
         result = copernicusmarine.get(
-            dataset_id=base_info["dataset_id"], dry_run=True, disable_progress_bar=True
+            dataset_id=base_info["dataset_id"],
+            dry_run=True,
+            disable_progress_bar=True,
+            username=COPERNICUSMARINE_USERNAME,
+            password=COPERNICUSMARINE_PASSWORD,
         )
         record = {
             **base_info,
@@ -55,9 +62,12 @@ def check_size_limit(base_info, filename, max_size_mb):
             filter=f"*{filename}*",
             dry_run=True,
             disable_progress_bar=True,
+            username=COPERNICUSMARINE_USERNAME,
+            password=COPERNICUSMARINE_PASSWORD,
         )
 
         if result.total_size > max_size_mb:
+            error_message = f"File too big: {result.total_size}MB > {max_size_mb}MB"
             error_record = {
                 **base_info,
                 "status_message": "Too big",
@@ -65,7 +75,7 @@ def check_size_limit(base_info, filename, max_size_mb):
                 "total_size": result.total_size,
                 "first_file": filename,
                 "error": True,
-                "error_message": f"File too big: {result.total_size}MB > {max_size_mb}MB",
+                "error_message": error_message,
             }
             return None, error_record
 
@@ -95,6 +105,8 @@ def do_download(base_info, filename):
             output_directory="./",
             no_directories=True,
             disable_progress_bar=True,
+            username=COPERNICUSMARINE_USERNAME,
+            password=COPERNICUSMARINE_PASSWORD,
         )
 
         # Cleanup downloaded file
@@ -127,11 +139,11 @@ def do_download(base_info, filename):
         }
 
 
-def test_get_capabilities(data_dir, max_products: Optional[int] = None):
+def test_get_capabilities(data_dir, max_products: int | None = None):
     datasets_copernicus = copernicusmarine.describe()
     dry_run_records = []
     download_records = []
-
+    # TODO: better and consistent way to get one product
     for product in (
         datasets_copernicus.products[:max_products]
         if max_products
@@ -184,7 +196,8 @@ def test_get_capabilities(data_dir, max_products: Optional[int] = None):
     pd.DataFrame(dry_run_records).to_csv(dry_run_path, index=False)
     pd.DataFrame(download_records).to_csv(products_downloaded_path, index=False)
     print(
-        f"Done: {len(dry_run_records)} dry runs, {len(download_records)} download attempts"
+        f"Done: {len(dry_run_records)} dry runs, "
+        f"{len(download_records)} download attempts"
     )
 
 

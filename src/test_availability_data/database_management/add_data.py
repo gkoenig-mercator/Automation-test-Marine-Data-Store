@@ -3,7 +3,6 @@ import os
 import uuid
 
 import pandas as pd
-from dotenv import load_dotenv
 from sqlalchemy import create_engine, insert
 
 from test_availability_data.database_management.schemas import (
@@ -11,20 +10,10 @@ from test_availability_data.database_management.schemas import (
     errors,
     testing_metadata,
 )
-
-load_dotenv()
-
-api_key = os.getenv("API_KEY")
-username = os.environ["DATABASE_USERNAME"]
-password = os.environ["DATABASE_PASSWORD"]
-database_url = os.environ["DATABASE_URL"]
-database_name = os.environ["DATABASE_NAME"]
-database_port = os.environ["DATABASE_PORT"]
+from test_availability_data.environment_variables import DATABASE_URL
 
 table_name = "List_of_datasets"
-engine = create_engine(
-    f"postgresql+psycopg2://{username}:{password}@{database_url}:{database_port}/{database_name}"
-)
+engine = create_engine(DATABASE_URL)
 
 
 def append_test_metadata_in_db(
@@ -85,6 +74,7 @@ def append_errors_in_db(data_dir):
                 )
 
     if error_rows:
+        print(f"Inserting {len(error_rows)} error rows into the database...")
         with engine.begin() as conn:
             conn.execute(insert(errors), error_rows)
 
@@ -113,7 +103,7 @@ def append_dataset_downloadable_status_in_db(data_dir, test_id):
                     "variable_name": row["variable_name"],
                     "command": row["first_command"],  # rename column on the fly
                     "last_downloadable_time": row["last_downloadable_time"],
-                    "downloadable": bool(row["downloadable"]),
+                    "downloadable": str(row["downloadable"]).lower() == "true",
                 }
             )
 

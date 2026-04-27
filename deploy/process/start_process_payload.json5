@@ -4,8 +4,8 @@
     },
     "processInputs": {
         "onyxia": {
-            "friendlyName": "test-renaud",
-            "share": false
+            "friendlyName": "run-catalogue-check",
+            "share": true
         },
         "resources": {
             "limits": {
@@ -17,12 +17,12 @@
                 "memory": "200m"
             }
         },
-        "vault": {
-            "enabled": false,
+        "vault": { // Apparently needs to be set otherwise pod doesn't start
+            "enabled": true,
             "token": "",
-            "url": "",
-            "mount": "",
-            "directory": "",
+            "url": "https://vault.edito.com",
+            "mount": "secret-kv",
+            "directory": "project-test-datasets-subsetting-toolbox",
             "secret": ""
         },
         "s3": {
@@ -34,6 +34,10 @@
             "secretAccessKey": "",
             "sessionToken": ""
         },
-        "inputs": {}
+        "inputs": {
+            // "DATABASE_URL": "postgresql://postgres: Set in the code
+            // "COPERNICUSMARINE_USERNAME": " Set as environment variable in the workflow
+            // "COPERNICUSMARINE_PASSWORD": " Set as environment variable in the workflow
+        }
     }
 }

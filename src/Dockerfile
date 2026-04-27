@@ -6,8 +6,10 @@ WORKDIR /app
 
 COPY pyproject.toml poetry.lock* ./
 
-RUN poetry install --only main --no-root --no-interaction
+RUN poetry install --only main --no-interaction --no-root
 
 COPY src/ ./src/
 
-CMD ["poetry", "run", "python", "src/scripts/retrieve_from_describe_test_availability_and_push_in_db.py", "--data-dir", "data", "--max-products", "1"]
+ENV PYTHONPATH=/app/src
+
+CMD ["poetry", "run", "python", "src/test_availability_data/scripts/retrieve_from_describe_test_availability_and_push_in_db.py", "--data-dir", "data", "--max-products", "1"]

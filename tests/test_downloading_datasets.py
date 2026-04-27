@@ -1,11 +1,12 @@
 # tests/test_downloading_datasets.py
+
 import pandas as pd
 import pytest
 
+from test_availability_data.toolbox_wrapper.download import Downloader
 from test_availability_data.toolbox_wrapper.downloading_datasets import (
     DatasetAvailabilityChecker,
 )
-from test_availability_data.toolbox_wrapper.download import Downloader
 
 
 class FakeDownloader(Downloader):

@@ -1,5 +1,4 @@
 import os
-from typing import Optional
 
 import copernicusmarine
 import pandas as pd
@@ -18,7 +17,7 @@ MAX_PARTS_PER_VERSION = 1
 
 
 def collect_dataset_information(
-    max_products: Optional[int] = None,
+    max_products: int | None = None,
     allowed_services: list[str] = ALLOWED_SERVICES,
     skipped_products: set[str] = SKIPPED_PRODUCTS,
     max_parts_per_version: int = MAX_PARTS_PER_VERSION,
@@ -26,13 +25,7 @@ def collect_dataset_information(
     datasets_copernicus = copernicusmarine.describe()
     dataset_informations = []
 
-    products = (
-        datasets_copernicus.products[:max_products]
-        if max_products
-        else datasets_copernicus.products
-    )
-
-    for product in products:
+    for product in datasets_copernicus.products:
         if product.product_id in skipped_products:
             continue
 
@@ -75,12 +68,14 @@ def collect_dataset_information(
                             }
                         )
 
-    return pd.DataFrame(dataset_informations)
+    return pd.DataFrame(
+        dataset_informations[:max_products] if max_products else dataset_informations
+    )
 
 
 def collect_and_store_dataset_informations(
     data_dir: str,
-    max_products: Optional[int] = None,
+    max_products: int | None = None,
     output_filename: str = DEFAULT_OUTPUT_FILENAME,
 ) -> None:
     df = collect_dataset_information(max_products)

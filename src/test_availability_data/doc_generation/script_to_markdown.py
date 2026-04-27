@@ -1,8 +1,9 @@
-import pandas as pd
 import os
 import subprocess
-from datetime import datetime
 import sys
+from datetime import datetime, timezone
+
+import pandas as pd
 
 
 def create_markdown_file_from_csv(
@@ -35,7 +36,8 @@ def create_markdown_file_from_csv(
         with open("docs/generated_table.md", "w") as f:
             f.write("# List of Datasets With Errors\n\n")
             f.write(
-                f"Generated at: {datetime.utcnow().strftime('%B %d, %Y at %H:%M UTC')}\n\n"
+                f"Generated at: "
+                f"{datetime.now(timezone.utc).strftime('%B %d, %Y at %H:%M UTC')}\n\n"
             )
             f.write(f"Toolbox version: {toolbox_version}\n\n")
             f.write(f"Number of datasets tested: {number_of_datasets_tested}\n\n")
