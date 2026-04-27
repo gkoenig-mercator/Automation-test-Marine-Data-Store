@@ -3,11 +3,7 @@ from datetime import datetime, timezone
 import copernicusmarine
 
 from test_availability_data.config.region_config import region_identifier
-from test_availability_data.database_management.add_data import (
-    append_dataset_downloadable_status_in_db,
-    append_errors_in_db,
-    append_test_metadata_in_db,
-)
+from test_availability_data.database_management.add_data import DatabaseManager
 from test_availability_data.environment_variables import (
     COPERNICUSMARINE_PASSWORD,
     COPERNICUSMARINE_USERNAME,
@@ -29,8 +25,11 @@ from test_availability_data.utils.miscellaneous import (
 )
 from test_availability_data.utils.obtaining_environment_versions import get_versions
 
+from test_availability_data.environment_variables import DATABASE_URL
+
 
 def main():
+    db = DatabaseManager(DATABASE_URL)
     start_time = datetime.now(timezone.utc)
     data_dir, max_products = get_configuration_from_command_line()
     print(f"Data directory: {data_dir}, Max products: {max_products}")
@@ -55,7 +54,7 @@ def main():
     print(f"Number of datasets downloaded: {number_of_datasets}")
 
     test_get_capabilities(data_dir, max_products)
-    run_id = append_test_metadata_in_db(
+    run_id = db.append_test_metadata(
         start_time,
         end_time,
         versions["linux_version"],
@@ -64,8 +63,8 @@ def main():
         run_duration,
         number_of_datasets,
     )
-    append_dataset_downloadable_status_in_db(data_dir, run_id)
-    append_errors_in_db(data_dir)
+    db.append_dataset_downloadable_status(data_dir, run_id)
+    db.append_errors(data_dir)
 
 
 #    create_markdown_file_from_csv(data_dir,versions['toolbox_version'],

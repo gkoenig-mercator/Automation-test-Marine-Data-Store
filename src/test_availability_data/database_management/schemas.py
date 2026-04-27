@@ -1,5 +1,6 @@
+from datetime import timezone, datetime
+import os
 import uuid
-from datetime import datetime
 
 from sqlalchemy import (
     Boolean,
@@ -11,16 +12,19 @@ from sqlalchemy import (
     String,
     Table,
     Text,
+    UUID,
 )
 
-metadata = MetaData(schema="testing")
+SCHEMA = os.getenv("DB_SCHEMA", "testing")
+schema_prefix = f"{SCHEMA}." if SCHEMA else ""
+metadata = MetaData(schema=SCHEMA or None)
 
 # --- 1. Testing metadata ---
 testing_metadata = Table(
     "test_runs",
     metadata,
-    Column("id", String, primary_key=True, default=lambda: str(uuid.uuid4())),
-    Column("start_time", DateTime, default=datetime.utcnow),
+    Column("id", UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
+    Column("start_time", DateTime, default=lambda: datetime.now(timezone.utc)),
     Column("end_time", DateTime),
     Column("run_duration_seconds", Integer),
     Column("numbers_of_datasets", Integer),
@@ -33,8 +37,8 @@ testing_metadata = Table(
 datasets_tested = Table(
     "test_run_datasets",
     metadata,
-    Column("id", String, primary_key=True, default=lambda: str(uuid.uuid4())),
-    Column("test_id", String, ForeignKey("test_runs.id")),
+    Column("id", UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
+    Column("test_id", UUID(as_uuid=True), ForeignKey(f"{schema_prefix}test_runs.id")),
     Column("dataset_id", String),
     Column("dataset_version", String),
     Column("version_part", String),
@@ -49,8 +53,12 @@ datasets_tested = Table(
 errors = Table(
     "test_run_dataset_errors",
     metadata,
-    Column("id", String, primary_key=True, default=lambda: str(uuid.uuid4())),
-    Column("dataset_test_id", String, ForeignKey("test_run_datasets.id")),
+    Column("id", UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
+    Column(
+        "dataset_test_id",
+        UUID(as_uuid=True),
+        ForeignKey(f"{schema_prefix}test_run_datasets.id"),
+    ),
     Column("command", Text),
     Column("error_message", Text),
 )
