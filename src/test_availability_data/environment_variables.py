@@ -2,7 +2,7 @@ import os
 
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(override=True)
 
 _ENV_VARS = {"DATABASE_URL", "COPERNICUSMARINE_USERNAME", "COPERNICUSMARINE_PASSWORD"}
 
