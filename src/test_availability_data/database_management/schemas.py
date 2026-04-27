@@ -1,4 +1,5 @@
 from datetime import timezone, datetime
+import os
 import uuid
 
 from sqlalchemy import (
@@ -14,7 +15,9 @@ from sqlalchemy import (
     UUID,
 )
 
-metadata = MetaData(schema="testing")
+SCHEMA = os.getenv("DB_SCHEMA", "testing")
+schema_prefix = f"{SCHEMA}." if SCHEMA else ""
+metadata = MetaData(schema=SCHEMA or None)
 
 # --- 1. Testing metadata ---
 testing_metadata = Table(
@@ -35,7 +38,7 @@ datasets_tested = Table(
     "test_run_datasets",
     metadata,
     Column("id", UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
-    Column("test_id", UUID(as_uuid=True), ForeignKey("testing.test_runs.id")),
+    Column("test_id", UUID(as_uuid=True), ForeignKey(f"{schema_prefix}test_runs.id")),
     Column("dataset_id", String),
     Column("dataset_version", String),
     Column("version_part", String),
@@ -54,7 +57,7 @@ errors = Table(
     Column(
         "dataset_test_id",
         UUID(as_uuid=True),
-        ForeignKey("testing.test_run_datasets.id"),
+        ForeignKey(f"{schema_prefix}test_run_datasets.id"),
     ),
     Column("command", Text),
     Column("error_message", Text),
