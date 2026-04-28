@@ -45,14 +45,14 @@ class DatabaseManager:
         df = pd.read_csv(file_path)
 
         dataset_rows = df.rename(columns={"first_command": "command"}).assign(
-            id=df["id"].apply(lambda x: uuid.UUID(x) if pd.notna(x) else uuid.uuid4()),
+            id=df["id"].apply(  # type: ignore[arg-type]
+                lambda x: uuid.UUID(x) if pd.notna(x) else uuid.uuid4()
+            ),
             test_id=test_id,
             downloadable=df["downloadable"].map(
                 lambda x: str(x).lower() == "true" if pd.notna(x) else False
             ),
-            last_downloadable_time=df["last_downloadable_time"].where(
-                pd.notna(df["last_downloadable_time"]), other=None
-            ),
+            last_downloadable_time=df["last_downloadable_time"],
         )[
             [
                 "id",
@@ -70,9 +70,11 @@ class DatabaseManager:
 
         if not dataset_rows.empty:
             with self.engine.begin() as conn:
-                conn.execute(
-                    insert(datasets_tested), dataset_rows.to_dict(orient="records")
-                )
+                records = [
+                    {str(k): v for k, v in row.items()}
+                    for row in dataset_rows.to_dict(orient="records")
+                ]
+                conn.execute(insert(datasets_tested), records)
 
     def append_errors(self, data_dir):
         file_path = os.path.join(data_dir, "downloaded_datasets.csv")
