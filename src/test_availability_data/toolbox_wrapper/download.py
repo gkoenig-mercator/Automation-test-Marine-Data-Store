@@ -3,11 +3,6 @@ import os
 import copernicusmarine
 import pandas as pd
 
-from test_availability_data.environment_variables import (
-    COPERNICUSMARINE_PASSWORD,
-    COPERNICUSMARINE_USERNAME,
-)
-
 
 class AttemptBuilder:
     def __init__(self, info: dict, region_dict: dict, data_dir: str):
@@ -102,8 +97,6 @@ class Downloader:
             try:
                 self.commands[i] = attempt["command_repr"]
                 copernicusmarine.subset(
-                    username=COPERNICUSMARINE_USERNAME,
-                    password=COPERNICUSMARINE_PASSWORD,
                     **attempt["kwargs"],
                 )
                 self._remove_temp_files()

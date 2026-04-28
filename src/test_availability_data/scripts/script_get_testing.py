@@ -3,10 +3,6 @@ import os
 import copernicusmarine
 import pandas as pd
 
-from test_availability_data.environment_variables import (
-    COPERNICUSMARINE_PASSWORD,
-    COPERNICUSMARINE_USERNAME,
-)
 from test_availability_data.utils.miscellaneous import (
     get_configuration_from_command_line,
 )
@@ -26,8 +22,6 @@ def do_dry_run(base_info):
             dataset_id=base_info["dataset_id"],
             dry_run=True,
             disable_progress_bar=True,
-            username=COPERNICUSMARINE_USERNAME,
-            password=COPERNICUSMARINE_PASSWORD,
         )
         record = {
             **base_info,
@@ -62,8 +56,6 @@ def check_size_limit(base_info, filename, max_size_mb):
             filter=f"*{filename}*",
             dry_run=True,
             disable_progress_bar=True,
-            username=COPERNICUSMARINE_USERNAME,
-            password=COPERNICUSMARINE_PASSWORD,
         )
 
         if result.total_size > max_size_mb:
@@ -105,8 +97,6 @@ def do_download(base_info, filename):
             output_directory="./",
             no_directories=True,
             disable_progress_bar=True,
-            username=COPERNICUSMARINE_USERNAME,
-            password=COPERNICUSMARINE_PASSWORD,
         )
 
         # Cleanup downloaded file

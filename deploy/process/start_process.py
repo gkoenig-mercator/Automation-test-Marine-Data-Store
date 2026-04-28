@@ -27,19 +27,19 @@ if __name__ == "__main__":
     client = EditoClient(token=token, project=os.getenv("EDITO_PROJECT"))
 
     payload = json5.load(open("deploy/process/start_process_payload.json5"))
-    copernicusmarine_username = os.getenv("COPERNICUSMARINE_USERNAME")
-    copernicusmarine_password = os.getenv("COPERNICUSMARINE_PASSWORD")
-    if not copernicusmarine_username or not copernicusmarine_password:
+    COPERNICUSMARINE_SERVICE_USERNAME = os.getenv("COPERNICUSMARINE_SERVICE_USERNAME")
+    COPERNICUSMARINE_SERVICE_PASSWORD = os.getenv("COPERNICUSMARINE_SERVICE_PASSWORD")
+    if not COPERNICUSMARINE_SERVICE_USERNAME or not COPERNICUSMARINE_SERVICE_PASSWORD:
         raise ValueError(
-            "COPERNICUSMARINE_USERNAME and COPERNICUSMARINE_PASSWORD "
+            "COPERNICUSMARINE_SERVICE_USERNAME and COPERNICUSMARINE_SERVICE_PASSWORD "
             "environment variables must be set."
         )
     payload["processInputs"]["inputs"]["DATABASE_URL"] = get_postgres_url(client)
-    payload["processInputs"]["inputs"]["COPERNICUSMARINE_USERNAME"] = (
-        copernicusmarine_username
-    )
-    payload["processInputs"]["inputs"]["COPERNICUSMARINE_PASSWORD"] = (
-        copernicusmarine_password
-    )
+    payload["processInputs"]["inputs"][
+        "COPERNICUSMARINE_SERVICE_USERNAME"
+    ] = COPERNICUSMARINE_SERVICE_USERNAME
+    payload["processInputs"]["inputs"][
+        "COPERNICUSMARINE_SERVICE_PASSWORD"
+    ] = COPERNICUSMARINE_SERVICE_PASSWORD
     response = client.post(url=url, payload=payload)
     print("Process started successfully:", response.json())

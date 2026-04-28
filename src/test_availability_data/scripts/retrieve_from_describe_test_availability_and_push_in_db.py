@@ -3,10 +3,10 @@ from datetime import datetime, timezone
 import copernicusmarine
 
 from test_availability_data.config.region_config import region_identifier
-from test_availability_data.database_management.add_data import DatabaseManager
+from test_availability_data.database_management.add_data import (
+    DatabaseManager,
+)
 from test_availability_data.environment_variables import (
-    COPERNICUSMARINE_PASSWORD,
-    COPERNICUSMARINE_USERNAME,
     DATABASE_URL,
 )
 from test_availability_data.results.analysis import (
@@ -34,8 +34,6 @@ def main():
     print(f"Data directory: {data_dir}, Max products: {max_products}")
     copernicusmarine.login(
         check_credentials_valid=True,
-        username=COPERNICUSMARINE_USERNAME,
-        password=COPERNICUSMARINE_PASSWORD,
     )
     print("Logged in to Copernicus Marine Service successfully.")
     versions = get_versions()
