@@ -13,7 +13,7 @@ from test_availability_data.database_management.schemas import (
 
 
 def _to_uuid(x: object) -> Any:
-    return uuid.UUID(str(x)) if pd.notna(x) else uuid.uuid4() # type: ignore[arg-type]
+    return uuid.UUID(str(x)) if pd.notna(x) else uuid.uuid4()  # type: ignore[arg-type]
 
 
 class DatabaseManager:
