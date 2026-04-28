@@ -45,7 +45,7 @@ class DatabaseManager:
         df = pd.read_csv(file_path)
 
         dataset_rows = df.rename(columns={"first_command": "command"}).assign(
-            id=df["id"].apply(  # type: ignore[arg-type]
+            id=df["id"].apply(  # pyright: ignore[reportArgumentType]
                 lambda x: uuid.UUID(x) if pd.notna(x) else uuid.uuid4()
             ),
             test_id=test_id,
