@@ -1,5 +1,6 @@
 import os
 import uuid
+from typing import Any
 
 import pandas as pd
 from sqlalchemy import create_engine, insert
@@ -11,20 +12,24 @@ from test_availability_data.database_management.schemas import (
 )
 
 
+def _to_uuid(x: object) -> Any:
+    return uuid.UUID(str(x)) if pd.notna(x) else uuid.uuid4()
+
+
 class DatabaseManager:
-    def __init__(self, database_url):
+    def __init__(self, database_url: str) -> None:
         self.engine = create_engine(database_url)
 
     def append_test_metadata(
         self,
-        start_time,
-        end_time,
-        linux_version,
-        toolbox_version,
-        script_version,
-        run_duration,
-        number_of_datasets,
-    ):
+        start_time: Any,
+        end_time: Any,
+        linux_version: str,
+        toolbox_version: str,
+        script_version: str,
+        run_duration: float,
+        number_of_datasets: int,
+    ) -> Any:
         test_run = {
             "start_time": start_time,
             "end_time": end_time,
@@ -40,14 +45,12 @@ class DatabaseManager:
                 return result.inserted_primary_key[0]
             raise Exception("Failed to retrieve test_id after inserting test metadata.")
 
-    def append_dataset_downloadable_status(self, data_dir, test_id):
+    def append_dataset_downloadable_status(self, data_dir: str, test_id: Any) -> None:
         file_path = os.path.join(data_dir, "downloaded_datasets.csv")
         df = pd.read_csv(file_path)
 
         dataset_rows = df.rename(columns={"first_command": "command"}).assign(
-            id=df["id"].apply(  # pyright: ignore[reportArgumentType]
-                lambda x: uuid.UUID(x) if pd.notna(x) else uuid.uuid4()
-            ),
+            id=df["id"].apply(_to_uuid),
             test_id=test_id,
             downloadable=df["downloadable"].map(
                 lambda x: str(x).lower() == "true" if pd.notna(x) else False
@@ -76,7 +79,7 @@ class DatabaseManager:
                 ]
                 conn.execute(insert(datasets_tested), records)
 
-    def append_errors(self, data_dir):
+    def append_errors(self, data_dir: str) -> None:
         file_path = os.path.join(data_dir, "downloaded_datasets.csv")
         df = pd.read_csv(file_path)
 
