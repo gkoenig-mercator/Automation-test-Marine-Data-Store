@@ -1,8 +1,9 @@
-from datetime import timezone, datetime
 import os
 import uuid
+from datetime import datetime, timezone
 
 from sqlalchemy import (
+    UUID,
     Boolean,
     Column,
     DateTime,
@@ -12,7 +13,6 @@ from sqlalchemy import (
     String,
     Table,
     Text,
-    UUID,
 )
 
 SCHEMA = os.getenv("DB_SCHEMA", "testing")

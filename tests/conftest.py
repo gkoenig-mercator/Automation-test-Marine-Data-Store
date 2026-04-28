@@ -3,11 +3,10 @@ import os
 os.environ["DB_SCHEMA"] = ""  # must be before any local imports
 
 import uuid
-from datetime import datetime
 
 import pandas as pd
 import pytest
-from sqlalchemy import create_engine, event
+from sqlalchemy import event
 
 from test_availability_data.database_management.add_data import DatabaseManager
 from test_availability_data.database_management.schemas import metadata

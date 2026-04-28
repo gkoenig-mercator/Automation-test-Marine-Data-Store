@@ -1,8 +1,7 @@
+import uuid
 from datetime import datetime
 
 import pandas as pd
-import uuid
-import pytest
 from sqlalchemy import select
 
 from test_availability_data.database_management.schemas import (

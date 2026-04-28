@@ -7,6 +7,7 @@ from test_availability_data.database_management.add_data import DatabaseManager
 from test_availability_data.environment_variables import (
     COPERNICUSMARINE_PASSWORD,
     COPERNICUSMARINE_USERNAME,
+    DATABASE_URL,
 )
 from test_availability_data.results.analysis import (
     get_number_of_datasets_downloaded,
@@ -24,8 +25,6 @@ from test_availability_data.utils.miscellaneous import (
     get_duration_in_seconds_from_two_utc,
 )
 from test_availability_data.utils.obtaining_environment_versions import get_versions
-
-from test_availability_data.environment_variables import DATABASE_URL
 
 
 def main():
