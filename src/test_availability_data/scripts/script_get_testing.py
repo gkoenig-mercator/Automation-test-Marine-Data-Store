@@ -202,5 +202,5 @@ def test_get_capabilities(data_dir, max_products: int | None = None):
 
 
 if __name__ == "__main__":
-    data_dir, max_products = get_configuration_from_command_line()
+    data_dir, max_products, _ = get_configuration_from_command_line()
     test_get_capabilities(data_dir, max_products)
