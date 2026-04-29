@@ -24,14 +24,14 @@ class ReportMailer:
     ) -> None:
         self.sender = sender
         self.recipients = [recipients] if isinstance(recipients, str) else recipients
-        self.password = password or os.environ.get("EMAIL_PASSWORD")
+        self.password: str = password or os.environ.get("EMAIL_PASSWORD") or ""
 
         if not self.password:
             raise ValueError(
                 "No email password provided. "
                 "Set EMAIL_PASSWORD env var or pass password= argument."
             )
-        assert self.password is not None
+
         if not self.recipients:
             raise ValueError("At least one recipient is required.")
 
