@@ -20,7 +20,7 @@ class ReportMailer:
         self,
         sender: str,
         recipients: Union[str, list[str]],
-        password: str = None,
+        password: str | None = None,
     ) -> None:
         self.sender = sender
         self.recipients = [recipients] if isinstance(recipients, str) else recipients
@@ -31,10 +31,13 @@ class ReportMailer:
                 "No email password provided. "
                 "Set EMAIL_PASSWORD env var or pass password= argument."
             )
+        assert self.password is not None
         if not self.recipients:
             raise ValueError("At least one recipient is required.")
 
-    def send(self, subject: str, body: str, attachments: list[str] = None) -> None:
+    def send(
+        self, subject: str, body: str, attachments: list[str] | None = None
+    ) -> None:
         msg = MIMEMultipart()
         msg["Subject"] = subject
         msg["From"] = self.sender
@@ -65,7 +68,9 @@ class ReportMailer:
         except smtplib.SMTPException as e:
             raise RuntimeError(f"Failed to send email: {e}")
 
-    def send_report(self, success: bool = False, attachments: list[str] = None) -> None:
+    def send_report(
+        self, success: bool = False, attachments: list[str] | None = None
+    ) -> None:
         if success:
             subject = "Script Complete - OK"
             body = "Your script has finished running successfully!"
