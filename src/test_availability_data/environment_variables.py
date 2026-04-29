@@ -4,7 +4,11 @@ from dotenv import load_dotenv
 
 load_dotenv(override=True)
 
-_ENV_VARS = {"DATABASE_URL", "COPERNICUSMARINE_USERNAME", "COPERNICUSMARINE_PASSWORD"}
+_ENV_VARS = {
+    "DATABASE_URL",
+    "COPERNICUSMARINE_SERVICE_USERNAME",
+    "COPERNICUSMARINE_SERVICE_PASSWORD",
+}
 
 
 def __getattr__(name: str) -> str:

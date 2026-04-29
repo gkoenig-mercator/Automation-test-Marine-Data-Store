@@ -4,8 +4,8 @@ import copernicusmarine
 import pandas as pd
 
 from test_availability_data.environment_variables import (
-    COPERNICUSMARINE_PASSWORD,
-    COPERNICUSMARINE_USERNAME,
+    COPERNICUSMARINE_SERVICE_PASSWORD,
+    COPERNICUSMARINE_SERVICE_USERNAME,
 )
 
 
@@ -102,9 +102,9 @@ class Downloader:
             try:
                 self.commands[i] = attempt["command_repr"]
                 copernicusmarine.subset(
-                    username=COPERNICUSMARINE_USERNAME,
-                    password=COPERNICUSMARINE_PASSWORD,
                     **attempt["kwargs"],
+                    username=COPERNICUSMARINE_SERVICE_USERNAME,
+                    password=COPERNICUSMARINE_SERVICE_PASSWORD,
                 )
                 self._remove_temp_files()
                 self.downloadable = True
