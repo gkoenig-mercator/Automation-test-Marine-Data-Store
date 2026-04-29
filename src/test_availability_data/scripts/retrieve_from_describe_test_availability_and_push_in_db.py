@@ -2,6 +2,8 @@ import copernicusmarine
 import os
 
 from datetime import datetime, timezone
+from dotenv import load_dotenv
+
 from test_availability_data.config.region_config import region_identifier
 from test_availability_data.database_management.add_data import DatabaseManager
 from test_availability_data.environment_variables import (
@@ -26,7 +28,6 @@ from test_availability_data.utils.miscellaneous import (
 )
 from test_availability_data.utils.obtaining_environment_versions import get_versions
 from test_availability_data.email_sending.email_sending import ReportMailer
-from dotenv import load_dotenv
 
 
 def main():
