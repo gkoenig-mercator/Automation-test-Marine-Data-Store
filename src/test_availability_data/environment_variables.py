@@ -6,6 +6,8 @@ load_dotenv(override=True)
 
 _ENV_VARS = {
     "DATABASE_URL",
+    "COPERNICUSMARINE_SERVICE_USERNAME",
+    "COPERNICUSMARINE_SERVICE_PASSWORD",
 }
 
 
