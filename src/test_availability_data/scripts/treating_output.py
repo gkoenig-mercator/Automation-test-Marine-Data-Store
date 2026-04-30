@@ -6,7 +6,7 @@ from test_availability_data.utils.miscellaneous import (
     get_configuration_from_command_line,
 )
 
-data_dir, max_products = get_configuration_from_command_line()
+data_dir, max_products, _ = get_configuration_from_command_line()
 
 # --- Load dataset ---
 csv_path = os.path.join(data_dir, "downloaded_datasets.csv")

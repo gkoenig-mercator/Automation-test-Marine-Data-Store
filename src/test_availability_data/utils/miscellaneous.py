@@ -26,6 +26,12 @@ def get_configuration_from_command_line():
         default=None,
         help="Maximum number of products to test (default: all products)",
     )
+    parser.add_argument(
+        "--email-sending",
+        action="store_true",
+        default=False,
+        help="Activate or not the email sending",
+    )
 
     args = parser.parse_args()
 
@@ -36,7 +42,7 @@ def get_configuration_from_command_line():
     # Create directory if needed
     os.makedirs(args.data_dir, exist_ok=True)
 
-    return args.data_dir, args.max_products
+    return args.data_dir, args.max_products, args.email_sending
 
 
 def determine_region(dataset_id: str, region_dict: dict) -> str:
