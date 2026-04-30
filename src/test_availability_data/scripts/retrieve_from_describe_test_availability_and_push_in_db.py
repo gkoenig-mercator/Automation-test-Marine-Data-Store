@@ -1,11 +1,13 @@
-import copernicusmarine
 import os
-
 from datetime import datetime, timezone
+
+import copernicusmarine
+
 from test_availability_data.config.region_config import region_identifier
 from test_availability_data.database_management.add_data import (
     DatabaseManager,
 )
+from test_availability_data.email_sending.email_sending import ReportMailer
 from test_availability_data.environment_variables import (
     COPERNICUSMARINE_SERVICE_PASSWORD,
     COPERNICUSMARINE_SERVICE_USERNAME,
@@ -27,12 +29,9 @@ from test_availability_data.utils.miscellaneous import (
     get_duration_in_seconds_from_two_utc,
 )
 from test_availability_data.utils.obtaining_environment_versions import get_versions
-from test_availability_data.email_sending.email_sending import ReportMailer
-from dotenv import load_dotenv
 
 
 def main():
-    load_dotenv(override=True)
     db = DatabaseManager(DATABASE_URL)
     start_time = datetime.now(timezone.utc)
     data_dir, max_products, email_sending = get_configuration_from_command_line()
