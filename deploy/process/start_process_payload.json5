@@ -36,8 +36,8 @@
         },
         "inputs": {
             // "DATABASE_URL": "postgresql://postgres: Set in the code
-            // "COPERNICUSMARINE_USERNAME": " Set as environment variable in the workflow
-            // "COPERNICUSMARINE_PASSWORD": " Set as environment variable in the workflow
+            // "COPERNICUSMARINE_SERVICE_USERNAME": "" Set as environment variable in the workflow
+            // "COPERNICUSMARINE_SERVICE_PASSWORD": "" Set as environment variable in the workflow
         }
     }
 }

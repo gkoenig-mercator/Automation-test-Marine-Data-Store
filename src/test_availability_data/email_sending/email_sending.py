@@ -14,6 +14,8 @@ REPORT_URL = (
     "Automation-test-Marine-Data-Store/generated_table/"
 )
 
+MAX_EMAIL_SIZE_BYTES = 5 * 1024 * 1024  # 25 MB
+
 
 class ReportMailer:
     def __init__(
@@ -35,6 +37,29 @@ class ReportMailer:
         if not self.recipients:
             raise ValueError("At least one recipient is required.")
 
+    def _attach_files(
+        self, msg: MIMEMultipart, attachments: list[str]
+    ) -> MIMEMultipart:
+        for filepath in attachments:
+            path = Path(filepath)
+            if not path.exists():
+                raise FileNotFoundError(f"Attachment not found: {filepath}")
+            with open(path, "rb") as f:
+                part = MIMEBase("application", "octet-stream")
+                part.set_payload(f.read())
+            encoders.encode_base64(part)
+            part.add_header("Content-Disposition", f"attachment; filename={path.name}")
+            msg.attach(part)
+        return msg
+
+    def _check_email_size(self, msg: MIMEMultipart) -> None:
+        email_size = len(msg.as_bytes())
+        if email_size > MAX_EMAIL_SIZE_BYTES:
+            raise ValueError(
+                f"Email size ({email_size / 1024 / 1024:.2f} MB) exceeds "
+                f"the maximum allowed size of {MAX_EMAIL_SIZE_BYTES / 1024 / 1024:.0f} MB."
+            )
+
     def send(
         self, subject: str, body: str, attachments: list[str] | None = None
     ) -> None:
@@ -45,18 +70,9 @@ class ReportMailer:
         msg.attach(MIMEText(body, "plain"))
 
         if attachments:
-            for filepath in attachments:
-                path = Path(filepath)
-                if not path.exists():
-                    raise FileNotFoundError(f"Attachment not found: {filepath}")
-                with open(path, "rb") as f:
-                    part = MIMEBase("application", "octet-stream")
-                    part.set_payload(f.read())
-                encoders.encode_base64(part)
-                part.add_header(
-                    "Content-Disposition", f"attachment; filename={path.name}"
-                )
-                msg.attach(part)
+            msg = self._attach_files(msg, attachments)
+
+        self._check_email_size(msg)
 
         try:
             with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT) as server:
