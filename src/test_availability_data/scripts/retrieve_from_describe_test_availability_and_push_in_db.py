@@ -2,8 +2,6 @@ import os
 from datetime import datetime, timezone
 
 import copernicusmarine
-from dotenv import load_dotenv
-
 from test_availability_data.config.region_config import region_identifier
 from test_availability_data.database_management.add_data import (
     DatabaseManager,
@@ -33,7 +31,6 @@ from test_availability_data.utils.obtaining_environment_versions import get_vers
 
 
 def main():
-    load_dotenv(override=True)
     db = DatabaseManager(DATABASE_URL)
     start_time = datetime.now(timezone.utc)
     data_dir, max_products, email_sending = get_configuration_from_command_line()
