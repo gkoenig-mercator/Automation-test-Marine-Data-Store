@@ -57,7 +57,8 @@ class ReportMailer:
         if email_size > MAX_EMAIL_SIZE_BYTES:
             raise ValueError(
                 f"Email size ({email_size / 1024 / 1024:.2f} MB) exceeds "
-                f"the maximum allowed size of {MAX_EMAIL_SIZE_BYTES / 1024 / 1024:.0f} MB."
+                f"the maximum allowed size of "
+                f"{MAX_EMAIL_SIZE_BYTES / 1024 / 1024:.0f} MB."
             )
 
     def send(
