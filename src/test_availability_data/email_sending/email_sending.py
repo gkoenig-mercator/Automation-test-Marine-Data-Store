@@ -21,7 +21,7 @@ class ReportMailer:
         self,
         sender: str,
         recipients: Union[str, list[str]],
-        password: str | None = None,
+        password: str,
     ) -> None:
         self.sender = sender
         self.recipients = [recipients] if isinstance(recipients, str) else recipients
