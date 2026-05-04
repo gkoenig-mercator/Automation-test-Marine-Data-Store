@@ -1,4 +1,3 @@
-import os
 import smtplib
 from email import encoders
 from email.mime.base import MIMEBase
@@ -26,13 +25,10 @@ class ReportMailer:
     ) -> None:
         self.sender = sender
         self.recipients = [recipients] if isinstance(recipients, str) else recipients
-        self.password: str = password or os.environ.get("EMAIL_PASSWORD") or ""
+        self.password: str = password
 
         if not self.password:
-            raise ValueError(
-                "No email password provided. "
-                "Set EMAIL_PASSWORD env var or pass password= argument."
-            )
+            raise ValueError("No email password provided. " "pass password argument.")
 
         if not self.recipients:
             raise ValueError("At least one recipient is required.")

@@ -12,6 +12,7 @@ from test_availability_data.environment_variables import (
     COPERNICUSMARINE_SERVICE_PASSWORD,
     COPERNICUSMARINE_SERVICE_USERNAME,
     DATABASE_URL,
+    EMAIL_PASSWORD,
 )
 from test_availability_data.results.analysis import (
     get_number_of_datasets_downloaded,
@@ -78,6 +79,7 @@ def main():
         mailer = ReportMailer(
             sender="gkoenigmercatorocean@gmail.com",
             recipients=["gkoenig@mercator-ocean.fr"],
+            password=EMAIL_PASSWORD,
         )
 
         mailer.send_report(
