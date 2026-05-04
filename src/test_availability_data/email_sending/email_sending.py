@@ -28,7 +28,7 @@ class ReportMailer:
         self.password: str = password
 
         if not self.password:
-            raise ValueError("No email password provided. " "pass password argument.")
+            raise ValueError("No email password provided. pass password argument.")
 
         if not self.recipients:
             raise ValueError("At least one recipient is required.")
