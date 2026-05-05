@@ -1,3 +1,4 @@
+import os
 from datetime import datetime, timezone
 
 import copernicusmarine
@@ -6,10 +7,12 @@ from test_availability_data.config.region_config import region_identifier
 from test_availability_data.database_management.add_data import (
     DatabaseManager,
 )
+from test_availability_data.email_sending.email_sending import ReportMailer
 from test_availability_data.environment_variables import (
     COPERNICUSMARINE_SERVICE_PASSWORD,
     COPERNICUSMARINE_SERVICE_USERNAME,
     DATABASE_URL,
+    EMAIL_PASSWORD,
 )
 from test_availability_data.results.analysis import (
     get_number_of_datasets_downloaded,
@@ -32,7 +35,7 @@ from test_availability_data.utils.obtaining_environment_versions import get_vers
 def main():
     db = DatabaseManager(DATABASE_URL)
     start_time = datetime.now(timezone.utc)
-    data_dir, max_products = get_configuration_from_command_line()
+    data_dir, max_products, email_sending = get_configuration_from_command_line()
     print(f"Data directory: {data_dir}, Max products: {max_products}")
     copernicusmarine.login(
         check_credentials_valid=True,
@@ -67,13 +70,32 @@ def main():
     db.append_dataset_downloadable_status(data_dir, run_id)
     db.append_errors(data_dir)
 
+    #    create_markdown_file_from_csv(data_dir,versions['toolbox_version'],
+    #                                  number_of_datasets,
+    #                                  percentage_with_error)
+    #    deploy_on_gh_pages()
+    if email_sending:
+        print("Sending the data mail")
+        mailer = ReportMailer(
+            sender="gkoenigmercatorocean@gmail.com",
+            recipients=["gkoenig@mercator-ocean.fr"],
+            password=EMAIL_PASSWORD,
+        )
 
-#    create_markdown_file_from_csv(data_dir,versions['toolbox_version'],
-#                                  number_of_datasets,
-#                                  percentage_with_error)
-#    deploy_on_gh_pages()
-#    if not no_error_in_download(data_dir):
-#        sending_mail()
+        mailer.send_report(
+            success=True,
+            attachments=[
+                os.path.join(data_dir, f)
+                for f in [
+                    "datasets_not_downloaded.csv",
+                    "downloaded_datasets_reduced.csv",
+                    "downloaded_datasets.csv",
+                    "get_products_downloaded.csv",
+                    "get_products_dry_run.csv",
+                    "list_of_informations_from_the_describe.csv",
+                ]
+            ],
+        )
 
 
 if __name__ == "__main__":
