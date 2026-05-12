@@ -3,8 +3,8 @@
 import pandas as pd
 import pytest
 
-from test_availability_data.toolbox_wrapper.download import Downloader
-from test_availability_data.toolbox_wrapper.downloading_datasets import (
+from test_availability_data.todelete.download import Downloader
+from test_availability_data.toolbox_wrapper import (
     DatasetAvailabilityChecker,
 )
 

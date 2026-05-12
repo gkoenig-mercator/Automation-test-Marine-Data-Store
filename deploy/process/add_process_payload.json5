@@ -62,7 +62,21 @@
         defaultValue: '',
         required: true,
         type: 'string'
-      }
+      },
+      {
+        name: "REPORT_RECEIVER_EMAIL",
+        description: "Email address to receive the csv reports.",
+        defaultValue: "",
+        required: false,
+        type: "string"
+      },
+      {
+        name: "REPORT_SENDER_EMAIL_PASSWORD",
+        description: "Password for the email account used to send reports.",
+        defaultValue: "",
+        required: false,
+        type: "string"
+      },
     ],
     "resources": {
       "requests": {

@@ -7,9 +7,6 @@ from test_availability_data.environment_variables import (
     COPERNICUSMARINE_SERVICE_PASSWORD,
     COPERNICUSMARINE_SERVICE_USERNAME,
 )
-from test_availability_data.utils.miscellaneous import (
-    get_configuration_from_command_line,
-)
 
 ALLOWED_SERVICES = {"original-files", "wmts"}
 EXCLUDED_PRODUCTS = [
@@ -199,8 +196,3 @@ def test_get_capabilities(data_dir, max_products: int | None = None):
         f"Done: {len(dry_run_records)} dry runs, "
         f"{len(download_records)} download attempts"
     )
-
-
-if __name__ == "__main__":
-    data_dir, max_products, _ = get_configuration_from_command_line()
-    test_get_capabilities(data_dir, max_products)

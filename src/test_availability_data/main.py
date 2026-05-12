@@ -1,0 +1,167 @@
+import argparse
+import importlib.metadata
+import os
+import platform
+from datetime import datetime, timezone
+
+import copernicusmarine
+import distro
+import pandas as pd
+
+from test_availability_data.config import logger, region_identifier
+from test_availability_data.database import (
+    DatabaseManager,
+)
+from test_availability_data.email_sending import send_report_email
+from test_availability_data.environment_variables import (
+    COPERNICUSMARINE_SERVICE_PASSWORD,
+    COPERNICUSMARINE_SERVICE_USERNAME,
+    DATABASE_URL,
+)
+from test_availability_data.extract_datasets_from_describe import (
+    collect_and_store_dataset_informations,
+)
+from test_availability_data.results_analysis import (
+    get_number_of_datasets_downloaded,
+)
+from test_availability_data.script_get_testing import test_get_capabilities
+from test_availability_data.toolbox_wrapper import (
+    DatasetAvailabilityChecker,
+)
+
+
+def get_duration_in_seconds_from_two_utc(start_time, end_time):
+    duration = end_time - start_time
+
+    duration_seconds = duration.total_seconds()
+
+    return int(duration_seconds)
+
+
+def get_linux_version():
+    try:
+        return f"{distro.name()} {distro.version()} ({distro.codename()})"
+    except Exception:
+        return platform.platform()
+
+
+def get_toolbox_version():
+    try:
+        return importlib.metadata.version("copernicusmarine")
+    except importlib.metadata.PackageNotFoundError:
+        return "not installed"
+
+
+def get_script_version():
+    try:
+        return importlib.metadata.version("test_availability_data")
+    except importlib.metadata.PackageNotFoundError:
+        return "not installed"
+
+
+def get_versions():
+    return {
+        "linux_version": get_linux_version(),
+        "script_version": get_script_version(),
+        "toolbox_version": get_toolbox_version(),
+    }
+
+
+def write_availability_results(
+    df: pd.DataFrame,
+    data_dir: str,
+    full_filename: str = "downloaded_datasets.csv",
+    reduced_filename: str = "downloaded_datasets_reduced.csv",
+    error_filename: str = "datasets_not_downloaded.csv",
+):
+    df.to_csv(os.path.join(data_dir, full_filename), index=False)
+
+    df[["dataset_id", "dataset_version", "version_part", "downloadable"]].to_csv(
+        os.path.join(data_dir, reduced_filename), index=False
+    )
+
+    df[~df["downloadable"]].to_csv(os.path.join(data_dir, error_filename), index=False)
+
+
+if __name__ == "__main__":
+    # Inputs
+    parser = argparse.ArgumentParser(
+        description="Analyze dataset downloadability and timing."
+    )
+    parser.add_argument(
+        "--data-dir",
+        type=str,
+        required=True,
+        help="Path to the directory containing csv files",
+    )
+    parser.add_argument(
+        "--max-products",
+        type=int,
+        default=None,
+        help="Maximum number of products to test (default: all products)",
+    )
+    args = parser.parse_args()
+
+    data_dir = args.data_dir
+    if os.path.exists(args.data_dir) and not os.path.isdir(args.data_dir):
+        raise NotADirectoryError(f"❌ '{args.data_dir}' exists but is not a directory.")
+    os.makedirs(args.data_dir, exist_ok=True)
+
+    max_products = args.max_products
+
+    # Start of the process
+    logger.info(f"Starting dataset availability test, data directory: {data_dir}")
+    if max_products:
+        logger.info(f"Max products to test: {max_products}")
+    start_time = datetime.now(timezone.utc)
+    db = DatabaseManager(DATABASE_URL)
+    copernicusmarine.login(
+        check_credentials_valid=True,
+        username=COPERNICUSMARINE_SERVICE_USERNAME,
+        password=COPERNICUSMARINE_SERVICE_PASSWORD,
+    )
+    logger.info("Logged in to Copernicus Marine Service successfully.")
+
+    collect_and_store_dataset_informations(data_dir, max_products)
+    logger.info("Collected dataset information and stored it in CSV.")
+    checker_dataset_availability_subset = DatasetAvailabilityChecker(
+        data_dir=data_dir, region_dict=region_identifier
+    )
+    subset_availability_dataframe = checker_dataset_availability_subset.run()
+    write_availability_results(subset_availability_dataframe, data_dir)
+    end_time = datetime.now(timezone.utc)
+    run_duration = get_duration_in_seconds_from_two_utc(start_time, end_time)
+    number_of_datasets = get_number_of_datasets_downloaded(data_dir)
+    logger.info(f"Number of datasets downloaded: {number_of_datasets}")
+
+    logger.info("Running get capabilities test.")
+    test_get_capabilities(data_dir, max_products)
+
+    logger.info("Storing dataset availability results in the database.")
+    versions = get_versions()
+    run_id = db.append_test_metadata(
+        start_time,
+        end_time,
+        versions["linux_version"],
+        versions["toolbox_version"],
+        versions["script_version"],
+        run_duration,
+        number_of_datasets,
+    )
+    db.append_dataset_downloadable_status(data_dir, run_id)
+    db.append_errors(data_dir)
+
+    logger.info("Sending report email.")
+    send_report_email(
+        attachments=[
+            os.path.join(data_dir, f)
+            for f in [
+                "datasets_not_downloaded.csv",
+                "downloaded_datasets_reduced.csv",
+                "downloaded_datasets.csv",
+                "get_products_downloaded.csv",
+                "get_products_dry_run.csv",
+                "list_of_informations_from_the_describe.csv",
+            ]
+        ],
+    )

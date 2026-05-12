@@ -6,12 +6,19 @@ from email.mime.text import MIMEText
 from pathlib import Path
 from typing import Union
 
+from test_availability_data.config.logger import logger
+from test_availability_data.environment_variables import (
+    EMAIL_PASSWORD,
+    REPORT_RECIPIENT_EMAIL_ADDRESS,
+)
+
 SMTP_HOST = "smtp.gmail.com"
 SMTP_PORT = 465
 REPORT_URL = (
     "https://gkoenig-mercator.github.io/"
     "Automation-test-Marine-Data-Store/generated_table/"
 )
+SENDER_EMAIL = "gkoenigmercatorocean@gmail.com"
 
 MAX_EMAIL_SIZE_BYTES = 5 * 1024 * 1024  # 25 MB
 
@@ -21,17 +28,11 @@ class ReportMailer:
         self,
         sender: str,
         recipients: Union[str, list[str]],
-        password: str,
+        password: str = "",
     ) -> None:
         self.sender = sender
         self.recipients = [recipients] if isinstance(recipients, str) else recipients
-        self.password: str = password
-
-        if not self.password:
-            raise ValueError("No email password provided. pass password argument.")
-
-        if not self.recipients:
-            raise ValueError("At least one recipient is required.")
+        self.password: str = password or EMAIL_PASSWORD
 
     def _attach_files(
         self, msg: MIMEMultipart, attachments: list[str]
@@ -57,7 +58,7 @@ class ReportMailer:
                 f"{MAX_EMAIL_SIZE_BYTES / 1024 / 1024:.0f} MB."
             )
 
-    def send(
+    def _send(
         self, subject: str, body: str, attachments: list[str] | None = None
     ) -> None:
         msg = MIMEMultipart()
@@ -93,4 +94,19 @@ class ReportMailer:
                 "Your script has finished running but there was an issue. "
                 f"Check the report here: {REPORT_URL}"
             )
-        self.send(subject=subject, body=body, attachments=attachments)
+        self._send(subject=subject, body=body, attachments=attachments)
+
+
+def send_report_email(attachments: list[str] | None = None) -> None:
+    mailer = ReportMailer(
+        sender=SENDER_EMAIL,
+        recipients=REPORT_RECIPIENT_EMAIL_ADDRESS,
+    )
+    if not mailer.password or not mailer.recipients:
+        logger.warning(
+            "Email password or recipient email address not set. "
+            "Email sending will be skipped."
+        )
+        return
+    # TODO: refactor this success flag
+    mailer.send_report(success=True, attachments=attachments)

@@ -6,6 +6,10 @@ on:
       version:
         description: "Version of the process to start"
         required: true
+      recipient_email:
+        type: string
+        description: "Email address to send the report to (optional, will not send if not provided)"
+        required: false
 
 jobs:
   start-process:
@@ -33,4 +37,6 @@ jobs:
           EDITO_PROJECT: ${{ secrets.EDITO_PROJECT }}
           COPERNICUSMARINE_SERVICE_USERNAME: ${{ secrets.COPERNICUSMARINE_SERVICE_USERNAME }}
           COPERNICUSMARINE_SERVICE_PASSWORD: ${{ secrets.COPERNICUSMARINE_SERVICE_PASSWORD }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          REPORT_RECIPIENT_EMAIL_ADDRESS: ${{ inputs.recipient_email }}
         run: make start-process VERSION="${{ inputs.version }}"

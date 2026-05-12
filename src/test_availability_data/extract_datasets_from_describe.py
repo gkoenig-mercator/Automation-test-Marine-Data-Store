@@ -1,16 +1,12 @@
 import os
+from typing import Any
 
 import copernicusmarine
 import pandas as pd
-
-from test_availability_data.toolbox_wrapper.general import (
-    check_if_there_is_time_coordinate,
-    extract_last_available_time,
-    filter_allowed_services,
-    get_first_variable_with_a_time_coordinate,
-)
+from copernicusmarine import CopernicusMarineService, CopernicusMarineVariable
 
 ALLOWED_SERVICES = ["arco-geo-series", "arco-time-series"]
+# TODO: check why it is skipped
 SKIPPED_PRODUCTS = {"INSITU_GLO_PHY_TS_DISCRETE_MY_013_001"}
 DEFAULT_OUTPUT_FILENAME = "list_of_informations_from_the_describe.csv"
 MAX_PARTS_PER_VERSION = 1
@@ -18,22 +14,19 @@ MAX_PARTS_PER_VERSION = 1
 
 def collect_dataset_information(
     max_products: int | None = None,
-    allowed_services: list[str] = ALLOWED_SERVICES,
-    skipped_products: set[str] = SKIPPED_PRODUCTS,
-    max_parts_per_version: int = MAX_PARTS_PER_VERSION,
 ) -> pd.DataFrame:
     datasets_copernicus = copernicusmarine.describe()
     dataset_informations = []
 
     for product in datasets_copernicus.products:
-        if product.product_id in skipped_products:
+        if product.product_id in SKIPPED_PRODUCTS:
             continue
 
         for dataset in product.datasets:
             for version in dataset.versions:
-                for part in version.parts[:max_parts_per_version]:
+                for part in version.parts[:MAX_PARTS_PER_VERSION]:
                     for service in filter_allowed_services(
-                        part.services, allowed_services
+                        part.services, ALLOWED_SERVICES
                     ):
                         has_time = check_if_there_is_time_coordinate(service.variables)
                         variable_name = service.variables[0].standard_name
@@ -82,3 +75,46 @@ def collect_and_store_dataset_informations(
     output_path = os.path.join(data_dir, output_filename)
     df.to_csv(output_path, index=False)
     print(f"Saved dataset into {output_path}")
+
+
+def extract_last_available_time(variable: CopernicusMarineVariable) -> Any:
+    """Get the last available time from copernicusmarine variable metadata."""
+    for coordinate in variable.coordinates:
+        if coordinate.coordinate_id == "time":
+            if coordinate.maximum_value:
+                return coordinate.maximum_value
+            if coordinate.values:
+                return coordinate.values[-1]
+    return None
+
+
+def filter_allowed_services(
+    services: list[CopernicusMarineService],
+    allowed_services: list[str] | None = None,
+) -> list[CopernicusMarineService]:
+    """
+    Return services that are in the allowed list, or all services if no filter is given.
+    """
+    if allowed_services is None:
+        return services
+    return [s for s in services if s.service_name in allowed_services]
+
+
+def check_if_there_is_time_coordinate(
+    variables: list[CopernicusMarineVariable],
+) -> bool:
+    """Check if any variable has a time coordinate."""
+    return any(
+        coord.coordinate_id == "time" for var in variables for coord in var.coordinates
+    )
+
+
+def get_first_variable_with_a_time_coordinate(
+    variables: list[CopernicusMarineVariable],
+) -> tuple[str | None, int | None]:
+    """Get the name and index of the first variable that has a time coordinate."""
+    for index, variable in enumerate(variables):
+        for coordinate in variable.coordinates:
+            if coordinate.coordinate_id == "time":
+                return variable.short_name, index
+    return None, None
