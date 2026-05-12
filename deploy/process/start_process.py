@@ -42,9 +42,9 @@ if __name__ == "__main__":
     if sender_email_password := os.getenv("REPORT_SENDER_EMAIL_PASSWORD"):
         inputs["REPORT_SENDER_EMAIL_PASSWORD"] = sender_email_password
     if sender_email_password := os.getenv("REPORT_SENDER_EMAIL_PASSWORD"):
-        payload["processInputs"]["inputs"][
-            "REPORT_SENDER_EMAIL_PASSWORD"
-        ] = sender_email_password
+        payload["processInputs"]["inputs"]["REPORT_SENDER_EMAIL_PASSWORD"] = (
+            sender_email_password
+        )
     payload["processInputs"]["inputs"] = inputs
     response = client.post(url=url, payload=payload)
     print("Process started successfully:", response.json())
