@@ -79,8 +79,9 @@ class ReportMailer:
             print(f"Email sent to {self.recipients}")
         except smtplib.SMTPAuthenticationError:
             raise RuntimeError("Authentication failed. Check your email and password.")
-        except smtplib.SMTPException as e:
-            raise RuntimeError(f"Failed to send email: {e}")
+        except Exception:
+            logger.error("Failed to send email, raising exception.")
+            raise
 
     def send_report(
         self, success: bool = False, attachments: list[str] | None = None
