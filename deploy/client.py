@@ -4,6 +4,8 @@ import requests
 class EditoClient:
     """
     Requests client with authentified calls through bearer token.
+
+    #TODO: add a retry mechanism
     """
 
     def __init__(self, token: str, project: str | None = None) -> None:

@@ -8,8 +8,7 @@ import pandas as pd
 import pytest
 from sqlalchemy import event
 
-from test_availability_data.database_management.add_data import DatabaseManager
-from test_availability_data.database_management.schemas import metadata
+from test_availability_data.database import DatabaseManager, metadata
 
 
 @pytest.fixture

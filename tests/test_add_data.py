@@ -4,7 +4,7 @@ from datetime import datetime
 import pandas as pd
 from sqlalchemy import select
 
-from test_availability_data.database_management.schemas import (
+from test_availability_data.database.schemas import (
     datasets_tested,
     errors,
     testing_metadata,
