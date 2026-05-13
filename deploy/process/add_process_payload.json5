@@ -64,7 +64,7 @@
         type: 'string'
       },
       {
-        name: "REPORT_RECEIVER_EMAIL",
+        name: "REPORT_RECIPIENT_EMAIL_ADDRESS",
         description: "Email address to receive the csv reports.",
         defaultValue: "",
         required: false,
