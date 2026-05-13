@@ -102,9 +102,15 @@ def send_report_email(attachments: list[str] | None = None) -> None:
         sender=SENDER_EMAIL,
         recipients=REPORT_RECIPIENT_EMAIL_ADDRESS,
     )
-    if not mailer.password or not mailer.recipients:
+    if not mailer.password:
         logger.warning(
-            "Email password or recipient email address not set. "
+            "Email password is not set. Cannot send email report. "
+            "Email sending will be skipped."
+        )
+        return
+    if not mailer.recipients:
+        logger.warning(
+            "Email recipient is not set. Cannot send email report. "
             "Email sending will be skipped."
         )
         return

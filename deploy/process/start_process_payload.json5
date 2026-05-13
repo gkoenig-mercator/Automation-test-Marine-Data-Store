@@ -38,8 +38,8 @@
             // "DATABASE_URL": "postgresql://postgres: Set in the code
             // "COPERNICUSMARINE_SERVICE_USERNAME": "" Set as environment variable in the workflow
             // "COPERNICUSMARINE_SERVICE_PASSWORD": "" Set as environment variable in the workflow
-            // "REPORT_SENDER_EMAIL_PASSWORD": "" Set as environment variable in the workflow
-            // "REPORT_RECEIVER_EMAIL": "" Set as environment variable in the workflow
+            // "EMAIL_PASSWORD": "" Set as environment variable in the workflow
+            // "REPORT_RECIPIENT_EMAIL_ADDRESS": "" Set as environment variable in the workflow
         }
     }
 }

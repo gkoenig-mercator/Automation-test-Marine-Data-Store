@@ -71,7 +71,7 @@
         type: "string"
       },
       {
-        name: "REPORT_SENDER_EMAIL_PASSWORD",
+        name: "EMAIL_PASSWORD",
         description: "Password for the email account used to send reports.",
         defaultValue: "",
         required: false,

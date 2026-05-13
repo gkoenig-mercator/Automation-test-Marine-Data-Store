@@ -44,7 +44,7 @@ if __name__ == "__main__":
         "COPERNICUSMARINE_SERVICE_PASSWORD": COPERNICUSMARINE_SERVICE_PASSWORD,
     }
     if sender_email_password := os.getenv("EMAIL_PASSWORD"):
-        inputs["REPORT_SENDER_EMAIL_PASSWORD"] = sender_email_password
+        inputs["EMAIL_PASSWORD"] = sender_email_password
     if recipient_email := os.getenv("REPORT_RECIPIENT_EMAIL_ADDRESS"):
         inputs["REPORT_RECIPIENT_EMAIL_ADDRESS"] = recipient_email
     payload["processInputs"]["inputs"] = inputs
