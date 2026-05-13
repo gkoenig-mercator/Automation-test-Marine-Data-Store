@@ -2,11 +2,15 @@ import argparse
 import os
 
 import json5
+from dotenv import load_dotenv
 
 from deploy.auth import Authenticator
 from deploy.client import EditoClient
 from deploy.urls import PROCESS_NAME, process_execution_url
 from deploy.utils import get_postgres_url
+
+load_dotenv()
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Start an EDITO process execution.")
@@ -39,7 +43,7 @@ if __name__ == "__main__":
         "COPERNICUSMARINE_SERVICE_USERNAME": COPERNICUSMARINE_SERVICE_USERNAME,
         "COPERNICUSMARINE_SERVICE_PASSWORD": COPERNICUSMARINE_SERVICE_PASSWORD,
     }
-    if sender_email_password := os.getenv("REPORT_SENDER_EMAIL_PASSWORD"):
+    if sender_email_password := os.getenv("EMAIL_PASSWORD"):
         inputs["REPORT_SENDER_EMAIL_PASSWORD"] = sender_email_password
     if sender_email_password := os.getenv("REPORT_SENDER_EMAIL_PASSWORD"):
         payload["processInputs"]["inputs"]["REPORT_SENDER_EMAIL_PASSWORD"] = (
