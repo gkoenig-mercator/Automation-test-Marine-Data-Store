@@ -35,7 +35,7 @@ logHandler = logging.StreamHandler()
 logHandler.setLevel(level)
 logHandler.setFormatter(CustomFormatter())
 
-logger = logging.getLogger("logger")
+logger = logging.getLogger("catalogue_check")
 logger.addHandler(logHandler)
 
 logging.getLogger("copernicusmarine").setLevel("INFO")

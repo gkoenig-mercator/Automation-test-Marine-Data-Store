@@ -5,6 +5,8 @@ import copernicusmarine
 import pandas as pd
 from copernicusmarine import CopernicusMarineService, CopernicusMarineVariable
 
+from test_availability_data.config import logger
+
 ALLOWED_SERVICES = ["arco-geo-series", "arco-time-series"]
 # TODO: check why it is skipped
 SKIPPED_PRODUCTS = {"INSITU_GLO_PHY_TS_DISCRETE_MY_013_001"}
@@ -15,7 +17,7 @@ MAX_PARTS_PER_VERSION = 1
 def collect_dataset_information(
     max_products: int | None = None,
 ) -> pd.DataFrame:
-    datasets_copernicus = copernicusmarine.describe()
+    datasets_copernicus = copernicusmarine.describe(disable_progress_bar=True)
     dataset_informations = []
 
     for product in datasets_copernicus.products:
@@ -74,7 +76,7 @@ def collect_and_store_dataset_informations(
     df = collect_dataset_information(max_products)
     output_path = os.path.join(data_dir, output_filename)
     df.to_csv(output_path, index=False)
-    print(f"Saved dataset into {output_path}")
+    logger.info(f"Saved dataset into {output_path}")
 
 
 def extract_last_available_time(variable: CopernicusMarineVariable) -> Any:

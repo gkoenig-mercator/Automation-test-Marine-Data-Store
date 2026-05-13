@@ -3,6 +3,7 @@ import os
 import copernicusmarine
 import pandas as pd
 
+from test_availability_data.config import logger
 from test_availability_data.environment_variables import (
     COPERNICUSMARINE_SERVICE_PASSWORD,
     COPERNICUSMARINE_SERVICE_USERNAME,
@@ -137,7 +138,7 @@ def do_download(base_info, filename):
 
 
 def test_get_capabilities(data_dir, max_products: int | None = None):
-    datasets_copernicus = copernicusmarine.describe()
+    datasets_copernicus = copernicusmarine.describe(disable_progress_bar=True)
     dry_run_records = []
     download_records = []
     # TODO: better and consistent way to get one product
@@ -156,7 +157,7 @@ def test_get_capabilities(data_dir, max_products: int | None = None):
                     for service in [
                         s for s in part.services if s.service_name in ALLOWED_SERVICES
                     ]:
-                        print(f"Processing: {dataset.dataset_id}")
+                        logger.info(f"Processing: {dataset.dataset_id}")
 
                         # Common info used in all records
                         base_info = {
@@ -192,7 +193,7 @@ def test_get_capabilities(data_dir, max_products: int | None = None):
     products_downloaded_path = os.path.join(data_dir, "get_products_downloaded.csv")
     pd.DataFrame(dry_run_records).to_csv(dry_run_path, index=False)
     pd.DataFrame(download_records).to_csv(products_downloaded_path, index=False)
-    print(
+    logger.info(
         f"Done: {len(dry_run_records)} dry runs, "
         f"{len(download_records)} download attempts"
     )

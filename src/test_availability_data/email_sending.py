@@ -76,7 +76,7 @@ class ReportMailer:
             with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT) as server:
                 server.login(self.sender, self.password)
                 server.send_message(msg)
-            print(f"Email sent to {self.recipients}")
+            logger.info(f"Email sent to {self.recipients}")
         except smtplib.SMTPAuthenticationError:
             raise RuntimeError("Authentication failed. Check your email and password.")
         except Exception:
