@@ -1,4 +1,5 @@
 import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import copernicusmarine
 import pandas as pd
@@ -137,56 +138,68 @@ def do_download(base_info, filename):
         }
 
 
-def test_get_capabilities(data_dir, max_products: int | None = None):
+def _process_service(base_info):
+    """Process a single service: dry run, size check, and download."""
+    dry_record, dry_result = do_dry_run(base_info)
+
+    if not dry_result or not dry_result.files:
+        return dry_record, None
+
+    filename = dry_result.files[0].filename
+
+    # Size check
+    _, error_record = check_size_limit(base_info, filename, MAX_SIZE_MB)
+    if error_record:
+        return dry_record, error_record
+
+    # Download
+    dl_record = do_download(base_info, filename)
+    return dry_record, dl_record
+
+
+def test_get_capabilities(data_dir, max_datasets: int | None = None):
     datasets_copernicus = copernicusmarine.describe(disable_progress_bar=True)
     dry_run_records = []
     download_records = []
-    # TODO: better and consistent way to get one product
-    for product in (
-        datasets_copernicus.products[:max_products]
-        if max_products
-        else datasets_copernicus.products
-    ):
-        if product.product_id in EXCLUDED_PRODUCTS:
-            continue
+    datasets_to_check = [
+        dataset
+        for product in datasets_copernicus.products
+        for dataset in product.datasets
+        if product.product_id not in EXCLUDED_PRODUCTS
+    ]
+    datasets_to_check = (
+        datasets_to_check[:max_datasets] if max_datasets else datasets_to_check
+    )
 
-        for dataset in product.datasets:
-            for version in dataset.versions:
-                for part in version.parts[:1]:  # Only first part
-                    # Filter services inline
-                    for service in [
-                        s for s in part.services if s.service_name in ALLOWED_SERVICES
-                    ]:
-                        logger.info(f"Processing: {dataset.dataset_id}")
+    # Collect all service tasks
+    service_tasks = []
+    for dataset in datasets_to_check:
+        for version in dataset.versions:
+            for part in version.parts[:1]:  # Only first part
+                for service in [
+                    s for s in part.services if s.service_name in ALLOWED_SERVICES
+                ]:
+                    base_info = {
+                        "dataset_id": dataset.dataset_id,
+                        "dataset_version": version.label,
+                        "version_part": part.name,
+                        "service_name": service.service_name,
+                    }
+                    service_tasks.append(base_info)
 
-                        # Common info used in all records
-                        base_info = {
-                            "dataset_id": dataset.dataset_id,
-                            "dataset_version": version.label,
-                            "version_part": part.name,
-                            "service_name": service.service_name,
-                        }
-
-                        # STEP 1: Dry run
-                        dry_record, dry_result = do_dry_run(base_info)
-                        dry_run_records.append(dry_record)
-
-                        if not dry_result or not dry_result.files:
-                            continue
-
-                        filename = dry_result.files[0].filename
-
-                        # STEP 2: Size check
-                        size_result, error_record = check_size_limit(
-                            base_info, filename, MAX_SIZE_MB
-                        )
-                        if error_record:
-                            download_records.append(error_record)
-                            continue
-
-                        # STEP 3: Download
-                        dl_record = do_download(base_info, filename)
-                        download_records.append(dl_record)
+    # Process services in parallel
+    with ThreadPoolExecutor() as executor:
+        futures = {
+            executor.submit(_process_service, base_info): base_info
+            for base_info in service_tasks
+        }
+        for future in as_completed(futures):
+            base_info = futures[future]
+            logger.info(f"Processing: {base_info['dataset_id']}")
+            dry_record, dl_record = future.result()
+            dry_run_records.append(dry_record)
+            if dl_record:
+                download_records.append(dl_record)
 
     # Save results
     dry_run_path = os.path.join(data_dir, "get_products_dry_run.csv")

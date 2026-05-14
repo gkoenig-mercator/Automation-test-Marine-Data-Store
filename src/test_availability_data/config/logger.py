@@ -23,4 +23,4 @@ logHandler.setFormatter(CustomFormatter())
 logger = logging.getLogger("catalogue_check")
 logger.addHandler(logHandler)
 
-logging.getLogger("copernicusmarine").setLevel("INFO")
+logging.getLogger("copernicusmarine").setLevel("WARNING")

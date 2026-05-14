@@ -12,4 +12,4 @@ COPY src/ ./src/
 
 ENV PYTHONPATH=/app/src
 
-CMD ["poetry", "run", "python", "src/test_availability_data/main.py", "--data-dir", "data", "--max-products", "1"]
+CMD ["poetry", "run", "python", "src/test_availability_data/main.py"]

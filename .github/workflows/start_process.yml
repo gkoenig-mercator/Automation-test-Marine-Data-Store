@@ -10,6 +10,11 @@ on:
         type: string
         description: "Email address to send the report to (optional, will not send if not provided)"
         required: false
+      maximum_datasets_to_validate:
+        type: number
+        description: "Maximum number of datasets to validate (optional, will validate all if not provided)"
+        required: false
+
 
 jobs:
   start-process:
@@ -39,4 +44,5 @@ jobs:
           COPERNICUSMARINE_SERVICE_PASSWORD: ${{ secrets.COPERNICUSMARINE_SERVICE_PASSWORD }}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
           REPORT_RECIPIENT_EMAIL_ADDRESS: ${{ inputs.recipient_email }}
+          MAXIMUM_DATASETS_TO_VALIDATE: ${{ inputs.maximum_datasets_to_validate }}
         run: make start-process VERSION="${{ inputs.version }}"

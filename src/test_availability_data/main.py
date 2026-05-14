@@ -17,6 +17,7 @@ from test_availability_data.environment_variables import (
     COPERNICUSMARINE_SERVICE_PASSWORD,
     COPERNICUSMARINE_SERVICE_USERNAME,
     DATABASE_URL,
+    MAXIMUM_DATASETS_TO_VALIDATE,
 )
 from test_availability_data.extract_datasets_from_describe import (
     collect_and_store_dataset_informations,
@@ -91,14 +92,14 @@ if __name__ == "__main__":
     parser.add_argument(
         "--data-dir",
         type=str,
-        required=True,
         help="Path to the directory containing csv files",
+        default="data",
     )
     parser.add_argument(
-        "--max-products",
+        "--max-datasets",
         type=int,
         default=None,
-        help="Maximum number of products to test (default: all products)",
+        help="Maximum number of datasets to test (default: all datasets)",
     )
     args = parser.parse_args()
 
@@ -107,12 +108,14 @@ if __name__ == "__main__":
         raise NotADirectoryError(f"❌ '{args.data_dir}' exists but is not a directory.")
     os.makedirs(args.data_dir, exist_ok=True)
 
-    max_products = args.max_products
+    max_datasets = args.max_datasets
+    if not max_datasets and MAXIMUM_DATASETS_TO_VALIDATE:
+        max_datasets = int(MAXIMUM_DATASETS_TO_VALIDATE)
 
     # Start of the process
     logger.info(f"Starting dataset availability test, data directory: {data_dir}")
-    if max_products:
-        logger.info(f"Max products to test: {max_products}")
+    if max_datasets:
+        logger.info(f"Max datasets to test: {max_datasets}")
     start_time = datetime.now(timezone.utc)
     db = DatabaseManager(DATABASE_URL)
     copernicusmarine.login(
@@ -122,20 +125,28 @@ if __name__ == "__main__":
     )
     logger.info("Logged in to Copernicus Marine Service successfully.")
 
-    collect_and_store_dataset_informations(data_dir, max_products)
+    logger.info("Collecting dataset information and storing it in CSV.")
+    collect_and_store_dataset_informations(data_dir, max_datasets)
     logger.info("Collected dataset information and stored it in CSV.")
+
+    logger.info("Checking dataset availability and storing results in CSV.")
     checker_dataset_availability_subset = DatasetAvailabilityChecker(
         data_dir=data_dir, region_dict=region_identifier
     )
     subset_availability_dataframe = checker_dataset_availability_subset.run()
+    logger.info("Checked dataset availability and stored results in CSV.")
+
     write_availability_results(subset_availability_dataframe, data_dir)
     end_time = datetime.now(timezone.utc)
     run_duration = get_duration_in_seconds_from_two_utc(start_time, end_time)
     number_of_datasets = get_number_of_datasets_downloaded(data_dir)
-    logger.info(f"Number of datasets downloaded: {number_of_datasets}")
+    logger.info(
+        f"Number of datasets downloaded: {number_of_datasets} in "
+        f"{run_duration} seconds for subset."
+    )
 
     logger.info("Running get capabilities test.")
-    test_get_capabilities(data_dir, max_products)
+    test_get_capabilities(data_dir, max_datasets)
 
     logger.info("Storing dataset availability results in the database.")
     versions = get_versions()

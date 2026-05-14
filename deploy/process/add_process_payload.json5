@@ -77,6 +77,13 @@
         required: false,
         type: "string"
       },
+      {
+        name: "MAXIMUM_DATASETS_TO_VALIDATE",
+        description: "Maximum number of datasets to validate. If not set, all datasets will be validated.",
+        defaultValue: "",
+        required: false,
+        type: "string"
+      }
     ],
     "resources": {
       "requests": {
