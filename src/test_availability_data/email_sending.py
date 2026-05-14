@@ -68,6 +68,7 @@ class ReportMailer:
         msg.attach(MIMEText(body, "plain"))
 
         if attachments:
+            attachments = [a for a in attachments if Path(a).exists()]
             msg = self._attach_files(msg, attachments)
 
         self._check_email_size(msg)
