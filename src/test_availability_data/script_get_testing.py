@@ -1,5 +1,6 @@
 import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from tempfile import NamedTemporaryFile
 
 import copernicusmarine
 import pandas as pd
@@ -18,7 +19,7 @@ EXCLUDED_PRODUCTS = [
 MAX_SIZE_MB = 2000
 
 
-def do_dry_run(base_info):
+def _do_dry_run(base_info) -> tuple[dict, copernicusmarine.ResponseGet | None]:
     """Step 1: Basic dry run with just dataset_id."""
     try:
         result = copernicusmarine.get(
@@ -51,22 +52,28 @@ def do_dry_run(base_info):
         return record, None
 
 
-def check_size_limit(base_info, filename, max_size_mb):
-    """Step 2: Check specific file size. Returns (result, error_record)."""
+def _check_size_limit(
+    base_info: dict,
+    filename: str,
+    file_list_path: str,
+) -> tuple[copernicusmarine.ResponseGet | None, dict | None]:
+    """
+    Step 2: Check specific file size. Returns (result, error_record).
+    """
     try:
         result = copernicusmarine.get(
             dataset_id=base_info["dataset_id"],
             dataset_version=base_info["dataset_version"],
             dataset_part=base_info["version_part"],
-            filter=f"*{filename}*",
+            file_list=file_list_path,
             dry_run=True,
             disable_progress_bar=True,
             username=COPERNICUSMARINE_SERVICE_USERNAME,
             password=COPERNICUSMARINE_SERVICE_PASSWORD,
         )
 
-        if result.total_size > max_size_mb:
-            error_message = f"File too big: {result.total_size}MB > {max_size_mb}MB"
+        if (result.total_size or 0) > MAX_SIZE_MB:
+            error_message = f"File too big: {result.total_size}MB > {MAX_SIZE_MB}MB"
             error_record = {
                 **base_info,
                 "status_message": "Too big",
@@ -93,14 +100,14 @@ def check_size_limit(base_info, filename, max_size_mb):
         return None, error_record
 
 
-def do_download(base_info, filename):
+def _do_download(base_info: dict, filename: str, file_list_path: str) -> dict:
     """Step 3: Download file and cleanup. Returns record for logging."""
     try:
         result = copernicusmarine.get(
             dataset_id=base_info["dataset_id"],
             dataset_version=base_info["dataset_version"],
             dataset_part=base_info["version_part"],
-            filter=f"*{filename}*",
+            file_list=file_list_path,
             output_directory="./",
             no_directories=True,
             disable_progress_bar=True,
@@ -138,23 +145,39 @@ def do_download(base_info, filename):
         }
 
 
-def _process_service(base_info):
-    """Process a single service: dry run, size check, and download."""
-    dry_record, dry_result = do_dry_run(base_info)
+def _process_service(base_info: dict) -> tuple[dict, dict | None]:
+    """
+    Process a single service: dry run, size check, and download.
+
+    Using the file_list option to avoid relisting files for each step.
+    """
+    dry_record, dry_result = _do_dry_run(base_info)
 
     if not dry_result or not dry_result.files:
         return dry_record, None
 
+    s3_filepath = dry_result.files[0].s3_url
     filename = dry_result.files[0].filename
+    with NamedTemporaryFile(mode="w+", delete=True) as temp_file:
+        temp_file.write(s3_filepath)
+        temp_file.flush()
 
-    # Size check
-    _, error_record = check_size_limit(base_info, filename, MAX_SIZE_MB)
-    if error_record:
-        return dry_record, error_record
+        # Size check
+        _, error_record = _check_size_limit(
+            base_info,
+            filename,
+            temp_file.name,
+        )
+        if error_record:
+            return dry_record, error_record
 
-    # Download
-    dl_record = do_download(base_info, filename)
-    return dry_record, dl_record
+        # Download
+        dl_record = _do_download(
+            base_info,
+            filename,
+            temp_file.name,
+        )
+        return dry_record, dl_record
 
 
 def test_get_capabilities(data_dir, max_datasets: int | None = None):

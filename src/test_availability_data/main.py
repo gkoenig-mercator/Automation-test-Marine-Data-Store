@@ -3,6 +3,7 @@ import importlib.metadata
 import os
 import platform
 from datetime import datetime, timezone
+from time import time
 
 import copernicusmarine
 import distro
@@ -25,17 +26,12 @@ from test_availability_data.extract_datasets_from_describe import (
 from test_availability_data.results_analysis import (
     get_number_of_datasets_downloaded,
 )
+from test_availability_data.script_get_testing import (
+    test_get_capabilities,
+)
 from test_availability_data.toolbox_wrapper import (
     DatasetAvailabilityChecker,
 )
-
-
-def get_duration_in_seconds_from_two_utc(start_time, end_time):
-    duration = end_time - start_time
-
-    duration_seconds = duration.total_seconds()
-
-    return int(duration_seconds)
 
 
 def get_linux_version():
@@ -112,10 +108,10 @@ if __name__ == "__main__":
         max_datasets = int(MAXIMUM_DATASETS_TO_VALIDATE)
 
     # Start of the process
+    start_time = datetime.now(timezone.utc)
     logger.info(f"Starting dataset availability test, data directory: {data_dir}")
     if max_datasets:
         logger.info(f"Max datasets to test: {max_datasets}")
-    start_time = datetime.now(timezone.utc)
     db = DatabaseManager(DATABASE_URL)
     copernicusmarine.login(
         check_credentials_valid=True,
@@ -124,6 +120,7 @@ if __name__ == "__main__":
     )
     logger.info("Logged in to Copernicus Marine Service successfully.")
 
+    top_subset = time()
     logger.info("Collecting dataset information and storing it in CSV.")
     collect_and_store_dataset_informations(data_dir, max_datasets)
     logger.info("Collected dataset information and stored it in CSV.")
@@ -136,19 +133,19 @@ if __name__ == "__main__":
     logger.info("Checked dataset availability and stored results in CSV.")
 
     write_availability_results(subset_availability_dataframe, data_dir)
-    end_time = datetime.now(timezone.utc)
-    run_duration = get_duration_in_seconds_from_two_utc(start_time, end_time)
     number_of_datasets = get_number_of_datasets_downloaded(data_dir)
     logger.info(
         f"Number of datasets downloaded: {number_of_datasets} in "
-        f"{run_duration} seconds for subset."
+        f"{time() - top_subset} seconds for subset."
     )
 
-    # logger.info("Running get capabilities test.")
-    # test_get_capabilities(data_dir, max_datasets)
-    logger.info("Passing on the get capabilities test.")
+    top_get = time()
+    logger.info("Running get capabilities test.")
+    test_get_capabilities(data_dir, max_datasets)
+    logger.info(f"Finished in {time() - top_get} seconds for get.")
 
     logger.info("Storing dataset availability results in the database.")
+    end_time = datetime.now(timezone.utc)
     versions = get_versions()
     run_id = db.append_test_metadata(
         start_time,
@@ -156,7 +153,7 @@ if __name__ == "__main__":
         versions["linux_version"],
         versions["toolbox_version"],
         versions["script_version"],
-        run_duration,
+        (end_time - start_time).total_seconds(),
         number_of_datasets,
     )
     db.append_dataset_downloadable_status(data_dir, run_id)
