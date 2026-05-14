@@ -40,6 +40,7 @@
             // "COPERNICUSMARINE_SERVICE_PASSWORD": "" Set as environment variable in the workflow
             // "EMAIL_PASSWORD": "" Set as environment variable in the workflow
             // "REPORT_RECIPIENT_EMAIL_ADDRESS": "" Set as environment variable in the workflow
+            // "MAXIMUM_DATASETS_TO_VALIDATE": "" Set as environment variable in the workflow
         }
     }
 }

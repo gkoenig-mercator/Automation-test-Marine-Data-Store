@@ -4,6 +4,7 @@ import uuid
 import copernicusmarine
 import pandas as pd
 
+from test_availability_data.config import logger
 from test_availability_data.environment_variables import (
     COPERNICUSMARINE_SERVICE_PASSWORD,
     COPERNICUSMARINE_SERVICE_USERNAME,
@@ -113,6 +114,7 @@ class Downloader:
                     **attempt["kwargs"],
                     username=COPERNICUSMARINE_SERVICE_USERNAME,
                     password=COPERNICUSMARINE_SERVICE_PASSWORD,
+                    disable_progress_bar=True,
                 )
                 self._remove_temp_files()
                 self.downloadable = True
@@ -160,6 +162,9 @@ class DatasetAvailabilityChecker:
         return df
 
     def _process_row(self, row: pd.Series) -> dict:
+        logger.info(
+            f"Processing dataset {row['dataset_id']} ith service {row['service_name']}"
+        )
         if pd.isnull(row["last_available_time"]):
             return {
                 "downloadable": False,
