@@ -1,12 +1,9 @@
 import os
 import uuid
-from concurrent.futures import ProcessPoolExecutor, as_completed
-from multiprocessing import cpu_count
 
 import copernicusmarine
 import pandas as pd
 
-from test_availability_data.config import logger
 from test_availability_data.environment_variables import (
     COPERNICUSMARINE_SERVICE_PASSWORD,
     COPERNICUSMARINE_SERVICE_USERNAME,
@@ -96,13 +93,13 @@ class Downloader:
         self.errors = []
 
     def remove_files(self):
-        if os.path.exists(self.temp_file_dir):
-            for filename in os.listdir(self.temp_file_dir):
-                if filename.endswith((".csv", ".nc")):
-                    os.remove(os.path.join(self.temp_file_dir, filename))
+        for filename in os.listdir(self.temp_file_dir):
+            if filename.endswith((".csv", ".nc")):
+                os.remove(os.path.join(self.temp_file_dir, filename))
 
     def _remove_temp_files(self):
-        self.remove_files()
+        if os.path.exists(self.temp_file_dir):
+            self.remove_files()
 
     def run(self) -> dict:
         attempts = self.builder.build()
@@ -134,49 +131,6 @@ class Downloader:
         }
 
 
-def _process_row(
-    row_dict: dict, region_dict: dict, data_dir: str, worker_id: int
-) -> dict:
-    """Module-level function for multiprocessing compatibility."""
-    logger.info(
-        f"Worker {worker_id} processing dataset {row_dict['dataset_id']} "
-        f"with service {row_dict['service_name']}"
-    )
-    if pd.isnull(row_dict.get("last_available_time")):
-        return {
-            "downloadable": False,
-            "last_downloadable_time": pd.NaT,
-            "first_command": None,
-            "first_error": "No last_available_time available",
-            "second_command": None,
-            "second_error": None,
-            "third_command": None,
-            "third_error": None,
-        }
-
-    # Each worker uses its own temp directory to avoid file conflicts
-    worker_data_dir = os.path.join(data_dir, f"worker_{worker_id}")
-    os.makedirs(os.path.join(worker_data_dir, "temp"), exist_ok=True)
-
-    downloader = Downloader(row_dict, region_dict, worker_data_dir)
-    result = downloader.run()
-
-    return {
-        "downloadable": result["downloadable"],
-        "last_downloadable_time": result["last_downloadable_time"],
-        "first_command": result["commands"][0],
-        "first_error": result["errors"][0],
-        "second_command": (
-            result["commands"][1] if len(result["commands"]) > 1 else None
-        ),
-        "second_error": result["errors"][1] if len(result["errors"]) > 1 else None,
-        "third_command": (
-            result["commands"][2] if len(result["commands"]) > 2 else None
-        ),
-        "third_error": result["errors"][2] if len(result["errors"]) > 2 else None,
-    }
-
-
 class DatasetAvailabilityChecker:
     def __init__(
         self,
@@ -193,7 +147,6 @@ class DatasetAvailabilityChecker:
         df = self._assign_regions(df)
         df = self._process_dataframe(df)
         df["id"] = [str(uuid.uuid4()) for _ in range(len(df))]
-        self._cleanup_worker_dirs()
         return df
 
     def _read_input_csv(self) -> pd.DataFrame:
@@ -206,33 +159,37 @@ class DatasetAvailabilityChecker:
         )
         return df
 
-    def _process_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
-        rows = df.to_dict(orient="records")
-        n_workers = min(cpu_count(), len(rows)) or 1
-        results = [None] * len(rows)
-
-        with ProcessPoolExecutor(max_workers=n_workers) as executor:
-            futures = {
-                executor.submit(
-                    _process_row,
-                    row,
-                    self.region_dict,
-                    self.data_dir,
-                    i % n_workers,
-                ): i
-                for i, row in enumerate(rows)
+    def _process_row(self, row: pd.Series) -> dict:
+        if pd.isnull(row["last_available_time"]):
+            return {
+                "downloadable": False,
+                "last_downloadable_time": pd.NaT,
+                "first_command": None,
+                "first_error": "No last_available_time available",
+                "second_command": None,
+                "second_error": None,
+                "third_command": None,
+                "third_error": None,
             }
-            for future in as_completed(futures):
-                idx = futures[future]
-                results[idx] = future.result()
 
-        results_df = pd.DataFrame(results)
-        return pd.concat([df.reset_index(drop=True), results_df], axis=1)
+        downloader = Downloader(row.to_dict(), self.region_dict, self.data_dir)
+        result = downloader.run()
 
-    def _cleanup_worker_dirs(self):
-        """Remove temporary worker directories after processing."""
-        import shutil
+        return {
+            "downloadable": result["downloadable"],
+            "last_downloadable_time": result["last_downloadable_time"],
+            "first_command": result["commands"][0],
+            "first_error": result["errors"][0],
+            "second_command": (
+                result["commands"][1] if len(result["commands"]) > 1 else None
+            ),
+            "second_error": result["errors"][1] if len(result["errors"]) > 1 else None,
+            "third_command": (
+                result["commands"][2] if len(result["commands"]) > 2 else None
+            ),
+            "third_error": result["errors"][2] if len(result["errors"]) > 2 else None,
+        }
 
-        for name in os.listdir(self.data_dir):
-            if name.startswith("worker_"):
-                shutil.rmtree(os.path.join(self.data_dir, name), ignore_errors=True)
+    def _process_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
+        results = df.apply(self._process_row, axis=1, result_type="expand")
+        return pd.concat([df, results], axis=1)

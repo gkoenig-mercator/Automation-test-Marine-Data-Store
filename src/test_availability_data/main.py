@@ -25,7 +25,6 @@ from test_availability_data.extract_datasets_from_describe import (
 from test_availability_data.results_analysis import (
     get_number_of_datasets_downloaded,
 )
-from test_availability_data.script_get_testing import test_get_capabilities
 from test_availability_data.toolbox_wrapper import (
     DatasetAvailabilityChecker,
 )
