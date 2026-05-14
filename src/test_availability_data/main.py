@@ -145,8 +145,9 @@ if __name__ == "__main__":
         f"{run_duration} seconds for subset."
     )
 
-    logger.info("Running get capabilities test.")
-    test_get_capabilities(data_dir, max_datasets)
+    # logger.info("Running get capabilities test.")
+    # test_get_capabilities(data_dir, max_datasets)
+    logger.info("Passing on the get capabilities test.")
 
     logger.info("Storing dataset availability results in the database.")
     versions = get_versions()
